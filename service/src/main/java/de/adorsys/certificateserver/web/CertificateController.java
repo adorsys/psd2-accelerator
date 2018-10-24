@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/cert-generator")
+@RequestMapping("api/cert-generator")
 @Api(value = "Certificate Controller")
 public class CertificateController {
 

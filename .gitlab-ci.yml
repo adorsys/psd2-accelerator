@@ -1,0 +1,76 @@
+stages:
+  - "build"
+  - "package"
+  - "deploy"
+
+variables:
+  OPENSHIFT_NAMESPACE: "psd2-sandbox-dev"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.cache/m2"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
+
+build_service:
+  stage: "build"
+  image: "adorsys/openjdk-build-base:8"
+  script:
+    - mvn -f service/pom.xml -B clean test
+  cache:
+    key: MVN
+    paths:
+      - ".cache/m2"
+
+build_ui:
+  stage: "build"
+  image: "node:8"
+  script:
+    - cd ui
+    - npm ci
+    - npm run build
+  artifacts:
+    name: "ui-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
+    paths:
+      - "ui/dist"
+    expire_in: "1 week"
+  cache:
+    key: NPM
+    paths:
+      - ".cache/npm"
+
+package:
+  stage: package
+  image: "adorsys/openjdk-build-base:8"
+  script:
+    - mvn -f service/pom.xml -B -DskipTests clean package
+  artifacts:
+    name: "sandbox-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
+    paths:
+      - service/target/*.jar
+    expire_in: "1 week"
+  cache:
+    key: MVN
+    paths:
+      - ".cache/m2"
+
+docker_build_only:
+  stage: "deploy"
+  except:
+    - master
+  script:
+    - docker build --pull
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
+      service
+  cache: {}
+
+docker_build_deploy:
+  stage: "deploy"
+  only:
+    - master
+  script:
+    - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
+    - docker build --pull
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
+      service
+    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
+      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox" # tag master as latest, too
+  cache: {}
