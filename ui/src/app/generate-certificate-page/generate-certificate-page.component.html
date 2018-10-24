@@ -1,0 +1,107 @@
+<div class="page">
+    <div class="page-inner">
+      <div class="border">
+        <div class="container">
+          <h1 class="container__title">QWAC-Generator</h1>
+          <h2 class="container__subtitle">Description</h2>
+             <div class="container__text">
+              Generates a QWAC Certificate. To validate the identity of the PSP the TSP needs specific attributes from the PSP. The NCA provides this PSD2 specific attributes in a public register.
+              Besides the NCAID, NCAName and authorization number (PSP identifier) and the Roles of PSP, the TSP requires additional data from the PSP.
+             </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              NCA Name
+            </label>
+            <input type="text" required placeholder="FictNCA">
+          </div>
+
+          <div class="inputfields__input">
+            <label>
+              NCA ID
+            </label>
+            <input type="text" required placeholder="ES-BDE">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Roles of PSP
+            </label>
+            <br>
+            <div class="input__select">
+            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_AS</div>
+            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_PI</div>
+            <div class="inputfields__checkbox"><input type="checkbox"  (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_AI</div>
+            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_IC</div>
+            </div>
+          </div>
+          <div class="inputfields__input">
+            <label>
+              Authorizatrion Number
+            </label>
+            <input type="text" required placeholder="3DFD21">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Country
+            </label>
+            <input type="text" required placeholder="Germany">
+          </div>
+          <div class="inputfields__input">
+            <label>
+              State
+            </label>
+            <input type="text" required placeholder="Bayern">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              City
+            </label>
+            <input type="text" required placeholder="Nürnberg">
+          </div>
+          <div class="inputfields__input">
+            <label>
+              Domain
+            </label>
+            <input type="text" required placeholder="https://www.fymio.de/">
+          </div>
+        </div>
+
+      <div class="inputfields">
+        <div class="inputfields__input">
+          <label>
+            Organization Name
+          </label>
+          <input type="text" required placeholder="Fictional Corporation AG">
+        </div>
+        <div class="inputfields__input">
+          <label>
+            Organization Unit
+          </label>
+          <input type="text" required placeholder="Information Technology">
+        </div>
+      </div>
+
+        <div class="buttons">
+          <button (click)=onClickCancel() type="button" name="decision" value="revoked"
+                  class="buttons btn--cancel">
+            Cancel
+          </button>
+          <button (click)=onClickContinue() type="button" name="decision" value="confirmed"
+                  class="buttons btn--continue">
+            Confirm
+          </button>
+        </div>
+  </div>
+</div>
+</div>
