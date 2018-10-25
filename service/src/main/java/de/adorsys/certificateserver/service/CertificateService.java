@@ -39,15 +39,15 @@ public class CertificateService {
 
     private QCStatement qcStatement(CertificateData cerData) {
         List<RoleOfPSP> roles = new ArrayList<>();
-        if (cerData.isASPSP()) roles.add(RoleOfPSP.PSP_AS);
+        //if (cerData.isASPSP()) roles.add(RoleOfPSP.PSP_AS); // TODO: How does the role ASPSP differ to the others?
         if (cerData.isPISP()) roles.add(RoleOfPSP.PSP_PI);
         if (cerData.isAISP()) roles.add(RoleOfPSP.PSP_AI);
         if (cerData.isPIISP()) roles.add(RoleOfPSP.PSP_IC);
 
         RolesOfPSP rolesOfPSP = new RolesOfPSP(roles.toArray(new RoleOfPSP[0]));
-        // TODO: should the NCAName and NCAId not be extracted of the Issuer?
-        NCAName nCAName = new NCAName(cerData.getNcaName());
-        NCAId nCAId = new NCAId(cerData.getNcaId());
+        // TODO: extract NCAName and NCAId from Issuer instead of hard-coded Strings?
+        NCAName nCAName = new NCAName("Fictional National Authority");
+        NCAId nCAId = new NCAId("DE-FICTNCA");
         ASN1Encodable qcStatementInfo = Psd2Utils.psd2QcType(rolesOfPSP, nCAName, nCAId);
 
         return new QCStatement(PSD2QCObjectIdentifiers.id_etsi_psd2_qcStatement, qcStatementInfo);
@@ -69,12 +69,15 @@ public class CertificateService {
         Integer serialNumber = rand.nextInt(Integer.MAX_VALUE);
 
         X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
         builder.addRDN(BCStyle.O, cerData.getOrganizationName());
-        builder.addRDN(BCStyle.OU, cerData.getOrganizationUnit());
-        builder.addRDN(BCStyle.CN, cerData.getCountryName());
-        builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
-        builder.addRDN(BCStyle.L, cerData.getLocalityName());
+        if (cerData.getDomainComponent() != null) builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
+        if (cerData.getOrganizationUnit() != null) builder.addRDN(BCStyle.OU, cerData.getOrganizationUnit());
+        if (cerData.getCountryName() != null) builder.addRDN(BCStyle.CN, cerData.getCountryName());
+        if (cerData.getStateOrProvinceName() != null) builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
+        if (cerData.getLocalityName() != null) builder.addRDN(BCStyle.L, cerData.getLocalityName());
+
+        // Organization-Identifier should be something like: PSDDE-FICTNCA-820B3A; Authorization Number is just the last part
+        // TODO: Generate method which is building the organization_identifier with the values we have
         builder.addRDN(BCStyle.ORGANIZATION_IDENTIFIER, cerData.getAuthorizationNumber());
 
         return new SubjectData(keyPairSubject.getPrivate(), keyPairSubject.getPublic(), builder.build(), serialNumber, startDate, endDate);

@@ -3,77 +3,49 @@ package de.adorsys.certificateserver.domain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import javax.validation.constraints.Size;
 
 @Data
 @ApiModel(description = "Certificate Data", value = "CertificateData")
 public class CertificateData {
 
-    @ApiModelProperty(value = "domainComponent", required = true, example = "public.corporation.de")
-    @NotNull
-    private String domainComponent;
-
-    @ApiModelProperty(value = "organizationName", required = true, example = "Fictional Corporation AG")
-    @NotNull
-    private String organizationName;
-
-    @ApiModelProperty(value = "organizationUnit", required = true, example = "Information Technology")
-    @NotNull
-    private String organizationUnit;
-
-    @ApiModelProperty(value = "localityName", required = true, example = "Nuremberg")
-    @NotNull
-    private String localityName;
-
-    @ApiModelProperty(value = "stateOrProvinceName", required = true, example = "Bayern")
-    @NotNull
-    private String stateOrProvinceName;
-
-    @ApiModelProperty(value = "countryName", required = true, example = "Germany")
-    @NotNull
-    private String countryName;
-
-    // TODO Discussion: to be set from outside or hard-coded?
-    @ApiModelProperty(value = "validity", required = true, example = "365")
-    @NotNull
-    private int validity;
-
-    @ApiModelProperty(value = "pISP", required = true, example = "true")
-    private boolean pISP;
-
-    @ApiModelProperty(value = "aISP", required = true, example = "true")
-    private boolean aISP;
-
-    @ApiModelProperty(value = "pIISP", required = true, example = "true")
-    private boolean pIISP;
-
-    @ApiModelProperty(value = "aSPSP", required = true, example = "true")
-    private boolean aSPSP;
-
-    // TODO should be not part of this request (maybe within the header for authentication?)
-    // not part of QCStatement, nor X.509 Certificate
-    @ApiModelProperty(value = "authorizationNumber", required = true, example = "87B2AC")
+    @ApiModelProperty(required = true, example = "87B2AC", notes = "Available in the Public Register of the appropriate National Competent Authority; ")
     @NotNull
     private String authorizationNumber;
 
-    // TODO remove from model class; set hard-coded
-    /* The NCAName shall be plain text name in English provided by the NCA itself for purpose of identification in certificates.
-     */
-    @ApiModelProperty(value = "ncaName", required = true, example = "FictNCA")
-    @NotNull
-    private String ncaName;
+    @ApiModelProperty(required = true, example = "true", notes = "Account Information Service Provider")
+    private boolean aISP;
 
-    // TODO remove from model class; set hard-coded
-    /* The NCAId shall contain information using the following structure in the presented order:
-         2 character ISO 3166 countryName code representing the NCA countryName;
-         hyphen-minus "-"; and
-         2-8 character NCA identifier (A-Z uppercase only, no separator).
-     * The NCAId shall be unique and provided by the NCA itself for purpose of identification in certificates.
-     */
-    @ApiModelProperty(value = "ncaId", required = true, example = "DE-FICTNCA")
+    @ApiModelProperty(required = true, example = "true", notes = "Payment Initiation Service Provider")
+    private boolean pISP;
+
+    @ApiModelProperty(required = true, example = "true", notes = "Payment Instrument Issuer Service Provider")
+    private boolean pIISP;
+
+    @ApiModelProperty(required = true, example = "Fictional Corporation AG", notes = "Registered name of your corporation", position = 1)
     @NotNull
-    private String ncaId;
+    private String organizationName;
+
+    @ApiModelProperty(example = "Information Technology", notes = "", position = 2)
+    private String organizationUnit;
+
+    @ApiModelProperty(example = "public.corporation.de", notes = "Domain of your corporation", position = 2)
+    private String domainComponent;
+
+    @ApiModelProperty(example = "Nuremberg", notes = "Name of the city of your corporation headquarter", position = 2)
+    private String localityName;
+
+    @ApiModelProperty(example = "Bayern", notes = "Name of the state/province of your corporation headquarter", position = 2)
+    private String stateOrProvinceName;
+
+    @ApiModelProperty(example = "Germany", notes = "Name of the country your corporation is registered", position = 2)
+    private String countryName;
+
+    //TODO default value?
+    //TODO min/max validation does not work
+    @ApiModelProperty(example = "365", notes = "Number of days the certificate is valid", position = 2)
+    @Size(min = 1, max = 365)
+    private int validity;
 }
