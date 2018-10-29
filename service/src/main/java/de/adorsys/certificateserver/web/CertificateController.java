@@ -5,12 +5,11 @@ import de.adorsys.certificateserver.domain.CertificateResponse;
 import de.adorsys.certificateserver.service.CertificateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,13 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "Certificate Controller")
 public class CertificateController {
 
-    @Autowired
     private CertificateService cerService;
 
-    @ApiOperation(value = "Returns Base 64 encoded Certificate", response = CertificateResponse.class)
-    @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity add(@RequestBody CertificateData certData)  {
+    public CertificateController(CertificateService cerService) {
+        this.cerService = cerService;
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(cerService.newCertificate(certData));
+    @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at " +
+            "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
+    @PostMapping
+    public ResponseEntity<CertificateResponse> createCert(@RequestBody CertificateData certData) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(cerService.newCertificate(certData));
     }
 }
