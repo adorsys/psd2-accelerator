@@ -6,13 +6,15 @@ import { AppComponent } from './app.component';
 import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
 import { AppRoutingModule } from './app-routing.module';
 import {RouterModule} from '@angular/router';
+import { GenerateCertificateSuccessComponent } from './generate-certificate-success/generate-certificate-success.component';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    GenerateCertificatePageComponent
+    GenerateCertificatePageComponent,
+    GenerateCertificateSuccessComponent
   ],
   imports: [
     BrowserModule,

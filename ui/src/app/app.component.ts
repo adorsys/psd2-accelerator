@@ -7,5 +7,6 @@ import {HttpClient} from '@angular/common/http';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  title = 'psd2-certificate-ui';
   constructor(private http: HttpClient) {}
 }

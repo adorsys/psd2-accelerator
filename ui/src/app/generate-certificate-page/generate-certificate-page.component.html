@@ -10,21 +10,6 @@
              </div>
         </div>
 
-        <div class="inputfields">
-          <div class="inputfields__input">
-            <label>
-              NCA Name
-            </label>
-            <input type="text" required placeholder="FictNCA">
-          </div>
-
-          <div class="inputfields__input">
-            <label>
-              NCA ID
-            </label>
-            <input type="text" required placeholder="ES-BDE">
-          </div>
-        </div>
 
         <div class="inputfields">
           <div class="inputfields__input">
@@ -33,17 +18,16 @@
             </label>
             <br>
             <div class="input__select">
-            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_AS</div>
-            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_PI</div>
-            <div class="inputfields__checkbox"><input type="checkbox"  (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_AI</div>
-            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectAccount(account)" [checked]="isAccountSelected(account)">PSP_IC</div>
+            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectPisp()" [checked]="certData.pisp">PSP_PI</div>
+            <div class="inputfields__checkbox"><input type="checkbox"  (change)="onSelectAisp()" [checked]="certData.aisp">PSP_AI</div>
+            <div class="inputfields__checkbox"><input type="checkbox" (change)="onSelectPiisp()" [checked]="certData.piisp">PSP_IC</div>
             </div>
           </div>
           <div class="inputfields__input">
             <label>
               Authorizatrion Number
             </label>
-            <input type="text" required placeholder="3DFD21">
+            <input type="text" required [(ngModel)]="certData.authorizationNumber">
           </div>
         </div>
 
@@ -52,13 +36,13 @@
             <label>
               Country
             </label>
-            <input type="text" required placeholder="Germany">
+            <input type="text" required [(ngModel)]="certData.countryName">
           </div>
           <div class="inputfields__input">
             <label>
               State
             </label>
-            <input type="text" required placeholder="Bayern">
+            <input type="text" required [(ngModel)]="certData.stateOrProvinceName">
           </div>
         </div>
 
@@ -67,13 +51,13 @@
             <label>
               City
             </label>
-            <input type="text" required placeholder="Nürnberg">
+            <input type="text" required [(ngModel)]="certData.localityName">
           </div>
           <div class="inputfields__input">
             <label>
               Domain
             </label>
-            <input type="text" required placeholder="https://www.fymio.de/">
+            <input type="text" required [(ngModel)]="certData.domainComponent">
           </div>
         </div>
 
@@ -82,15 +66,24 @@
           <label>
             Organization Name
           </label>
-          <input type="text" required placeholder="Fictional Corporation AG">
+          <input type="text" required [(ngModel)]="certData.organizationName">
         </div>
         <div class="inputfields__input">
           <label>
             Organization Unit
           </label>
-          <input type="text" required placeholder="Information Technology">
+          <input type="text" required [(ngModel)]="certData.organizationUnit">
         </div>
       </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Validity
+            </label>
+            <input type="text" required [(ngModel)]="certData.validity">
+          </div>
+        </div>
 
         <div class="buttons">
           <button (click)=onClickCancel() type="button" name="decision" value="revoked"

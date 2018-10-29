@@ -131,8 +131,7 @@ public class CertificateService {
         try (StringWriter writer = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
             pemWriter.writeObject(obj);
             pemWriter.flush();
-            String response = writer.toString();
-            return response.replaceAll("\n", "").replaceAll("\r", "");
+            return writer.toString();
         } catch (IOException e) {
             throw new CertificateException("Could not export certificate", e);
         }
