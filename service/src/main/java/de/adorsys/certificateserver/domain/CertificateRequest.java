@@ -2,14 +2,19 @@ package de.adorsys.certificateserver.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @ApiModel(description = "Certificate Data", value = "CertificateRequest")
 public class CertificateRequest {
 
@@ -18,13 +23,13 @@ public class CertificateRequest {
     private String authorizationNumber;
 
     @ApiModelProperty(required = true, example = "true", notes = "Account Information Service Provider")
-    private boolean aISP;
+    private boolean aisp;
 
     @ApiModelProperty(required = true, example = "true", notes = "Payment Initiation Service Provider")
-    private boolean pISP;
+    private boolean pisp;
 
     @ApiModelProperty(required = true, example = "true", notes = "Payment Instrument Issuer Service Provider")
-    private boolean pIISP;
+    private boolean piisp;
 
     @ApiModelProperty(required = true, example = "Fictional Corporation AG", notes = "Registered name of your corporation", position = 1)
     @NotNull
@@ -45,10 +50,10 @@ public class CertificateRequest {
     @ApiModelProperty(example = "Germany", notes = "Name of the country your corporation is registered", position = 2)
     private String countryName;
 
-    //TODO default value?
-    //TODO min/max validation does not work
     @ApiModelProperty(example = "365", notes = "Number of days the certificate is valid", position = 2)
-    @Size(min = 1, max = 365)
-    private int validity;
+    @Min(1)
+    @Max(365)
+    @Builder.Default
+    private int validity = 365;
 
 }

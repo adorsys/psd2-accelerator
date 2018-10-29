@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("api/cert-generator")
 @Api(value = "Certificate Controller")
@@ -26,7 +28,7 @@ public class CertificateController {
     @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at " +
             "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
     @PostMapping
-    public ResponseEntity<CertificateResponse> createCert(@RequestBody CertificateRequest certData) {
+    public ResponseEntity<CertificateResponse> createCert(@Valid @RequestBody CertificateRequest certData) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(cerService.newCertificate(certData));
     }
