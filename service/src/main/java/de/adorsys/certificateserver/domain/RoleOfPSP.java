@@ -9,6 +9,7 @@ public class RoleOfPSP extends DERSequence {
     public static final RoleOfPSP PSP_AI = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ai, RoleOfPspName.PSP_AI);
     public static final RoleOfPSP PSP_IC = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ic, RoleOfPspName.PSP_IC);
 
+
     private RoleOfPSP(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
         super(new ASN1Encodable[]{roleOfPspOid, roleOfPspName});
     }

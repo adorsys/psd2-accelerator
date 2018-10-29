@@ -1,6 +1,6 @@
 package de.adorsys.certificateserver.web;
 
-import de.adorsys.certificateserver.domain.CertificateData;
+import de.adorsys.certificateserver.domain.CertificateRequest;
 import de.adorsys.certificateserver.domain.CertificateResponse;
 import de.adorsys.certificateserver.service.CertificateService;
 import io.swagger.annotations.Api;
@@ -26,7 +26,7 @@ public class CertificateController {
     @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at " +
             "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
     @PostMapping
-    public ResponseEntity<CertificateResponse> createCert(@RequestBody CertificateData certData) {
+    public ResponseEntity<CertificateResponse> createCert(@RequestBody CertificateRequest certData) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(cerService.newCertificate(certData));
     }

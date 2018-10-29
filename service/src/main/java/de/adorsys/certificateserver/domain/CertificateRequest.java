@@ -2,14 +2,16 @@ package de.adorsys.certificateserver.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-@ApiModel(description = "Certificate Data", value = "CertificateData")
-public class CertificateData {
+@Builder
+@ApiModel(description = "Certificate Data", value = "CertificateRequest")
+public class CertificateRequest {
 
     @ApiModelProperty(required = true, example = "87B2AC", notes = "Available in the Public Register of the appropriate National Competent Authority; ")
     @NotNull
@@ -48,4 +50,5 @@ public class CertificateData {
     @ApiModelProperty(example = "365", notes = "Number of days the certificate is valid", position = 2)
     @Size(min = 1, max = 365)
     private int validity;
+
 }
