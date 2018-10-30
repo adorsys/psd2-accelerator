@@ -207,9 +207,7 @@ public class CertificateService {
         if (cerData.getStateOrProvinceName() != null) builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
         if (cerData.getLocalityName() != null) builder.addRDN(BCStyle.L, cerData.getLocalityName());
 
-        // Organization-Identifier should be something like: PSDDE-FICTNCA-820B3A; Authorization Number is just the last part
-        // TODO: Generate method which is building the organization_identifier with the values we have
-        builder.addRDN(BCStyle.ORGANIZATION_IDENTIFIER, cerData.getAuthorizationNumber());
+        builder.addRDN(BCStyle.ORGANIZATION_IDENTIFIER, "PSD" + getNcaIdFromIssuerData() + "-" + cerData.getAuthorizationNumber());
 
         Random rand = new Random();
         Integer serialNumber = rand.nextInt(Integer.MAX_VALUE);
