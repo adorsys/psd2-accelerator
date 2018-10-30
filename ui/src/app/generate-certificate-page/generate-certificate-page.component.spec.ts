@@ -4,12 +4,12 @@ import { GenerateCertificatePageComponent } from './generate-certificate-page.co
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { CertificateData } from '../../models/certificateData';
+import { CertificateRequest } from '../../models/certificateRequest';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;
   let fixture: ComponentFixture<GenerateCertificatePageComponent>;
-  let certData: CertificateData;
+  let certData: CertificateRequest;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

@@ -11,17 +11,17 @@
  */
 
 
+import { PspRole } from './PspRole';
+
 /**
  * Certificate Data
  */
-export interface CertificateData {
-    aisp?: boolean;
+export interface CertificateRequest {
+    roles: Array<PspRole>;
     /**
-     * Available in the Public Register of the appropriate National Competent Authority; 
+     * Available in the Public Register of the appropriate National Competent Authority;
      */
     authorizationNumber: string;
-    piisp?: boolean;
-    pisp?: boolean;
     /**
      * Registered name of your corporation
      */

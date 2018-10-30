@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient} from '@angular/common/http';
 import { CertificateResponse } from '../models/certificateResponse';
-import { CertificateData } from '../models/certificateData';
+import { CertificateRequest } from '../models/certificateRequest';
 
 
 @Injectable({
@@ -14,7 +14,7 @@ export class CertificateService {
   constructor(private httpClient: HttpClient) {}
 
 
-  createCertificate(certData: CertificateData): Observable<CertificateResponse> {
+  createCertificate(certData: CertificateRequest): Observable<CertificateResponse> {
     return this.httpClient.post<CertificateResponse>(this.CREATE_CERT_URL, certData);
   }
 

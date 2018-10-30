@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CertificateService } from '../certificate.service';
-import {CertificateData} from '../../models/certificateData';
+import { CertificateRequest } from '../../models/certificateRequest';
+import { PspRole } from '../../models/PspRole';
 
 @Component({
   selector: 'app-generate-certificate-page',
@@ -9,16 +10,15 @@ import {CertificateData} from '../../models/certificateData';
   styleUrls: ['./generate-certificate-page.component.css']
 })
 export class GenerateCertificatePageComponent implements OnInit {
-  certData: CertificateData;
+  certData: CertificateRequest;
+  pspRolesKeys = Object.keys(PspRole);
 
   constructor(private router: Router, private route: ActivatedRoute, private certService: CertificateService) {
   }
 
   ngOnInit() {
     this.certData = {
-      aisp: false,
-      piisp: false,
-      pisp: false,
+      roles: [PspRole.PIS],
       authorizationNumber: '87B2AC',
       countryName: 'Germany',
       domainComponent: 'public.corporation.de',
@@ -43,18 +43,18 @@ export class GenerateCertificatePageComponent implements OnInit {
     );
   }
 
-  onSelectPiisp() {
-    this.certData.piisp = !this.certData.piisp;
-  }
-
-  onSelectAisp() {
-    this.certData.aisp = !this.certData.aisp;
-  }
-
-  onSelectPisp() {
-    this.certData.pisp = !this.certData.pisp;
-  }
-
   onClickCancel() {
+  }
+
+  onSelectPspRole(pspRole: string) {
+    if (this.isPspRoleSelected(pspRole)) {
+      this.certData.roles = this.certData.roles.filter(psp => psp !== PspRole[pspRole]);
+    } else {
+      this.certData.roles.push(PspRole[pspRole]);
+    }
+  }
+
+  isPspRoleSelected(pspRole: string): boolean {
+    return this.certData.roles.includes(PspRole[pspRole]);
   }
 }
