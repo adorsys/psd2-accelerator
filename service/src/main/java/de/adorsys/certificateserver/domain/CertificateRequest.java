@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -22,14 +25,12 @@ public class CertificateRequest {
     @NotNull
     private String authorizationNumber;
 
-    @ApiModelProperty(required = true, example = "true", notes = "Account Information Service Provider")
-    private boolean aisp;
-
-    @ApiModelProperty(required = true, example = "true", notes = "Payment Initiation Service Provider")
-    private boolean pisp;
-
-    @ApiModelProperty(required = true, example = "true", notes = "Payment Instrument Issuer Service Provider")
-    private boolean piisp;
+    // TODO infer from enum?
+    @ApiModelProperty(required = true, notes = "Roles of the TPP", position = 1)
+    @Size(min = 1, max = 3)
+    @NotNull
+    @Builder.Default
+    private List<PspRole> roles = new ArrayList<>();
 
     @ApiModelProperty(required = true, example = "Fictional Corporation AG", notes = "Registered name of your corporation", position = 1)
     @NotNull

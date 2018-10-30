@@ -3,7 +3,9 @@ package de.adorsys.certificateserver.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.certificateserver.domain.CertificateRequest;
 import de.adorsys.certificateserver.domain.CertificateResponse;
+import de.adorsys.certificateserver.domain.PspRole;
 import de.adorsys.certificateserver.service.CertificateService;
+import org.assertj.core.util.Sets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyObject;
@@ -51,6 +56,7 @@ public class CertificateControllerTest {
     CertificateRequest certificateRequest = CertificateRequest.builder()
                                               .authorizationNumber("87B2AC")
                                               .organizationName("Fictional Corporation AG")
+                                              .roles(Collections.singletonList(PspRole.AISP))
                                               .build();
 
     mockMvc.perform(

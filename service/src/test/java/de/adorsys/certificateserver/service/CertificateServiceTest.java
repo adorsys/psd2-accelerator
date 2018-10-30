@@ -27,7 +27,7 @@ public class CertificateServiceTest {
     @Test
     public void exportPrivateKeyToStringResultsInSingleLinePK() {
         PrivateKey key = CertificateService.getKeyFromClassPath("MyRootCA.key");
-        String result = CertificateService.exportToString(key);
+        String result = CertificateService.exportToString(key).trim();
         assertTrue(result.startsWith("-----BEGIN RSA PRIVATE KEY-----"));
         assertTrue(result.endsWith("-----END RSA PRIVATE KEY-----"));
     }
@@ -35,7 +35,7 @@ public class CertificateServiceTest {
     @Test
     public void exportCertificateToStringResultsInSingleLineCertificate() {
         X509Certificate cert = CertificateService.getCertificateFromClassPath("MyRootCA.pem");
-        String result = CertificateService.exportToString(cert);
+        String result = CertificateService.exportToString(cert).trim();
         System.out.println(result);
         assertTrue(result.startsWith("-----BEGIN CERTIFICATE-----"));
         assertTrue(result.endsWith("-----END CERTIFICATE-----"));

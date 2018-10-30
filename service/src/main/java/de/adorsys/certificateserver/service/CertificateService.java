@@ -5,7 +5,9 @@ import de.adorsys.certificateserver.CertificateException;
 import de.adorsys.certificateserver.domain.*;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -34,7 +36,9 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -244,5 +248,63 @@ public class CertificateService {
         issuerData.setPrivateKey(privateKey);
 
         return issuerData;
+    }
+
+    private static class RolesOfPSP extends DERSequence {
+
+        public static RolesOfPSP fromCertificateRequest(CertificateRequest certificateRequest) {
+            List<RoleOfPSP> roles = new ArrayList<>();
+
+            if (certificateRequest.getRoles().contains(PspRole.AISP)) {
+                roles.add(RoleOfPSP.PSP_AI);
+            }
+
+            if (certificateRequest.getRoles().contains(PspRole.PISP)) {
+                roles.add(RoleOfPSP.PSP_PI);
+            }
+
+            if (certificateRequest.getRoles().contains(PspRole.PIISP)) {
+                roles.add(RoleOfPSP.PSP_IC);
+            }
+
+            return new RolesOfPSP(roles.toArray(new RoleOfPSP[]{}));
+        }
+
+        public RolesOfPSP(RoleOfPSP[] array) {
+            super(array);
+        }
+    }
+
+    private static class RoleOfPSP extends DERSequence {
+        public static final RoleOfPSP PSP_PI = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_pi, RoleOfPspName.PSP_PI);
+        public static final RoleOfPSP PSP_AI = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ai, RoleOfPspName.PSP_AI);
+        public static final RoleOfPSP PSP_IC = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ic, RoleOfPspName.PSP_IC);
+
+        private RoleOfPSP(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
+            super(new ASN1Encodable[]{roleOfPspOid, roleOfPspName});
+        }
+    }
+
+    private static class RoleOfPspName extends DERUTF8String {
+        public static final RoleOfPspName PSP_AS = new RoleOfPspName("PSP_AS");
+        public static final RoleOfPspName PSP_PI = new RoleOfPspName("PSP_PI");
+        public static final RoleOfPspName PSP_AI = new RoleOfPspName("PSP_AI");
+        public static final RoleOfPspName PSP_IC = new RoleOfPspName("PSP_IC");
+
+        private RoleOfPspName(String string) {
+            super(string);
+        }
+    }
+
+    private static class RoleOfPspOid extends ASN1ObjectIdentifier {
+        public static final ASN1ObjectIdentifier etsi_psd2_roles = new ASN1ObjectIdentifier("0.4.0.19495.1");
+        public static final RoleOfPspOid id_psd2_role_psp_as = new RoleOfPspOid(etsi_psd2_roles.branch("1"));
+        public static final RoleOfPspOid id_psd2_role_psp_pi = new RoleOfPspOid(etsi_psd2_roles.branch("2"));
+        public static final RoleOfPspOid id_psd2_role_psp_ai = new RoleOfPspOid(etsi_psd2_roles.branch("3"));
+        public static final RoleOfPspOid id_psd2_role_psp_ic = new RoleOfPspOid(etsi_psd2_roles.branch("4"));
+
+        public RoleOfPspOid(ASN1ObjectIdentifier identifier) {
+            super(identifier.getId());
+        }
     }
 }
