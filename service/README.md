@@ -25,11 +25,11 @@ Further Information:
 In order to start the SpringBoot Application, the following steps need to be fulfilled.
     
 ```sh 
-$ git clone https://git.adorsys.de/####.git
-$ cd certificate-service
+$ git clone https://git.adorsys.de/psd2/sandbox.git
+$ cd sandbox/service
 $ mvn clean install
-# Start Application
+$ mvn spring-boot:run
 ```
 
-* Services will be available at http://localhost:8080/api/v1
+* Services will be available at http://localhost:8080/api/
 * Swagger-Documentation is provided at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)

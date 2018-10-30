@@ -1,6 +1,29 @@
-# Psd2CertificateUi
+# Ui
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.2.2.
+
+## Getting Started
+1.) In order to start the SpringBoot Application, the following steps need to be fulfilled.
+    
+```sh 
+$ git clone https://git.adorsys.de/psd2/sandbox.git
+$ cd sandbox/service
+$ mvn clean install
+$ mvn spring-boot:run
+```
+
+2.) Start the UI and navigate to http://localhost:4200/
+```sh 
+$ cd ../ui
+$ ng serve
+```
+
+- Navigate to http://localhost:4200/ 
+- Confirm the Certificate with click on the "Confirm" button
+- You get redirected to the GenerateCertificateSuccess Component
+- Click the "Certificate and Private Key" URL and download the Zip-File. (It should contain the Certificate and the Private Key)
+
+For detailed information about backend service see [README.md](https://git.adorsys.de/psd2/sandbox/blob/master/service/README.md)
 
 ## Development server
 
