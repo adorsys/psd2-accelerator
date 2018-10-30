@@ -13,93 +13,102 @@
       </div>
 
 
-      <div class="inputfields">
-        <div class="inputfields__input">
-          <label>
-            Roles of PSP
-          </label>
-          <ul class="checkbox">
-            <li *ngFor="let pspRole of pspRolesKeys">
-              <label>
-                <input name="{{pspRole}}" type="checkbox" (change)="onSelectPspRole(pspRole)"
-                       [checked]="isPspRoleSelected(pspRole)">
-                {{pspRole}}
-              </label>
+      <form #certForm="ngForm" (ngSubmit)="onClickContinue()">
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Roles of PSP
+            </label>
+            <ul class="checkbox">
+              <li *ngFor="let pspRole of pspRolesKeys">
+                <label>
+                  <input name="{{pspRole}}" type="checkbox" (change)="onSelectPspRole(pspRole)"
+                         [checked]="isPspRoleSelected(pspRole)">
+                  {{pspRole}}
+                </label>
+              </li>
+            </ul>
+          </div>
+          <div class="inputfields__input">
+            <label>
+              Authorizatrion Number
+            </label>
+            <input type="text" name="authorizationNumber" required [(ngModel)]="certData.authorizationNumber">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Country
+            </label>
+            <input type="text" name="countryName" [(ngModel)]="certData.countryName">
+          </div>
+          <div class="inputfields__input">
+            <label>
+              State
+            </label>
+            <input type="text" name="stateOrProvinceName" [(ngModel)]="certData.stateOrProvinceName">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              City
+            </label>
+            <input type="text" name="localityName" [(ngModel)]="certData.localityName">
+          </div>
+          <div class="inputfields__input">
+            <label>
+              Domain
+            </label>
+            <input type="text" name="domainComponent" [(ngModel)]="certData.domainComponent">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Organization Name
+            </label>
+            <input type="text" name="organizationName" required [(ngModel)]="certData.organizationName">
+          </div>
+          <div class="inputfields__input">
+            <label>
+              Organization Unit
+            </label>
+            <input type="text" name="organizationUnit" [(ngModel)]="certData.organizationUnit">
+          </div>
+        </div>
+
+        <div class="inputfields">
+          <div class="inputfields__input">
+            <label>
+              Validity
+            </label>
+            <input type="text" name="validity" [(ngModel)]="certData.validity">
+          </div>
+        </div>
+        <div class="error" *ngIf="error">
+          <ul>
+            <li *ngFor="let error of error.error.errors">
+              {{error.field}}: {{error.defaultMessage}}
             </li>
           </ul>
         </div>
-        <div class="inputfields__input">
-          <label>
-            Authorizatrion Number
-          </label>
-          <input type="text" required [(ngModel)]="certData.authorizationNumber">
-        </div>
-      </div>
 
-      <div class="inputfields">
-        <div class="inputfields__input">
-          <label>
-            Country
-          </label>
-          <input type="text" [(ngModel)]="certData.countryName">
+        <div class="buttons">
+          <button (click)=onClickCancel() type="button" name="decision" value="revoked"
+                  class="buttons btn--cancel">
+            Cancel
+          </button>
+          <button type="submit" [disabled]=certForm.invalid class="buttons btn--continue">
+            Confirm
+          </button>
         </div>
-        <div class="inputfields__input">
-          <label>
-            State
-          </label>
-          <input type="text" [(ngModel)]="certData.stateOrProvinceName">
-        </div>
-      </div>
 
-      <div class="inputfields">
-        <div class="inputfields__input">
-          <label>
-            City
-          </label>
-          <input type="text" [(ngModel)]="certData.localityName">
-        </div>
-        <div class="inputfields__input">
-          <label>
-            Domain
-          </label>
-          <input type="text" [(ngModel)]="certData.domainComponent">
-        </div>
-      </div>
-
-      <div class="inputfields">
-        <div class="inputfields__input">
-          <label>
-            Organization Name
-          </label>
-          <input type="text" required [(ngModel)]="certData.organizationName">
-        </div>
-        <div class="inputfields__input">
-          <label>
-            Organization Unit
-          </label>
-          <input type="text" [(ngModel)]="certData.organizationUnit">
-        </div>
-      </div>
-
-      <div class="inputfields">
-        <div class="inputfields__input">
-          <label>
-            Validity
-          </label>
-          <input type="text" [(ngModel)]="certData.validity">
-        </div>
-      </div>
-
-      <div class="buttons">
-        <button (click)=onClickCancel() type="button" name="decision" value="revoked"
-                class="buttons btn--cancel">
-          Cancel
-        </button>
-        <button (click)=onClickContinue() type="button" name="decision" value="confirmed"
-                class="buttons btn--continue">
-          Confirm
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 </div>

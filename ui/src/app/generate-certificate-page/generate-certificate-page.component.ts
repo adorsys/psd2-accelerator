@@ -12,6 +12,7 @@ import { PspRole } from '../../models/PspRole';
 export class GenerateCertificatePageComponent implements OnInit {
   certData: CertificateRequest;
   pspRolesKeys = Object.keys(PspRole);
+  error: any;
 
   constructor(private router: Router, private route: ActivatedRoute, private certService: CertificateService) {
   }
@@ -33,12 +34,12 @@ export class GenerateCertificatePageComponent implements OnInit {
   onClickContinue() {
     this.certService.createCertificate(this.certData).subscribe(
       data => {
+        this.error = undefined;
         this.certService.saveCertResponse(data);
         this.router.navigate(['success']);
       },
-      // TODO Refactoring
       error => {
-        alert(error.message);
+        this.error = error;
       }
     );
   }
