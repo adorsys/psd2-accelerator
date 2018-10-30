@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CertificateRequest } from '../../models/certificateRequest';
+import { PspRole } from '../../models/PspRole';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;
@@ -24,9 +25,7 @@ describe('GenerateCertificatePageComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     certData = {
-      aisp: false,
-      piisp: false,
-      pisp: false,
+      roles: [PspRole.PIS],
       authorizationNumber: '87B2AC',
       countryName: 'Germany',
       domainComponent: 'public.corporation.de',
@@ -42,14 +41,14 @@ describe('GenerateCertificatePageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should set Aisp Role to true', () => {
-    component.onSelectAisp();
-    expect(component.certData.aisp).toBe(true);
+  it('should add AIS role', () => {
+    component.onSelectPspRole('ais');
+    expect(component.certData.roles.includes(PspRole['ais'])).toBe(true);
   });
 
-  it('should set Aisp Role to false', () => {
-    component.certData.aisp = true;
-    component.onSelectAisp();
-    expect(component.certData.aisp).toBe(false);
+  it('should remove AIS role', () => {
+    component.onSelectPspRole('ais');
+    component.onSelectPspRole('ais');
+    expect(component.certData.roles.includes(PspRole['ais'])).toBe(false);
   });
 });

@@ -14,19 +14,18 @@ describe('GenerateCertificateSuccessComponent', () => {
     privateKey: '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
     keyId: '1612748784',
     algorithm: 'SHA256WITHRSA'
-  } ;
+  };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       providers: [CertificateService],
       imports: [HttpClientTestingModule],
-      declarations: [ GenerateCertificateSuccessComponent ]
+      declarations: [GenerateCertificateSuccessComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
-
     fixture = TestBed.createComponent(GenerateCertificateSuccessComponent);
     component = fixture.componentInstance;
     certService = TestBed.get(CertificateService);
