@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { GenerateCertificatePageComponent } from './generate-certificate-page.component';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -41,14 +40,20 @@ describe('GenerateCertificatePageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should add AIS role', () => {
-    component.onSelectPspRole('ais');
-    expect(component.certData.roles.includes(PspRole['ais'])).toBe(true);
+  it('should add a new role', () => {
+    component.onSelectPspRole('AIS');
+    expect(component.certData.roles.includes(PspRole['AIS'])).toBe(true);
   });
 
-  it('should remove AIS role', () => {
-    component.onSelectPspRole('ais');
-    component.onSelectPspRole('ais');
-    expect(component.certData.roles.includes(PspRole['ais'])).toBe(false);
+  it('should remove a role', () => {
+    const role = 'AIS';
+    component.onSelectPspRole(role);
+    component.onSelectPspRole(role);
+    expect(component.certData.roles.includes(PspRole[role])).toBe(false);
+  });
+
+  it('should check for current roles', () => {
+    expect(component.isPspRoleSelected('PIS')).toBe(true);
+    expect(component.isPspRoleSelected('AIS')).toBe(false);
   });
 });

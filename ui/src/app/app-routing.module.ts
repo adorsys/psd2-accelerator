@@ -3,7 +3,6 @@ import { GenerateCertificatePageComponent } from './generate-certificate-page/ge
 import { RouterModule, Routes } from '@angular/router';
 import { GenerateCertificateSuccessComponent } from './generate-certificate-success/generate-certificate-success.component';
 
-
 const routes: Routes = [
   {path: '', component: GenerateCertificatePageComponent}, // home
   {path: 'success', component: GenerateCertificateSuccessComponent},
