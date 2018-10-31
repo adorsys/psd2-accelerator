@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CertificateRequest } from '../../models/certificateRequest';
-import { PspRole } from '../../models/PspRole';
+import { PspRole } from '../../models/pspRole';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;

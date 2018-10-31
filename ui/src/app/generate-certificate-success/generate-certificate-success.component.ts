@@ -11,13 +11,15 @@ import JSZip from 'jszip';
 })
 export class GenerateCertificateSuccessComponent implements OnInit {
 
-  constructor(private certService: CertificateService, private sanitizer: DomSanitizer) { }
   certResponse: CertificateResponse;
-  downloadCertandKeyUrl: SafeResourceUrl;
+  downloadCertAndKeyUrl: SafeResourceUrl;
+
+  constructor(private certService: CertificateService, private sanitizer: DomSanitizer) { }
+
   static generateZipFile(certBlob, keyBlob): Promise<any> {
     const zip = new JSZip();
-    zip.file('Certificate.txt', certBlob);
-    zip.file('PrivateKey.txt', keyBlob);
+    zip.file('certificate.pem', certBlob);
+    zip.file('private.key', keyBlob);
     return zip.generateAsync({type: 'blob'});
   }
 
@@ -30,7 +32,7 @@ export class GenerateCertificateSuccessComponent implements OnInit {
     const blobCert = new Blob([this.certResponse.encodedCert], {type: 'text/plain'});
     const blobKey = new Blob([this.certResponse.privateKey], {type: 'text/plain'});
     GenerateCertificateSuccessComponent.generateZipFile(blobCert, blobKey).then(zip => {
-      this.downloadCertandKeyUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(zip));
+      this.downloadCertAndKeyUrl = this.sanitizer.bypassSecurityTrustResourceUrl(window.URL.createObjectURL(zip));
       }
     );
   }

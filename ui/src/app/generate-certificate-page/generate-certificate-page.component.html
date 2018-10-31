@@ -17,7 +17,7 @@
         <div class="inputfields">
           <div class="inputfields__input">
             <label>
-              Roles of PSP
+              Roles of PSP*
             </label>
             <ul class="checkbox">
               <li *ngFor="let pspRole of pspRolesKeys">
@@ -31,7 +31,7 @@
           </div>
           <div class="inputfields__input">
             <label>
-              Authorization Number
+              Authorization Number*
             </label>
             <input type="text" name="authorizationNumber" class="form-control" required [(ngModel)]="certData.authorizationNumber">
           </div>
@@ -70,7 +70,7 @@
         <div class="inputfields">
           <div class="inputfields__input">
             <label>
-              Organization Name
+              Organization Name*
             </label>
             <input type="text" name="organizationName" class="form-control" required [(ngModel)]="certData.organizationName">
           </div>
@@ -103,7 +103,7 @@
                   class="buttons btn--cancel">
             Cancel
           </button>
-          <button type="submit" [disabled]=certForm.invalid class="buttons btn--continue">
+          <button type="submit" [disabled]="certForm.invalid" class="buttons btn--continue">
             Confirm
           </button>
         </div>

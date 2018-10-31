@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CertificateService } from '../certificate.service';
 import { CertificateRequest } from '../../models/certificateRequest';
-import { PspRole } from '../../models/PspRole';
+import { PspRole } from '../../models/pspRole';
 
 @Component({
   selector: 'app-generate-certificate-page',

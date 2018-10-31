@@ -26,7 +26,7 @@ public class CertificateRequest {
     private String authorizationNumber;
 
     // TODO infer from enum?
-    @ApiModelProperty(required = true, notes = "Roles of the TPP", position = 1)
+    @ApiModelProperty(required = true, notes = "Roles of the PSP", position = 1)
     @Size(min = 1, max = 3)
     @NotNull
     @Builder.Default

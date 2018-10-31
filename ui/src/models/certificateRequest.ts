@@ -11,7 +11,7 @@
  */
 
 
-import { PspRole } from './PspRole';
+import { PspRole } from './pspRole';
 
 /**
  * Certificate Data
