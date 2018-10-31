@@ -9,6 +9,8 @@ variables:
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
 
 build_service:
+  tags:
+    - docker
   stage: "build"
   image: "adorsys/openjdk-build-base:8"
   script:
@@ -19,6 +21,8 @@ build_service:
       - ".cache/m2"
 
 build_ui:
+  tags:
+    - docker
   stage: "build"
   image: "node:8"
   script:
@@ -36,6 +40,8 @@ build_ui:
       - ".cache/npm"
 
 package:
+  tags:
+    - docker
   stage: package
   image: "adorsys/openjdk-build-base:8"
   script:
@@ -51,6 +57,8 @@ package:
       - ".cache/m2"
 
 docker_build_only:
+  tags:
+    - docker
   stage: "deploy"
   except:
     - master
@@ -61,6 +69,8 @@ docker_build_only:
   cache: {}
 
 docker_build_deploy:
+  tags:
+    - docker
   stage: "deploy"
   only:
     - master
