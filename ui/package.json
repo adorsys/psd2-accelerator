@@ -6,8 +6,12 @@
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "test": "ng test",
+    "test-headless": "ng test --browsers ChromeHeadless",
+    "test-single-headless": "ng test --browsers ChromeHeadless --watch=false",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "tslint": "tslint -p tsconfig.json",
+    "tslint-fix": "tslint --fix -p tsconfig.json"
   },
   "private": true,
   "dependencies": {
@@ -35,6 +39,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.3.0",
+    "husky": "^1.1.2",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.0.0",
@@ -42,10 +47,22 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "lint-staged": "^8.0.4",
     "node-sass": "^4.9.4",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~2.9.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "tslint --fix -p tsconfig.json",
+      "git add"
+    ]
   }
 }
