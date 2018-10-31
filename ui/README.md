@@ -8,18 +8,17 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 ```sh 
 $ git clone https://git.adorsys.de/psd2/sandbox.git
 $ cd sandbox/service
-$ mvn clean install
 $ mvn spring-boot:run
 ```
 
-2.) Start the UI and navigate to http://localhost:4200/
+2.) Start the UI
 ```sh 
 $ cd ../ui
 $ ng serve
 ```
 
-- Navigate to http://localhost:4200/ 
-- Confirm the Certificate with click on the "Confirm" button
+- Navigate to (<http://localhost:4200/>)
+- Confirm Certificate
 - You get redirected to the GenerateCertificateSuccess Component
 - Click the "Certificate and Private Key" URL and download the Zip-File. (It should contain the Certificate and the Private Key)
 
@@ -27,7 +26,7 @@ For detailed information about backend service see [README.md](https://git.adors
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server. Navigate to (<http://localhost:4200/>). The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 

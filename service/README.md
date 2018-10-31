@@ -17,8 +17,10 @@ X.509 certificate. For PSD2-purposes the certificate gets extended by the QCStat
 containing appropriate values such as the role(s) of the PSP.  
 
 Further Information:
+* [DIRECTIVE (EU) 2015/2366](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L2366&from=EN) -- Payment Service Directive 2 (PSD2)
 * [ETSI](https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf) -- European Telecommunications Standards Institute 
 * [RFC 3739](https://www.ietf.org/rfc/rfc3739.txt) -- X.509 Certificates
+* [Regulation (EU) No 910/2014](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN) –- eIDAS Certificate
 
    
 ## Getting Started
@@ -27,9 +29,8 @@ In order to start the SpringBoot Application, the following steps need to be ful
 ```sh 
 $ git clone https://git.adorsys.de/psd2/sandbox.git
 $ cd sandbox/service
-$ mvn clean install
 $ mvn spring-boot:run
 ```
 
-* Services will be available at http://localhost:8080/api/
-* Swagger-Documentation is provided at [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+* Services will be available at (<http://localhost:8080/api/>)
+* Swagger-Documentation is provided at (<http://localhost:8080/swagger-ui.html>)
