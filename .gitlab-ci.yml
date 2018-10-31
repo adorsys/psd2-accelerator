@@ -39,6 +39,21 @@ build_ui:
     paths:
       - ".cache/npm"
 
+build_arc42:
+  stage: "build"
+  image: "adorsys/arc42-tools"
+  script:
+    - cd arc42
+    - plantuml -o "$PWD/images/generated" diagrams/*
+    - asciidoctor psd2-sandbox-arc42.adoc
+  artifacts:
+    name: "arc42-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
+    paths:
+      - "arc42/images"
+      - "arc42/*.html"
+    expire_in: "1 week"
+  cache: {}
+
 package:
   tags:
     - docker
