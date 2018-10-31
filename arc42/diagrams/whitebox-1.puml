@@ -1,0 +1,24 @@
+@startuml whitebox-1
+
+skinparam shadowing false
+scale 1200 width
+
+actor "Bank Admin" as badmin
+actor "TPP Developer" as tppd
+
+package sandbox {
+
+  [xs2a] --> [testdata]
+  badmin --> [config]
+  config <-- [xs2a]
+
+  () api -- [xs2a]
+  tppd --> api
+  tppd --> [documentation]
+  tppd --> [certificate-generator]
+
+  ' only for layouting
+  api -[hidden]> [documentation]
+}
+
+@enduml

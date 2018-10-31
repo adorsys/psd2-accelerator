@@ -1,0 +1,81 @@
+[[section-introduction-and-goals]]
+== Introduction and Goals
+
+=== Introduction
+
+PSD2 instructs banks to expose existing banking services to registered Third Party Providers (TPPs) via an interface
+called Access-to-Account (XS2A) until September 2019. In order to guarantee the compliance of this deadline due to
+adaptions and bugs, PSD2 furthermore claims the banks to provide a functional sandbox offering XS2A services in a non-
+productive environment. The deadline for this test environment is dated six month earlier than the productive
+environment (March 2019).
+
+PSD2 itself is an EU directive describing requirements for banks on a very high level embedded in law paragraphs. The
+document contains links to Regulatory Technical Standards (RTS) prescribing technical descriptions like the Strong
+Customer Authentication (SCA). All those documents are still very abstract and close to the law.
+The Berlin-Group Initiative *NextGenPSD2* joint forces to create an open specification of the XS2A to harmonize this
+interface. We at https://adorsys.de[adorsys] are implementing and maintaining XS2A as an OpenSource project on https://github.com/adorsys/xs2a[GitHub].
+
+The *PSD2 Sandbox* project bundles existing PSD2 components created at adorsys. It is a self contained application
+which enables customers to provide a PSD2 compliant API for testing.
+
+=== Requirements Overview
+
+The PSD2 Sandbox is an application that aims to fulfill the following requirements:
+
+* Get banks compliant to the law in March 2019
+* Be easily deployable on the banks existing infrastructure
+* Be configurable to match the business features bank
+* Make the technical documentation of the XS2A interface accessible
+* Allow TPPs to test services based on test data
+* QWAC (certificate for authentication as specified in https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf[ETSI], https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN[eIDAS]) can be issued by the TPP itself and used as in the real world
+
+
+=== Quality Goals
+
+[options="header"]
+|===
+| Quality Goal       | Scenario
+| PSD2 Compliance    |
+The sandbox must be PSD2 compliant. Neither ease of use or cool technologies help the user if they fail the audit
+because of us.
+| Fast Onboarding    |
+As a potential user of the sandbox you should be able to get the application running within minutes. We need to provide good documentation, sensible defaults an a simple setup.
+| Simple Deployment  |
+The sandbox should be easy to deploy in enterprise contexts. This requires a simple architecture
+(e.g. not to many deployments, proven technology) and good documentation.
+|===
+
+=== Stakeholders
+
+[cols="1,2,3,4", options="header"]
+|===
+| Name              | Role                               | Contact        | Expectation
+| Denys Golubiev    | Software Architect PSD2            | dgo@adorsys.de
+a|
+- get feedback about XS2A (quality, design)
+- maybe move work to us (mockbank)
+| Francis Pouatcha  | Software Architect PSD2, ???       | fpo@adorsys.de
+a|
+- needs some sort of roadmap and progress reported from us (JIRA)
+| Peer Schmid       | Portfolio Manager PSD2             | psc@adorsys.de
+a|
+- expects us to work in short iterations to get features out of the door quickly so we can provide fast feedback to him
+- needs to be kept up to date if we (plan to) change stuff that impacts our customers
+- needs some sort of roadmap and progress reported from us (JIRA)
+| Rene Pongratz     | Sales / Business Development       | rpo@adorsys.de
+a|
+- needs some sort of roadmap and progress reported from us (JIRA)
+|===
+
+=== Development Team
+
+[options="header"]
+|===
+| Name              | Role                    | Contact
+| Andreas Winter    | Developer               | awi@adorsys.de
+| Isabella Ionescu  | Developer               | iio@adorsys.de
+| Jana Tiimus       | Developer               | jti@adorsys.de
+| Nadja Krendel     | Agile Coach             | nkr@adorsys.de
+| Roman Ataman      | Software Architect PSD2 | rat@adorsys.de
+| Sebastian Wild    | Product Owner           | swi@adorsys.de
+|===

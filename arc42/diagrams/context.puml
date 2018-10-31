@@ -1,0 +1,34 @@
+@startuml context
+
+left to right direction
+skinparam shadowing false
+scale 1200 width
+
+actor "TPP Developer" as tppd
+actor "Bank Admin" as ba
+actor "Bank Ops" as bo
+
+skinparam arrowColor black
+skinparam borderColor grey
+skinparam Component {
+  fontSize<<system>> 40
+}
+
+[Sandbox] as sandbox <<system>>
+[Bank CMS] as cms
+
+tppd --> sandbox : Use
+ba --> sandbox : Configure
+bo --> sandbox : Deploy
+sandbox <.. cms : include docs
+
+note right of cms #lightgoldenrodyellow
+  Under consideration
+end note
+
+note top of sandbox #gold
+  NOTE: we have no dependencies
+  to external systems (yet)
+end note
+
+@enduml

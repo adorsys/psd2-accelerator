@@ -1,0 +1,70 @@
+[[section-building-block-view]]
+
+
+== Building Block View
+
+=== Whitebox Overall System
+
+image:generated/whitebox-1.png["Whitebox Overall System Level 1",60%]
+
+Motivation::
+
+The application is designed as a modular monolith and uses Spring Boot 1.5. Every independent feature maps to a top level package (`de.adorsys.psd2.sandbox.certgen`) (backend) or a top level folder (`src/app/certgen`) (UI). The UI is
+implemented as an Angular app and bundled in the backend JAR.
+
+
+Contained Building Blocks::
+
+[cols="1,2" options="header"]
+|===
+| **Name**              | **Responsibility**
+
+| certificate-generator
+| Create QWAC certificates to enable access to the XS2A API
+
+| config
+| Configure the Sandbox and XS2A API (e.g. supported payment products). Just a https://todo-link-to-file[yaml] file right now.
+
+| documentation
+| Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place
+
+| testdata              | Generate, import and manage test data accessible over the XS2A API
+| xs2a                  | Provides the actual XS2A REST API
+
+|===
+
+=== Level 2
+
+==== White Box _xs2a_
+
+image:generated/whitebox-2-xs2a.png["Whitebox xs2a Level 2",60%]
+
+[cols="1,2" options="header"]
+|===
+| **Name**              | **Responsibility**
+
+| PIS
+| Provide the Payment Initiation Service implementation for XS2A (implements interface from `xs2a-impl`). Uses the _testdata_ module for the actual values.
+
+| AIS
+| Provide the Account Initiation Service implementation for XS2A (implements interface from `xs2a-impl`). Uses the _testdata_ module for the actual values.
+
+| PIIS
+| Provide the Payment Issuer Instruments implementation for XS2A (implements interface from `xs2a-impl`). Uses the _testdata_ module for the actual values.
+
+| profile (library)
+| Expose the XS2A configuration via REST API. The actual values come from the top level _config_ module. Is provided by the `profile` library from XS2A and embedded in our sandbox. Needed by `xs2a-impl` and not directly called by us.
+
+Part of the https://github.com/adorsys/xs2a[adorsys PSD2 XS2A implementation].
+
+| consent-management (library)
+| Handle consents for us. Every payment or account information needs/creates a consent. Is
+provided by the `consent-management` library from XS2A and embedded in our sandbox.
+
+Part of the https://github.com/adorsys/xs2a[adorsys PSD2 XS2A implementation].
+
+| xs2a-impl (library)
+| Provide the XS2A business implementation (e.g. validation, handling of consents via `consent-management`). Calls our own `AIS`/`PIS`/`PIIS` implementations.
+
+Part of the https://github.com/adorsys/xs2a[adorsys PSD2 XS2A implementation].
+|===

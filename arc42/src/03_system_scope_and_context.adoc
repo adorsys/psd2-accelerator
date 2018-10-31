@@ -1,0 +1,27 @@
+[[section-system-scope-and-context]]
+== System Scope and Context
+
+
+=== Business Context
+
+image::generated/context.png[Business Context Diagram]
+
+[options="header"]
+|===
+| Neighbor           | Description
+| 👤  TPP Developer
+| Registers at the Sandbox in order to gain access to the test API and documentation
+| 👤  Bank Admin
+| Configures the Sandbox and manages TPPs
+| 👤  Bank Ops
+| Deploys the Sandbox. Needs proper documentation, access to logs, ... Simple deployment
+is a central quality goal we design for, so the user is mentioned here.
+| Bank CMS
+a|
+[yellow]*UNDER CONSIDERATION*
+We assume that potential customers already have some sort of Content-Management-System in place we need to integrate with. So we must be able to provide content (e.g. documentation) in a format that's easy to work with (e.g. favor plain text over PDF).
+
+NOTE: if there is no CMS in place we need to provide the proper UI
+|===
+
+**<optionally: Explanation of external domain interfaces>**

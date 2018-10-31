@@ -1,0 +1,38 @@
+@startuml whitebox-2-xs2a
+
+skinparam shadowing false
+scale 1200 width
+
+() api
+[testdata]
+[config]
+
+package xs2a {
+
+  [xs2a-impl] as ximpl <<library>>
+  [profile]<<library>>
+  [consent-management] as cms <<library>>
+
+  api --> ximpl
+  api --> profile
+
+  ximpl -> profile
+  config <- profile
+
+  ximpl <-- [PIS] : impl
+  ximpl <-- [AIS] : impl
+  ximpl <-- [PIIS] : impl
+  ximpl --> cms
+
+  PIS -> testdata
+  AIS -> testdata
+  PIIS -> testdata
+
+  ' only for layouting
+  cms -[hidden]> AIS
+  cms -[hidden]> PIS
+  cms -[hidden]> PIIS
+
+}
+
+@enduml
