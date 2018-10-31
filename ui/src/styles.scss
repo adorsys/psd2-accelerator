@@ -96,6 +96,10 @@
         padding: 20px;
         width: 40%;
 
+        .ng-invalid:not(form)  {
+          border: 2px solid #a94442; /* red */
+        }
+
         label {
           display: inline-block;
           font-size: 18px;
@@ -105,8 +109,6 @@
         input {
           display: inline-block;
           justify-content: center;
-          border-width: 0 0 2px;
-          border-color: #33333336;
           font-size: 23px;
           font-weight: 300;
         }

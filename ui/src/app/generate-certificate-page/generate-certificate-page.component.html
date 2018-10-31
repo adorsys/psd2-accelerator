@@ -33,7 +33,7 @@
             <label>
               Authorization Number
             </label>
-            <input type="text" name="authorizationNumber" required [(ngModel)]="certData.authorizationNumber">
+            <input type="text" name="authorizationNumber" class="form-control" required [(ngModel)]="certData.authorizationNumber">
           </div>
         </div>
 
@@ -42,13 +42,13 @@
             <label>
               Country
             </label>
-            <input type="text" name="countryName" [(ngModel)]="certData.countryName">
+            <input type="text" name="countryName" class="form-control" [(ngModel)]="certData.countryName">
           </div>
           <div class="inputfields__input">
             <label>
               State
             </label>
-            <input type="text" name="stateOrProvinceName" [(ngModel)]="certData.stateOrProvinceName">
+            <input type="text" name="stateOrProvinceName" class="form-control" [(ngModel)]="certData.stateOrProvinceName">
           </div>
         </div>
 
@@ -57,13 +57,13 @@
             <label>
               City
             </label>
-            <input type="text" name="localityName" [(ngModel)]="certData.localityName">
+            <input type="text" name="localityName" class="form-control" [(ngModel)]="certData.localityName">
           </div>
           <div class="inputfields__input">
             <label>
               Domain
             </label>
-            <input type="text" name="domainComponent" [(ngModel)]="certData.domainComponent">
+            <input type="text" name="domainComponent" class="form-control" [(ngModel)]="certData.domainComponent">
           </div>
         </div>
 
@@ -72,13 +72,13 @@
             <label>
               Organization Name
             </label>
-            <input type="text" name="organizationName" required [(ngModel)]="certData.organizationName">
+            <input type="text" name="organizationName" class="form-control" required [(ngModel)]="certData.organizationName">
           </div>
           <div class="inputfields__input">
             <label>
               Organization Unit
             </label>
-            <input type="text" name="organizationUnit" [(ngModel)]="certData.organizationUnit">
+            <input type="text" name="organizationUnit" class="form-control" [(ngModel)]="certData.organizationUnit">
           </div>
         </div>
 
@@ -87,7 +87,7 @@
             <label>
               Validity
             </label>
-            <input type="text" name="validity" [(ngModel)]="certData.validity">
+            <input type="text" name="validity" class="form-control" [(ngModel)]="certData.validity">
           </div>
         </div>
         <div class="error" *ngIf="error">

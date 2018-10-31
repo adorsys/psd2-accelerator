@@ -7,7 +7,7 @@ import { PspRole } from '../../models/PspRole';
 @Component({
   selector: 'app-generate-certificate-page',
   templateUrl: './generate-certificate-page.component.html',
-  styleUrls: ['./generate-certificate-page.component.css']
+  styleUrls: ['./generate-certificate-page.component.scss']
 })
 export class GenerateCertificatePageComponent implements OnInit {
   certData: CertificateRequest;
