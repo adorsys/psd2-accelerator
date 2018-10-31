@@ -1,12 +1,16 @@
 package de.adorsys.certificateserver.service;
 
-import de.adorsys.certificateserver.domain.CertificateRequest;
-import de.adorsys.certificateserver.domain.CertificateResponse;
+import de.adorsys.certificateserver.domain.*;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.junit.Test;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -39,5 +43,36 @@ public class CertificateServiceTest {
         System.out.println(result);
         assertTrue(result.startsWith("-----BEGIN CERTIFICATE-----"));
         assertTrue(result.endsWith("-----END CERTIFICATE-----"));
+    }
+
+    @Test
+    public void checkRolesWithinQcStatement(){
+      CertificateService certificateService = new CertificateService();
+      CertificateRequest certificateRequest = CertificateRequest.builder()
+                                                .authorizationNumber("12345")
+                                                .countryName("Germany")
+                                                .roles(Collections.singletonList(PspRole.AISP))
+                                                .organizationName("adorsys").build();
+
+      SubjectData subjectData = certificateService.generateSubjectData(certificateRequest);
+      IssuerData issuerData = certificateService.generateIssuerData();
+      QCStatement qcStatement = certificateService.generateQcStatement(certificateRequest);
+
+      X509Certificate certificate = CertificateService.generateCertificate(subjectData, issuerData, qcStatement);
+
+      String formattedCertificate = null;
+
+      try {
+        formattedCertificate = CertificateService.format(certificate);
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+
+      assertNotNull(formattedCertificate);
+      assertThat(formattedCertificate, containsString(CertificateService.NCA_ID));
+      assertThat(formattedCertificate, containsString("PSP_AI"));
+      assertThat(formattedCertificate, not(containsString("PSP_PI")));
+      assertThat(formattedCertificate, not(containsString("PSP_IC")));
+      assertThat(formattedCertificate, not(containsString("PSP_AS")));
     }
 }

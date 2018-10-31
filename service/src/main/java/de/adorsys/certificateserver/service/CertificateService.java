@@ -4,14 +4,16 @@ import com.nimbusds.jose.util.X509CertUtils;
 import de.adorsys.certificateserver.CertificateException;
 import de.adorsys.certificateserver.domain.*;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.misc.MiscObjectIdentifiers;
+import org.bouncycastle.asn1.misc.NetscapeCertType;
+import org.bouncycastle.asn1.misc.NetscapeRevocationURL;
+import org.bouncycastle.asn1.misc.VerisignCzagExtension;
+import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -25,6 +27,7 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,10 +39,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class CertificateService {
@@ -48,6 +48,7 @@ public class CertificateService {
     private static final String ISSUER_PRIVATE_KEY = "MyRootCA.key";
 
     private final static Logger log = LoggerFactory.getLogger(CertificateService.class);
+    public static final String NCA_ID = "DE-ADORSYS";
 
     /**
      * @param filename Name of the key file. Suffix should be .pem
@@ -100,7 +101,6 @@ public class CertificateService {
      */
     static X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, QCStatement statement) {
         JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
-        builder = builder.setProvider("BC");
 
         ContentSigner contentSigner;
 
@@ -117,7 +117,6 @@ public class CertificateService {
             X509CertificateHolder certHolder = certGen.build(contentSigner);
 
             certConverter = new JcaX509CertificateConverter();
-            certConverter = certConverter.setProvider("BC");
 
             return certConverter.getCertificate(certHolder);
         } catch (Exception e) {
@@ -135,7 +134,7 @@ public class CertificateService {
         try (StringWriter writer = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
             pemWriter.writeObject(obj);
             pemWriter.flush();
-            return writer.toString();
+            return writer.toString();//.replaceAll("\n", ""); // comment for testing purposes
         } catch (IOException e) {
             throw new CertificateException("Could not export certificate", e);
         }
@@ -164,6 +163,13 @@ public class CertificateService {
 
         X509Certificate cert = generateCertificate(subjectData, issuerData, qcStatement);
 
+        try {
+            String formattedCertificate = format(cert);
+            log.debug(formattedCertificate);
+        } catch (Exception e) {
+            throw new CertificateException("Could not format certificate", e);
+        }
+
         return CertificateResponse.builder()
                 .privateKey(exportToString(subjectData.getPrivateKey()))
                 .encodedCert(exportToString(cert))
@@ -172,7 +178,76 @@ public class CertificateService {
                 .build();
     }
 
-    private QCStatement generateQcStatement(CertificateRequest certificateRequest) {
+    static String format(X509Certificate cert) throws Exception {
+        StringBuffer buf = new StringBuffer();
+        String nl = System.getProperty("line.separator");
+
+        buf.append("  [0]         Version: ").append(cert.getVersion()).append(nl);
+        buf.append("         SerialNumber: ").append(cert.getSerialNumber()).append(nl);
+        buf.append("             IssuerDN: ").append(cert.getIssuerDN().toString()).append(nl);
+        buf.append("           Start Date: ").append(cert.getNotBefore()).append(nl);
+        buf.append("           Final Date: ").append(cert.getNotAfter()).append(nl);
+        buf.append("            SubjectDN: ").append(cert.getSubjectDN().toString()).append(nl);
+        buf.append("           Public Key: ").append(cert.getPublicKey()).append(nl);
+        buf.append("  Signature Algorithm: ").append(cert.getSigAlgName()).append(nl);
+
+        byte[] sig = cert.getSignature();
+
+        buf.append("            Signature: ").append(new String(Hex.encode(sig, 0, 20))).append(nl);
+        for (int i = 20; i < sig.length; i += 20) {
+          if (i < sig.length - 20) {
+            buf.append("                       ").append(new String(Hex.encode(sig, i, 20))).append(nl);
+          } else {
+            buf.append("                       ").append(new String(Hex.encode(sig, i, sig.length - i))).append(nl);
+          }
+        }
+
+        TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Sequence.fromByteArray(cert.getTBSCertificate()));
+        X509Extensions extensions = tbs.getExtensions();
+
+        if (extensions != null) {
+            Enumeration e = extensions.oids();
+
+            if (e.hasMoreElements()) {
+                buf.append("       Extensions: \n");
+            }
+
+            while (e.hasMoreElements()) {
+                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
+                X509Extension ext = extensions.getExtension(oid);
+
+                if (ext.getValue() != null) {
+                    byte[] octs = ext.getValue().getOctets();
+                    ASN1InputStream dIn = new ASN1InputStream(octs);
+                    buf.append("                       critical(").append(ext.isCritical()).append(") ");
+                    try {
+                        if (oid.equals(Extension.basicConstraints)) {
+                            buf.append(BasicConstraints.getInstance(dIn.readObject())).append(nl);
+                        } else if (oid.equals(Extension.keyUsage)) {
+                            buf.append(KeyUsage.getInstance(dIn.readObject())).append(nl);
+                        } else if (oid.equals(MiscObjectIdentifiers.netscapeCertType)) {
+                            buf.append(new NetscapeCertType((DERBitString) dIn.readObject())).append(nl);
+                        } else if (oid.equals(MiscObjectIdentifiers.netscapeRevocationURL)) {
+                            buf.append(new NetscapeRevocationURL((DERIA5String) dIn.readObject())).append(nl);
+                        } else if (oid.equals(MiscObjectIdentifiers.verisignCzagExtension)) {
+                            buf.append(new VerisignCzagExtension((DERIA5String) dIn.readObject())).append(nl);
+                        } else {
+                            buf.append(oid.getId());
+                            buf.append(" value = ").append(ASN1Dump.dumpAsString(dIn.readObject())).append(nl);
+                        }
+                    } catch (Exception ex) {
+                      buf.append(oid.getId());
+                      buf.append(" value = ").append("*****").append(nl);
+                    }
+                } else {
+                    buf.append(nl);
+                }
+            }
+        }
+        return buf.toString();
+    }
+
+    public QCStatement generateQcStatement(CertificateRequest certificateRequest) {
 
         NCAName nCAName = getNcaNameFromIssuerData();
         NCAId nCAId = getNcaIdFromIssuerData();
@@ -192,10 +267,10 @@ public class CertificateService {
 
     private NCAId getNcaIdFromIssuerData() {
         // TODO: extract NCAId from Issuer instead of hard-coded Strings? Which field?
-        return new NCAId("DE-ADORSYS");
+        return new NCAId(NCA_ID);
     }
 
-    private SubjectData generateSubjectData(CertificateRequest cerData) {
+    public SubjectData generateSubjectData(CertificateRequest cerData) {
         KeyPair keyPairSubject = generateKeyPair();
 
         Date expiration = Date.from(
@@ -231,7 +306,7 @@ public class CertificateService {
         }
     }
 
-    private IssuerData generateIssuerData() {
+    public IssuerData generateIssuerData() {
         IssuerData issuerData = new IssuerData();
 
         X509Certificate cert = getCertificateFromClassPath(ISSUER_CERTIFICATE);
