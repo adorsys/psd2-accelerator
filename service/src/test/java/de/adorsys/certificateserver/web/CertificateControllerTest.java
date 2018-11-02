@@ -47,41 +47,42 @@ public class CertificateControllerTest {
   @Test
   public void createCert() throws Exception {
     CertificateResponse certificateResponse = CertificateResponse.builder()
-                                                .keyId(KEY_ID)
-                                                .encodedCert(CERTIFICATE)
-                                                .privateKey(PRIVATE_KEY)
-                                                .algorithm(ALGORITHM)
-                                                .build();
+        .keyId(KEY_ID)
+        .encodedCert(CERTIFICATE)
+        .privateKey(PRIVATE_KEY)
+        .algorithm(ALGORITHM)
+        .build();
 
     given(certificateService.newCertificate(anyObject())).willReturn(certificateResponse);
 
-
     CertificateRequest certificateRequest = CertificateRequest.builder()
-                                              .authorizationNumber("87B2AC")
-                                              .organizationName("Fictional Corporation AG")
-                                              .roles(Collections.singletonList(PspRole.AISP))
-                                              .build();
+        .authorizationNumber("87B2AC")
+        .organizationName("Fictional Corporation AG")
+        .roles(Collections.singletonList(PspRole.AISP))
+        .build();
 
     mockMvc.perform(
-      post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(certificateRequest)))
-      .andExpect(status().isOk())
-      .andExpect(jsonPath("$.encodedCert").value(CERTIFICATE))
-      .andExpect(jsonPath("$.privateKey").value(PRIVATE_KEY))
-      .andExpect(jsonPath("$.keyId").value(KEY_ID))
-      .andExpect(jsonPath("$.algorithm").value(ALGORITHM));
+        post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(certificateRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.encodedCert").value(CERTIFICATE))
+        .andExpect(jsonPath("$.privateKey").value(PRIVATE_KEY))
+        .andExpect(jsonPath("$.keyId").value(KEY_ID))
+        .andExpect(jsonPath("$.algorithm").value(ALGORITHM));
   }
 
   @Test
   public void createCertWithoutRoles() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
-                                              .authorizationNumber("87B2AC")
-                                              .organizationName("Fictional Corporation AG")
-                                              .build();
+        .authorizationNumber("87B2AC")
+        .organizationName("Fictional Corporation AG")
+        .build();
 
     MockHttpServletResponse response = mockMvc.perform(
-      post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(certificateRequest)))
-                                         .andExpect(status().isBadRequest())
-                                         .andReturn().getResponse();
+        post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(certificateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
 
     assertThat(response.getContentAsString(), is(""));
   }
@@ -89,14 +90,15 @@ public class CertificateControllerTest {
   @Test
   public void createCertWithoutAuthrizationNumber() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
-                                              .organizationName("Fictional Corporation AG")
-                                              .roles(Collections.singletonList(PspRole.AISP))
-                                              .build();
+        .organizationName("Fictional Corporation AG")
+        .roles(Collections.singletonList(PspRole.AISP))
+        .build();
 
     MockHttpServletResponse response = mockMvc.perform(
-      post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(certificateRequest)))
-                                         .andExpect(status().isBadRequest())
-                                         .andReturn().getResponse();
+        post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(certificateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
 
     assertThat(response.getContentAsString(), is(""));
   }
@@ -104,14 +106,15 @@ public class CertificateControllerTest {
   @Test
   public void createCertWithoutOrganizationName() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
-                                              .authorizationNumber("87B2AC")
-                                              .roles(Collections.singletonList(PspRole.AISP))
-                                              .build();
+        .authorizationNumber("87B2AC")
+        .roles(Collections.singletonList(PspRole.AISP))
+        .build();
 
     MockHttpServletResponse response = mockMvc.perform(
-      post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(certificateRequest)))
-                                         .andExpect(status().isBadRequest())
-                                         .andReturn().getResponse();
+        post("/api/cert-generator").contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(certificateRequest)))
+        .andExpect(status().isBadRequest())
+        .andReturn().getResponse();
 
     assertThat(response.getContentAsString(), is(""));
   }

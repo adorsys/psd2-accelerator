@@ -19,17 +19,18 @@ import javax.validation.Valid;
 @Api(value = "Certificate Controller")
 public class CertificateController {
 
-    private CertificateService cerService;
+  private CertificateService cerService;
 
-    public CertificateController(CertificateService cerService) {
-        this.cerService = cerService;
-    }
+  public CertificateController(CertificateService cerService) {
+    this.cerService = cerService;
+  }
 
-    @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at " +
-            "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
-    @PostMapping
-    public ResponseEntity<CertificateResponse> createCert(@Valid @RequestBody CertificateRequest certData) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(cerService.newCertificate(certData));
-    }
+  @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at "
+      + "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
+  @PostMapping
+  public ResponseEntity<CertificateResponse> createCert(
+      @Valid @RequestBody CertificateRequest certData) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(cerService.newCertificate(certData));
+  }
 }

@@ -44,342 +44,366 @@ import java.util.*;
 @Service
 public class CertificateService {
 
-    private static final String ISSUER_CERTIFICATE = "MyRootCA.pem";
-    private static final String ISSUER_PRIVATE_KEY = "MyRootCA.key";
+  private static final String ISSUER_CERTIFICATE = "MyRootCA.pem";
+  private static final String ISSUER_PRIVATE_KEY = "MyRootCA.key";
 
-    private final static Logger log = LoggerFactory.getLogger(CertificateService.class);
-    public static final String NCA_ID = "DE-ADORSYS";
+  private final static Logger log = LoggerFactory.getLogger(CertificateService.class);
+  public static final String NCA_ID = "DE-ADORSYS";
 
-    /**
-     * @param filename Name of the key file. Suffix should be .pem
-     * @return X509Certificate
-     */
-    static X509Certificate getCertificateFromClassPath(String filename) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream is = loader.getResourceAsStream("certificates/" + filename);
+  /**
+   * @param filename Name of the key file. Suffix should be .pem
+   * @return X509Certificate
+   */
+  static X509Certificate getCertificateFromClassPath(String filename) {
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    InputStream is = loader.getResourceAsStream("certificates/" + filename);
 
-        if (is == null)
-            throw new CertificateException("Could not find certificate in classpath");
-
-        try {
-            byte[] bytes = IOUtils.toByteArray(is);
-            return X509CertUtils.parse(bytes);
-        } catch (IOException e) {
-            throw new CertificateException("Could not read certificate from classpath", e);
-        }
+    if (is == null) {
+      throw new CertificateException("Could not find certificate in classpath");
     }
 
-    /**
-     * @param filename Name of the key file. Suffix should be .key
-     * @return PrivateKey
-     */
-    static PrivateKey getKeyFromClassPath(String filename) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream("certificates/" + filename);
+    try {
+      byte[] bytes = IOUtils.toByteArray(is);
+      return X509CertUtils.parse(bytes);
+    } catch (IOException e) {
+      throw new CertificateException("Could not read certificate from classpath", e);
+    }
+  }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+  /**
+   * @param filename Name of the key file. Suffix should be .key
+   * @return PrivateKey
+   */
+  static PrivateKey getKeyFromClassPath(String filename) {
+    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+    InputStream stream = loader.getResourceAsStream("certificates/" + filename);
 
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            PEMParser pp = new PEMParser(br);
-            PEMKeyPair pemKeyPair = (PEMKeyPair) pp.readObject();
-            KeyPair kp = new JcaPEMKeyConverter().getKeyPair(pemKeyPair);
-            pp.close();
-            return kp.getPrivate();
-        } catch (IOException e) {
-            throw new CertificateException("Could not read private key from classpath", e);
-        }
+    BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+
+    try {
+      Security.addProvider(new BouncyCastleProvider());
+      PEMParser pp = new PEMParser(br);
+      PEMKeyPair pemKeyPair = (PEMKeyPair) pp.readObject();
+      KeyPair kp = new JcaPEMKeyConverter().getKeyPair(pemKeyPair);
+      pp.close();
+      return kp.getPrivate();
+    } catch (IOException e) {
+      throw new CertificateException("Could not read private key from classpath", e);
+    }
+  }
+
+  /**
+   * Generates new X.509 Certificate
+   *
+   * @return X509Certificate
+   */
+  static X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData,
+      QCStatement statement) {
+    JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
+
+    ContentSigner contentSigner;
+
+    X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerData.getX500name(),
+        new BigInteger(subjectData.getSerialNumber().toString()), subjectData.getStartDate(),
+        subjectData.getEndDate(),
+        subjectData.getX500name(), subjectData.getPublicKey());
+
+    JcaX509CertificateConverter certConverter;
+
+    try {
+      contentSigner = builder.build(issuerData.getPrivateKey());
+      certGen.addExtension(Extension.qCStatements, false, statement);
+
+      X509CertificateHolder certHolder = certGen.build(contentSigner);
+
+      certConverter = new JcaX509CertificateConverter();
+
+      return certConverter.getCertificate(certHolder);
+    } catch (Exception e) {
+      throw new CertificateException("Could not create certificate", e);
+    }
+  }
+
+  /**
+   * Converts Objects like Certificates/Keys into Strings without '\n' or '\r'
+   *
+   * @return String
+   */
+  static String exportToString(Object obj) {
+    try (StringWriter writer = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(
+        writer)) {
+      pemWriter.writeObject(obj);
+      pemWriter.flush();
+      return writer.toString(); //.replaceAll("\n", ""); // comment for testing purposes
+    } catch (IOException e) {
+      throw new CertificateException("Could not export certificate", e);
+    }
+  }
+
+  static DERSequence createQcInfo(RolesOfPSP rolesOfPSP, NCAName nCAName, NCAId nCAId) {
+    return new DERSequence(new ASN1Encodable[]{rolesOfPSP, nCAName, nCAId});
+  }
+
+  private final IssuerData issuerData;
+
+  public CertificateService() {
+    issuerData = generateIssuerData();
+  }
+
+  /**
+   * Create a new base64 encoded X509 certificate for authentication at the XS2A API with the
+   * corresponding private key and meta data
+   *
+   * @param certificateRequest data needed for certificate generation
+   * @return CertificateResponse base64 encoded cert + private key
+   */
+  public CertificateResponse newCertificate(CertificateRequest certificateRequest) {
+    SubjectData subjectData = generateSubjectData(certificateRequest);
+    QCStatement qcStatement = generateQcStatement(certificateRequest);
+
+    X509Certificate cert = generateCertificate(subjectData, issuerData, qcStatement);
+
+    try {
+      String formattedCertificate = format(cert);
+      log.debug(formattedCertificate);
+    } catch (Exception e) {
+      throw new CertificateException("Could not format certificate", e);
     }
 
-    /**
-     * Generates new X.509 Certificate
-     *
-     * @param subjectData
-     * @param issuerData
-     * @param statement
-     * @return X509Certificate
-     */
-    static X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, QCStatement statement) {
-        JcaContentSignerBuilder builder = new JcaContentSignerBuilder("SHA256WithRSAEncryption");
+    return CertificateResponse.builder()
+        .privateKey(exportToString(subjectData.getPrivateKey()))
+        .encodedCert(exportToString(cert))
+        .keyId(cert.getSerialNumber().toString())
+        .algorithm(cert.getSigAlgName())
+        .build();
+  }
 
-        ContentSigner contentSigner;
+  static String format(X509Certificate cert) throws Exception {
+    StringBuffer buf = new StringBuffer();
+    String nl = System.getProperty("line.separator");
 
-        X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerData.getX500name(),
-                new BigInteger(subjectData.getSerialNumber().toString()), subjectData.getStartDate(), subjectData.getEndDate(),
-                subjectData.getX500name(), subjectData.getPublicKey());
+    buf.append("  [0]         Version: ").append(cert.getVersion()).append(nl);
+    buf.append("         SerialNumber: ").append(cert.getSerialNumber()).append(nl);
+    buf.append("             IssuerDN: ").append(cert.getIssuerDN().toString()).append(nl);
+    buf.append("           Start Date: ").append(cert.getNotBefore()).append(nl);
+    buf.append("           Final Date: ").append(cert.getNotAfter()).append(nl);
+    buf.append("            SubjectDN: ").append(cert.getSubjectDN().toString()).append(nl);
+    buf.append("           Public Key: ").append(cert.getPublicKey()).append(nl);
+    buf.append("  Signature Algorithm: ").append(cert.getSigAlgName()).append(nl);
 
-        JcaX509CertificateConverter certConverter;
+    byte[] sig = cert.getSignature();
 
-        try {
-            contentSigner = builder.build(issuerData.getPrivateKey());
-            certGen.addExtension(Extension.qCStatements, false, statement);
-
-            X509CertificateHolder certHolder = certGen.build(contentSigner);
-
-            certConverter = new JcaX509CertificateConverter();
-
-            return certConverter.getCertificate(certHolder);
-        } catch (Exception e) {
-            throw new CertificateException("Could not create certificate", e);
-        }
+    buf.append("            Signature: ").append(new String(Hex.encode(sig, 0, 20))).append(nl);
+    for (int i = 20; i < sig.length; i += 20) {
+      if (i < sig.length - 20) {
+        buf.append("                       ").append(new String(Hex.encode(sig, i, 20))).append(nl);
+      } else {
+        buf.append("                       ").append(new String(Hex.encode(sig, i, sig.length - i)))
+            .append(nl);
+      }
     }
 
-    /**
-     * Converts Objects like Certificates/Keys into Strings without '\n' or '\r'
-     *
-     * @param obj
-     * @return String
-     */
-    static String exportToString(Object obj) {
-        try (StringWriter writer = new StringWriter(); JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
-            pemWriter.writeObject(obj);
-            pemWriter.flush();
-            return writer.toString();//.replaceAll("\n", ""); // comment for testing purposes
-        } catch (IOException e) {
-            throw new CertificateException("Could not export certificate", e);
-        }
-    }
+    TBSCertificateStructure tbs = TBSCertificateStructure
+        .getInstance(ASN1Sequence.fromByteArray(cert.getTBSCertificate()));
+    X509Extensions extensions = tbs.getExtensions();
 
-    static DERSequence createQcInfo(RolesOfPSP rolesOfPSP, NCAName nCAName, NCAId nCAId) {
-        return new DERSequence(new ASN1Encodable[]{rolesOfPSP, nCAName, nCAId});
-    }
+    if (extensions != null) {
+      Enumeration e = extensions.oids();
 
-    private final IssuerData issuerData;
+      if (e.hasMoreElements()) {
+        buf.append("       Extensions: \n");
+      }
 
-    public CertificateService() {
-        issuerData = generateIssuerData();
-    }
+      while (e.hasMoreElements()) {
+        ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
+        X509Extension ext = extensions.getExtension(oid);
 
-    /**
-     * Create a new base64 encoded X509 certificate for authentication at
-     * the XS2A API with the corresponding private key and meta data
-     *
-     * @param certificateRequest data needed for certificate generation
-     * @return CertificateResponse base64 encoded cert + private key
-     */
-    public CertificateResponse newCertificate(CertificateRequest certificateRequest) {
-        SubjectData subjectData = generateSubjectData(certificateRequest);
-        QCStatement qcStatement = generateQcStatement(certificateRequest);
-
-        X509Certificate cert = generateCertificate(subjectData, issuerData, qcStatement);
-
-        try {
-            String formattedCertificate = format(cert);
-            log.debug(formattedCertificate);
-        } catch (Exception e) {
-            throw new CertificateException("Could not format certificate", e);
-        }
-
-        return CertificateResponse.builder()
-                .privateKey(exportToString(subjectData.getPrivateKey()))
-                .encodedCert(exportToString(cert))
-                .keyId(cert.getSerialNumber().toString())
-                .algorithm(cert.getSigAlgName())
-                .build();
-    }
-
-    static String format(X509Certificate cert) throws Exception {
-        StringBuffer buf = new StringBuffer();
-        String nl = System.getProperty("line.separator");
-
-        buf.append("  [0]         Version: ").append(cert.getVersion()).append(nl);
-        buf.append("         SerialNumber: ").append(cert.getSerialNumber()).append(nl);
-        buf.append("             IssuerDN: ").append(cert.getIssuerDN().toString()).append(nl);
-        buf.append("           Start Date: ").append(cert.getNotBefore()).append(nl);
-        buf.append("           Final Date: ").append(cert.getNotAfter()).append(nl);
-        buf.append("            SubjectDN: ").append(cert.getSubjectDN().toString()).append(nl);
-        buf.append("           Public Key: ").append(cert.getPublicKey()).append(nl);
-        buf.append("  Signature Algorithm: ").append(cert.getSigAlgName()).append(nl);
-
-        byte[] sig = cert.getSignature();
-
-        buf.append("            Signature: ").append(new String(Hex.encode(sig, 0, 20))).append(nl);
-        for (int i = 20; i < sig.length; i += 20) {
-          if (i < sig.length - 20) {
-            buf.append("                       ").append(new String(Hex.encode(sig, i, 20))).append(nl);
-          } else {
-            buf.append("                       ").append(new String(Hex.encode(sig, i, sig.length - i))).append(nl);
+        if (ext.getValue() != null) {
+          byte[] octs = ext.getValue().getOctets();
+          ASN1InputStream dIn = new ASN1InputStream(octs);
+          buf.append("                       critical(").append(ext.isCritical()).append(") ");
+          try {
+            if (oid.equals(Extension.basicConstraints)) {
+              buf.append(BasicConstraints.getInstance(dIn.readObject())).append(nl);
+            } else if (oid.equals(Extension.keyUsage)) {
+              buf.append(KeyUsage.getInstance(dIn.readObject())).append(nl);
+            } else if (oid.equals(MiscObjectIdentifiers.netscapeCertType)) {
+              buf.append(new NetscapeCertType((DERBitString) dIn.readObject())).append(nl);
+            } else if (oid.equals(MiscObjectIdentifiers.netscapeRevocationURL)) {
+              buf.append(new NetscapeRevocationURL((DERIA5String) dIn.readObject())).append(nl);
+            } else if (oid.equals(MiscObjectIdentifiers.verisignCzagExtension)) {
+              buf.append(new VerisignCzagExtension((DERIA5String) dIn.readObject())).append(nl);
+            } else {
+              buf.append(oid.getId());
+              buf.append(" value = ").append(ASN1Dump.dumpAsString(dIn.readObject())).append(nl);
+            }
+          } catch (Exception ex) {
+            buf.append(oid.getId());
+            buf.append(" value = ").append("*****").append(nl);
           }
+        } else {
+          buf.append(nl);
         }
+      }
+    }
+    return buf.toString();
+  }
 
-        TBSCertificateStructure tbs = TBSCertificateStructure.getInstance(ASN1Sequence.fromByteArray(cert.getTBSCertificate()));
-        X509Extensions extensions = tbs.getExtensions();
+  public QCStatement generateQcStatement(CertificateRequest certificateRequest) {
 
-        if (extensions != null) {
-            Enumeration e = extensions.oids();
+    NCAName nCAName = getNcaNameFromIssuerData();
+    NCAId nCAId = getNcaIdFromIssuerData();
+    ASN1Encodable qcStatementInfo = createQcInfo(
+        RolesOfPSP.fromCertificateRequest(certificateRequest), nCAName, nCAId
+    );
 
-            if (e.hasMoreElements()) {
-                buf.append("       Extensions: \n");
-            }
+    return new QCStatement(PSD2QCObjectIdentifiers.id_etsi_psd2_qcStatement, qcStatementInfo);
+  }
 
-            while (e.hasMoreElements()) {
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
-                X509Extension ext = extensions.getExtension(oid);
+  private NCAName getNcaNameFromIssuerData() {
+    return new NCAName(IETFUtils.valueToString(
+        issuerData.getX500name().getRDNs(BCStyle.O)[0]
+            .getFirst().getValue())
+    );
+  }
 
-                if (ext.getValue() != null) {
-                    byte[] octs = ext.getValue().getOctets();
-                    ASN1InputStream dIn = new ASN1InputStream(octs);
-                    buf.append("                       critical(").append(ext.isCritical()).append(") ");
-                    try {
-                        if (oid.equals(Extension.basicConstraints)) {
-                            buf.append(BasicConstraints.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid.equals(Extension.keyUsage)) {
-                            buf.append(KeyUsage.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.netscapeCertType)) {
-                            buf.append(new NetscapeCertType((DERBitString) dIn.readObject())).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.netscapeRevocationURL)) {
-                            buf.append(new NetscapeRevocationURL((DERIA5String) dIn.readObject())).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.verisignCzagExtension)) {
-                            buf.append(new VerisignCzagExtension((DERIA5String) dIn.readObject())).append(nl);
-                        } else {
-                            buf.append(oid.getId());
-                            buf.append(" value = ").append(ASN1Dump.dumpAsString(dIn.readObject())).append(nl);
-                        }
-                    } catch (Exception ex) {
-                      buf.append(oid.getId());
-                      buf.append(" value = ").append("*****").append(nl);
-                    }
-                } else {
-                    buf.append(nl);
-                }
-            }
-        }
-        return buf.toString();
+  private NCAId getNcaIdFromIssuerData() {
+    // TODO: extract NCAId from Issuer instead of hard-coded Strings? Which field?
+    return new NCAId(NCA_ID);
+  }
+
+  public SubjectData generateSubjectData(CertificateRequest cerData) {
+    KeyPair keyPairSubject = generateKeyPair();
+
+    Date expiration = Date.from(
+        LocalDate.now().plusDays(cerData.getValidity()).atStartOfDay(ZoneOffset.UTC).toInstant()
+    );
+
+    X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
+    builder.addRDN(BCStyle.O, cerData.getOrganizationName());
+    if (cerData.getDomainComponent() != null) {
+      builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
+    }
+    if (cerData.getOrganizationUnit() != null) {
+      builder.addRDN(BCStyle.OU, cerData.getOrganizationUnit());
+    }
+    if (cerData.getCountryName() != null) {
+      builder.addRDN(BCStyle.CN, cerData.getCountryName());
+    }
+    if (cerData.getStateOrProvinceName() != null) {
+      builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
+    }
+    if (cerData.getLocalityName() != null) {
+      builder.addRDN(BCStyle.L, cerData.getLocalityName());
     }
 
-    public QCStatement generateQcStatement(CertificateRequest certificateRequest) {
+    builder.addRDN(BCStyle.ORGANIZATION_IDENTIFIER,
+        "PSD" + getNcaIdFromIssuerData() + "-" + cerData.getAuthorizationNumber());
 
-        NCAName nCAName = getNcaNameFromIssuerData();
-        NCAId nCAId = getNcaIdFromIssuerData();
-        ASN1Encodable qcStatementInfo = createQcInfo(
-                RolesOfPSP.fromCertificateRequest(certificateRequest), nCAName, nCAId
-        );
+    Random rand = new Random();
+    Integer serialNumber = rand.nextInt(Integer.MAX_VALUE);
+    return new SubjectData(
+        keyPairSubject.getPrivate(), keyPairSubject.getPublic(), builder.build(),
+        serialNumber, new Date(), expiration
+    );
+  }
 
-        return new QCStatement(PSD2QCObjectIdentifiers.id_etsi_psd2_qcStatement, qcStatementInfo);
+  private KeyPair generateKeyPair() {
+    try {
+      KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+      SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+      keyGen.initialize(2048, random);
+      return keyGen.generateKeyPair();
+    } catch (GeneralSecurityException e) {
+      throw new CertificateException("Could not generate key pair", e);
+    }
+  }
+
+  public IssuerData generateIssuerData() {
+    IssuerData issuerData = new IssuerData();
+
+    X509Certificate cert = getCertificateFromClassPath(ISSUER_CERTIFICATE);
+
+    log.debug("Source for issuer data: {} from {}", cert, ISSUER_CERTIFICATE);
+
+    try {
+      issuerData.setX500name(new JcaX509CertificateHolder(cert).getSubject());
+    } catch (CertificateEncodingException e) {
+      throw new CertificateException("Could not read issuer data from certificate", e);
     }
 
-    private NCAName getNcaNameFromIssuerData() {
-        return new NCAName(IETFUtils.valueToString(
-                issuerData.getX500name().getRDNs(BCStyle.O)[0]
-                        .getFirst().getValue())
-        );
+    PrivateKey privateKey = getKeyFromClassPath(ISSUER_PRIVATE_KEY);
+    issuerData.setPrivateKey(privateKey);
+
+    return issuerData;
+  }
+
+  private static class RolesOfPSP extends DERSequence {
+
+    public static RolesOfPSP fromCertificateRequest(CertificateRequest certificateRequest) {
+      List<RoleOfPSP> roles = new ArrayList<>();
+
+      if (certificateRequest.getRoles().contains(PspRole.AISP)) {
+        roles.add(RoleOfPSP.PSP_AI);
+      }
+
+      if (certificateRequest.getRoles().contains(PspRole.PISP)) {
+        roles.add(RoleOfPSP.PSP_PI);
+      }
+
+      if (certificateRequest.getRoles().contains(PspRole.PIISP)) {
+        roles.add(RoleOfPSP.PSP_IC);
+      }
+
+      return new RolesOfPSP(roles.toArray(new RoleOfPSP[]{}));
     }
 
-    private NCAId getNcaIdFromIssuerData() {
-        // TODO: extract NCAId from Issuer instead of hard-coded Strings? Which field?
-        return new NCAId(NCA_ID);
+    public RolesOfPSP(RoleOfPSP[] array) {
+      super(array);
     }
+  }
 
-    public SubjectData generateSubjectData(CertificateRequest cerData) {
-        KeyPair keyPairSubject = generateKeyPair();
+  private static class RoleOfPSP extends DERSequence {
 
-        Date expiration = Date.from(
-                LocalDate.now().plusDays(cerData.getValidity()).atStartOfDay(ZoneOffset.UTC).toInstant()
-        );
+    public static final RoleOfPSP PSP_PI = new RoleOfPSP(RoleOfPspOid.ID_PSD_2_ROLE_PSP_PI,
+        RoleOfPspName.PSP_PI);
+    public static final RoleOfPSP PSP_AI = new RoleOfPSP(RoleOfPspOid.ID_PSD_2_ROLE_PSP_AI,
+        RoleOfPspName.PSP_AI);
+    public static final RoleOfPSP PSP_IC = new RoleOfPSP(RoleOfPspOid.ROLE_OF_PSP_OID,
+        RoleOfPspName.PSP_IC);
 
-        X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
-        builder.addRDN(BCStyle.O, cerData.getOrganizationName());
-        if (cerData.getDomainComponent() != null) builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
-        if (cerData.getOrganizationUnit() != null) builder.addRDN(BCStyle.OU, cerData.getOrganizationUnit());
-        if (cerData.getCountryName() != null) builder.addRDN(BCStyle.CN, cerData.getCountryName());
-        if (cerData.getStateOrProvinceName() != null) builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
-        if (cerData.getLocalityName() != null) builder.addRDN(BCStyle.L, cerData.getLocalityName());
-
-        builder.addRDN(BCStyle.ORGANIZATION_IDENTIFIER, "PSD" + getNcaIdFromIssuerData() + "-" + cerData.getAuthorizationNumber());
-
-        Random rand = new Random();
-        Integer serialNumber = rand.nextInt(Integer.MAX_VALUE);
-        return new SubjectData(
-                keyPairSubject.getPrivate(), keyPairSubject.getPublic(), builder.build(),
-                serialNumber, new Date(), expiration
-        );
+    private RoleOfPSP(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
+      super(new ASN1Encodable[]{roleOfPspOid, roleOfPspName});
     }
+  }
 
-    private KeyPair generateKeyPair() {
-        try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            keyGen.initialize(2048, random);
-            return keyGen.generateKeyPair();
-        } catch (GeneralSecurityException e) {
-            throw new CertificateException("Could not generate key pair", e);
-        }
+  private static class RoleOfPspName extends DERUTF8String {
+
+    public static final RoleOfPspName PSP_AS = new RoleOfPspName("PSP_AS");
+    public static final RoleOfPspName PSP_PI = new RoleOfPspName("PSP_PI");
+    public static final RoleOfPspName PSP_AI = new RoleOfPspName("PSP_AI");
+    public static final RoleOfPspName PSP_IC = new RoleOfPspName("PSP_IC");
+
+    private RoleOfPspName(String string) {
+      super(string);
     }
+  }
 
-    public IssuerData generateIssuerData() {
-        IssuerData issuerData = new IssuerData();
+  private static class RoleOfPspOid extends ASN1ObjectIdentifier {
 
-        X509Certificate cert = getCertificateFromClassPath(ISSUER_CERTIFICATE);
+    public static final ASN1ObjectIdentifier ETSI_PSD_2_ROLES = new ASN1ObjectIdentifier(
+        "0.4.0.19495.1");
+    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_AS = new RoleOfPspOid(
+        ETSI_PSD_2_ROLES.branch("1"));
+    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_PI = new RoleOfPspOid(
+        ETSI_PSD_2_ROLES.branch("2"));
+    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_AI = new RoleOfPspOid(
+        ETSI_PSD_2_ROLES.branch("3"));
+    public static final RoleOfPspOid ROLE_OF_PSP_OID = new RoleOfPspOid(
+        ETSI_PSD_2_ROLES.branch("4"));
 
-        log.debug("Source for issuer data: {} from {}", cert, ISSUER_CERTIFICATE);
-
-        try {
-            issuerData.setX500name(new JcaX509CertificateHolder(cert).getSubject());
-        } catch (CertificateEncodingException e) {
-            throw new CertificateException("Could not read issuer data from certificate", e);
-        }
-
-        PrivateKey privateKey = getKeyFromClassPath(ISSUER_PRIVATE_KEY);
-        issuerData.setPrivateKey(privateKey);
-
-        return issuerData;
+    public RoleOfPspOid(ASN1ObjectIdentifier identifier) {
+      super(identifier.getId());
     }
-
-    private static class RolesOfPSP extends DERSequence {
-
-        public static RolesOfPSP fromCertificateRequest(CertificateRequest certificateRequest) {
-            List<RoleOfPSP> roles = new ArrayList<>();
-
-            if (certificateRequest.getRoles().contains(PspRole.AISP)) {
-                roles.add(RoleOfPSP.PSP_AI);
-            }
-
-            if (certificateRequest.getRoles().contains(PspRole.PISP)) {
-                roles.add(RoleOfPSP.PSP_PI);
-            }
-
-            if (certificateRequest.getRoles().contains(PspRole.PIISP)) {
-                roles.add(RoleOfPSP.PSP_IC);
-            }
-
-            return new RolesOfPSP(roles.toArray(new RoleOfPSP[]{}));
-        }
-
-        public RolesOfPSP(RoleOfPSP[] array) {
-            super(array);
-        }
-    }
-
-    private static class RoleOfPSP extends DERSequence {
-        public static final RoleOfPSP PSP_PI = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_pi, RoleOfPspName.PSP_PI);
-        public static final RoleOfPSP PSP_AI = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ai, RoleOfPspName.PSP_AI);
-        public static final RoleOfPSP PSP_IC = new RoleOfPSP(RoleOfPspOid.id_psd2_role_psp_ic, RoleOfPspName.PSP_IC);
-
-        private RoleOfPSP(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
-            super(new ASN1Encodable[]{roleOfPspOid, roleOfPspName});
-        }
-    }
-
-    private static class RoleOfPspName extends DERUTF8String {
-        public static final RoleOfPspName PSP_AS = new RoleOfPspName("PSP_AS");
-        public static final RoleOfPspName PSP_PI = new RoleOfPspName("PSP_PI");
-        public static final RoleOfPspName PSP_AI = new RoleOfPspName("PSP_AI");
-        public static final RoleOfPspName PSP_IC = new RoleOfPspName("PSP_IC");
-
-        private RoleOfPspName(String string) {
-            super(string);
-        }
-    }
-
-    private static class RoleOfPspOid extends ASN1ObjectIdentifier {
-        public static final ASN1ObjectIdentifier etsi_psd2_roles = new ASN1ObjectIdentifier("0.4.0.19495.1");
-        public static final RoleOfPspOid id_psd2_role_psp_as = new RoleOfPspOid(etsi_psd2_roles.branch("1"));
-        public static final RoleOfPspOid id_psd2_role_psp_pi = new RoleOfPspOid(etsi_psd2_roles.branch("2"));
-        public static final RoleOfPspOid id_psd2_role_psp_ai = new RoleOfPspOid(etsi_psd2_roles.branch("3"));
-        public static final RoleOfPspOid id_psd2_role_psp_ic = new RoleOfPspOid(etsi_psd2_roles.branch("4"));
-
-        public RoleOfPspOid(ASN1ObjectIdentifier identifier) {
-            super(identifier.getId());
-        }
-    }
+  }
 }

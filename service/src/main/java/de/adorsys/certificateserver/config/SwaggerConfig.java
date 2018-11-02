@@ -14,22 +14,22 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                       .apiInfo(new ApiInfoBuilder()
-                                        .title("Certificate Generator")
-                                        .description("Certificate Generator for Testing Purposes of PSD2 Sandbox Environment")
-                                        .contact(new Contact(
-                                                "swi, adorsys GmbH & Co. KG",
-                                                "https://adorsys.de",
-                                                "swi@adorsys.de")
-                                        )
-                                        .version("1.0.0")
-                                        .build())
-                       .select()
-                       .apis(RequestHandlerSelectors.basePackage("de.adorsys.certificateserver"))
-                       .paths(PathSelectors.any())
-                       .build();
-    }
+  @Bean
+  public Docket api() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .apiInfo(new ApiInfoBuilder()
+            .title("Certificate Generator")
+            .description("Certificate Generator for Testing Purposes of PSD2 Sandbox Environment")
+            .contact(new Contact(
+                "swi, adorsys GmbH & Co. KG",
+                "https://adorsys.de",
+                "swi@adorsys.de")
+            )
+            .version("1.0.0")
+            .build())
+        .select()
+        .apis(RequestHandlerSelectors.basePackage("de.adorsys.certificateserver"))
+        .paths(PathSelectors.any())
+        .build();
+  }
 }

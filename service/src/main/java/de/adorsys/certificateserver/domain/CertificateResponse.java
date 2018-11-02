@@ -9,8 +9,9 @@ import lombok.Data;
 @Builder
 @ApiModel(description = "Certificate Response", value = "CertificateResponse")
 public class CertificateResponse {
-    private String encodedCert;
-    private String privateKey;
-    private String keyId;
-    private String algorithm;
+
+  private String encodedCert;
+  private String privateKey;
+  private String keyId;
+  private String algorithm;
 }

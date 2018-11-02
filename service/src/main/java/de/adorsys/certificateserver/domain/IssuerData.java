@@ -7,6 +7,7 @@ import java.security.PrivateKey;
 
 @Data
 public class IssuerData {
-    private X500Name x500name;
-    private PrivateKey privateKey;
+
+  private X500Name x500name;
+  private PrivateKey privateKey;
 }

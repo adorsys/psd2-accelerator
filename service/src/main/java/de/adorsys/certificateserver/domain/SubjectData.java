@@ -12,10 +12,11 @@ import org.bouncycastle.asn1.x500.X500Name;
 @Data
 @AllArgsConstructor
 public class SubjectData {
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
-    private X500Name x500name;
-    private Integer serialNumber;
-    private Date startDate;
-    private Date endDate;
+
+  private PrivateKey privateKey;
+  private PublicKey publicKey;
+  private X500Name x500name;
+  private Integer serialNumber;
+  private Date startDate;
+  private Date endDate;
 }
