@@ -1,11 +1,19 @@
 package de.adorsys.certificateserver.web;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyObject;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.certificateserver.domain.CertificateRequest;
 import de.adorsys.certificateserver.domain.CertificateResponse;
 import de.adorsys.certificateserver.domain.PspRole;
 import de.adorsys.certificateserver.service.CertificateService;
-import org.assertj.core.util.Sets;
+import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,24 +24,16 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collections;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyObject;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @RunWith(SpringRunner.class)
 @WebMvcTest(CertificateController.class)
 public class CertificateControllerTest {
 
   private static final String KEY_ID = "154054446";
+
+  // CHECKSTYLE:OFF
   private static final String CERTIFICATE = "-----BEGIN CERTIFICATE-----Stuff-----END CERTIFICATE-----";
   private static final String PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----Stuff-----END RSA PRIVATE KEY-----";
+  // CHECKSTYLE:ON
   private static final String ALGORITHM = "SHA256WITHRSA";
 
   @Autowired

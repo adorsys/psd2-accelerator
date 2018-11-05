@@ -1,18 +1,21 @@
 package de.adorsys.certificateserver.service;
 
-import de.adorsys.certificateserver.domain.*;
-import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.junit.Test;
-
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import de.adorsys.certificateserver.domain.CertificateRequest;
+import de.adorsys.certificateserver.domain.CertificateResponse;
+import de.adorsys.certificateserver.domain.IssuerData;
+import de.adorsys.certificateserver.domain.PspRole;
+import de.adorsys.certificateserver.domain.SubjectData;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
+import org.bouncycastle.asn1.x509.qualified.QCStatement;
+import org.junit.Test;
 
 public class CertificateServiceTest {
 
@@ -29,7 +32,7 @@ public class CertificateServiceTest {
   }
 
   @Test
-  public void exportPrivateKeyToStringResultsInSingleLinePK() {
+  public void exportPrivateKeyToStringResultsInSingleLinePrimaryKey() {
     PrivateKey key = CertificateService.getKeyFromClassPath("MyRootCA.key");
     String result = CertificateService.exportToString(key).trim();
     assertTrue(result.startsWith("-----BEGIN RSA PRIVATE KEY-----"));
