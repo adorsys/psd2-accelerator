@@ -10,8 +10,8 @@
     "test-single-headless": "ng test --browsers ChromeHeadless --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "tslint": "tslint -p tsconfig.json",
-    "tslint-fix": "tslint --fix -p tsconfig.json"
+    "tslint": "tslint -p tslint.json",
+    "tslint-fix": "tslint --fix -p tslint.json"
   },
   "private": true,
   "dependencies": {
@@ -61,7 +61,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "tslint --fix -p tsconfig.json",
+      "tslint --fix -p tslint.json",
       "git add"
     ]
   }
