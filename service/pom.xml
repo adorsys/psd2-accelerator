@@ -123,7 +123,7 @@
           <execution>
             <id>validate</id>
             <configuration>
-              <configLocation>${project.basedir}/google_checks.xml</configLocation>
+              <configLocation>${project.basedir}/google-checkstyle.xml</configLocation>
               <encoding>UTF-8</encoding>
               <consoleOutput>true</consoleOutput>
               <failsOnError>true</failsOnError>
