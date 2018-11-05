@@ -3,6 +3,7 @@ package de.adorsys.certificateserver.web;
 import de.adorsys.certificateserver.domain.CertificateRequest;
 import de.adorsys.certificateserver.domain.CertificateResponse;
 import de.adorsys.certificateserver.service.CertificateService;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.HttpStatus;
@@ -25,8 +26,9 @@ public class CertificateController {
     this.cerService = cerService;
   }
 
-  @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at "
-      + "the XS2A API with the corresponding private key and meta data", response = CertificateResponse.class)
+  @ApiOperation(value = "Create a new base64 encoded X509 certificate for authentication at the "
+      + "XS2A API with the corresponding private key and meta data",
+      response = CertificateResponse.class)
   @PostMapping
   public ResponseEntity<CertificateResponse> createCert(
       @Valid @RequestBody CertificateRequest certData) {
