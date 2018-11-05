@@ -1,9 +1,8 @@
 package de.adorsys.certificateserver.domain;
 
+import java.security.PrivateKey;
 import lombok.Data;
 import org.bouncycastle.asn1.x500.X500Name;
-
-import java.security.PrivateKey;
 
 @Data
 public class IssuerData {

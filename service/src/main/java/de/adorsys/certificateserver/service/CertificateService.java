@@ -1,5 +1,6 @@
 package de.adorsys.certificateserver.service;
 
+import com.nimbusds.jose.util.X509CertUtils;
 import de.adorsys.certificateserver.CertificateException;
 import de.adorsys.certificateserver.domain.CertificateRequest;
 import de.adorsys.certificateserver.domain.CertificateResponse;
@@ -8,8 +9,27 @@ import de.adorsys.certificateserver.domain.NcaId;
 import de.adorsys.certificateserver.domain.NcaName;
 import de.adorsys.certificateserver.domain.PspRole;
 import de.adorsys.certificateserver.domain.SubjectData;
-
-import com.nimbusds.jose.util.X509CertUtils;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.math.BigInteger;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Random;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
@@ -51,28 +71,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.math.BigInteger;
-import java.security.GeneralSecurityException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Random;
-
 
 @Service
 public class CertificateService {
@@ -86,6 +84,8 @@ public class CertificateService {
   private static final Logger log = LoggerFactory.getLogger(CertificateService.class);
 
   /**
+   * Load x509 cert from classpath.
+   *
    * @param filename Name of the key file. Suffix should be .pem
    * @return X509Certificate
    */
@@ -106,6 +106,8 @@ public class CertificateService {
   }
 
   /**
+   * Load private key from classpath.
+   *
    * @param filename Name of the key file. Suffix should be .key
    * @return PrivateKey
    */
