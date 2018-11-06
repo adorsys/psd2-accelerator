@@ -2,17 +2,16 @@
   <div class="page-inner">
     <div class="border">
       <div class="container">
-        <h1 class="container__title">QWAC-Generator</h1>
-        <h2 class="container__subtitle">Description</h2>
+        <h1 class="container__title">Certificate Service</h1>
+        <p class="container__subtitle">Welcome to the website of the Sample Trust Service Provider.</p>
         <div class="container__text">
-          Generates a QWAC Certificate. To validate the identity of the PSP the TSP needs specific attributes from the
-          PSP. The NCA provides this PSD2 specific attributes in a public register.
-          Besides the NCAID, NCAName and authorization number (PSP identifier) and the Roles of PSP, the TSP requires
-          additional data from the PSP.
+          We issue Qualified Website Authentication Certificates (QWAC) to Payment Service Providers (PSP) in order to use services offered at the Access-to-Account (XS2A) interface of the adorsys Sandbox Environment.
+          <br>
+          Usually each PSP has to be registered at the National Competent Authority (NCA) to receive an Authorisation Number. We allow you to skip this step and define a fake Authorisation Number yourself.
+          <br>
+          Performing the Certificate Service will generate a shared cryptographic key pair signed by the adorsys Sample Trust Service Provider. The Public Key which is also referred to a QWAC must be used for authentication purposes at XS2A.
         </div>
       </div>
-
-
       <form #certForm="ngForm" (ngSubmit)="onClickContinue()">
         <div class="inputfields">
           <div class="inputfields__input">
@@ -90,6 +89,7 @@
             <input type="text" name="validity" class="form-control" [(ngModel)]="certData.validity">
           </div>
         </div>
+
         <div class="error" *ngIf="error">
           <ul>
             <li *ngFor="let error of error.error.errors">
@@ -98,17 +98,13 @@
           </ul>
         </div>
 
-        <div class="buttons">
-          <button (click)=onClickCancel() type="button" name="decision" value="revoked"
-                  class="buttons btn--cancel">
-            Cancel
-          </button>
-          <button type="submit" [disabled]="certForm.invalid" class="buttons btn--continue">
+        <div class="button-container">
+          <button type="submit" [disabled]="certForm.invalid">
             Confirm
           </button>
         </div>
-
       </form>
+
     </div>
   </div>
 </div>

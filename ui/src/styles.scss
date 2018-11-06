@@ -35,6 +35,7 @@
   }
 
   .error {
+    display: block;
     background-color: firebrick;
     color: white;
     font-weight: bold;
@@ -45,13 +46,14 @@
   .border {
     flex-direction: column;
     align-items: center;
-    padding: 1%;
-    width: 40%;
+    padding: 0.25%;
+    width: 57%;
     border-width: 1px;
     border-style: outset;
     -webkit-box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
     -moz-box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
     box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
+
     .container {
 
       &__title {
@@ -65,21 +67,21 @@
 
       &__subtitle {
         display: block;
-        text-align: left;
-        font-size: 25px;
-        color: #333333f0;
-        font-weight: bolder;
-        padding: 5px;
+        line-height: 40px;
+        font-size: 23px;
+        font-weight: 400;
+        margin: 0 7px 7px 7px;
+        padding-top: 23px;
+        width: 96%;
       }
 
       &__text {
         display: block;
         text-align: justify;
-        justify-content: center;
-        line-height: 60px;
-        font-size: 25px;
+        line-height: 40px;
+        font-size: 23px;
         font-weight: 300;
-        margin: 5px;
+        margin: 0 7px 7px 7px;
         width: 96%;
 
       }
@@ -119,37 +121,22 @@
       }
     }
 
-    .buttons {
+    .button-container {
       display: flex;
+      justify-content: flex-end;
+      margin: 0.5% 0 0 0.5%;
 
       button {
         display: inline-block;
-        width: 50%;
-        justify-content: space-between;
+        width: 40%;
         font-size: 22px;
         padding: 8px;
         border-radius: 1px;
-
-      }
-
-    }
-
-    .btn {
-      &--continue {
-        display: inline-block;
         background-color: #0E6EB4;
         color: white;
-        font-weight: 100;
-        margin: 25px 0px 0px 14px;
       }
-
-      &--cancel {
-        display: inline-block;
-        background-color: #ffffff;
-        color: #33333382;
-        border-color: #33333369;
-        font-weight: 300;
-        margin: 25px 14px 0px 0px;
+      & .disabled {
+        background-color: lightgrey;
       }
     }
   }
