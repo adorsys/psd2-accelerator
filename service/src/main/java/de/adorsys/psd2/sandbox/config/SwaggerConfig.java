@@ -1,13 +1,18 @@
-package de.adorsys.psd2.sandbox.certificateserver.config;
+package de.adorsys.psd2.sandbox.config;
 
+import java.util.ArrayList;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.InMemorySwaggerResourcesProvider;
+import springfox.documentation.swagger.web.SwaggerResource;
+import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
@@ -28,8 +33,30 @@ public class SwaggerConfig {
             .version("1.0.0")
             .build())
         .select()
-        .apis(RequestHandlerSelectors.basePackage("de.adorsys.certificateserver"))
+        .apis(RequestHandlerSelectors.basePackage("de.adorsys.psd2.sandbox.certificateserver"))
         .paths(PathSelectors.any())
         .build();
+  }
+
+  // CHECKSTYLE:OFF
+  @Bean
+  @Primary
+  public SwaggerResourcesProvider swaggerResourcesProvider(
+      InMemorySwaggerResourcesProvider defaultResourcesProvider) {
+    // CHECKSTYLE:ON
+
+    return () -> {
+      SwaggerResource swaggerResource = new SwaggerResource();
+      swaggerResource.setName("XS2A API");
+      swaggerResource.setSwaggerVersion("3.0.1");
+      swaggerResource.setUrl("/psd2-api-2018-08-17.yaml");
+
+      ArrayList<SwaggerResource> resources = new ArrayList<>();
+
+      resources.add(swaggerResource);
+      resources.addAll(defaultResourcesProvider.get());
+
+      return resources;
+    };
   }
 }

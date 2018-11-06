@@ -20,8 +20,8 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <swagger.version>2.6.1</swagger.version>
     <lombok.version>1.18.2</lombok.version>
+    <xs2a.version>1.11-RC1</xs2a.version>
   </properties>
 
   <dependencies>
@@ -40,16 +40,27 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- Swagger -->
+    <!-- XS2A -->
     <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger2</artifactId>
-      <version>${swagger.version}</version>
+      <groupId>de.adorsys.psd2</groupId>
+      <artifactId>xs2a-impl</artifactId>
+      <version>${xs2a.version}</version>
     </dependency>
     <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>${swagger.version}</version>
+      <groupId>de.adorsys.psd2</groupId>
+      <artifactId>aspsp-profile-lib</artifactId>
+      <version>${xs2a.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.adorsys.psd2</groupId>
+      <artifactId>consent-management-lib</artifactId>
+      <version>${xs2a.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>de.adorsys.psd2</groupId>
+          <artifactId>aspsp-profile-remote</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Lombok -->
