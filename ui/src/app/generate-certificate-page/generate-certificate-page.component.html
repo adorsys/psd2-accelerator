@@ -12,7 +12,7 @@
           Performing the Certificate Service will generate a shared cryptographic key pair signed by the adorsys Sample Trust Service Provider. The Public Key which is also referred to a QWAC must be used for authentication purposes at XS2A.
         </div>
       </div>
-      <form #certForm="ngForm" (ngSubmit)="onClickContinue()">
+      <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
         <div class="inputfields">
           <div class="inputfields__input">
             <label>
@@ -89,7 +89,6 @@
             <input type="text" name="validity" class="form-control" [(ngModel)]="certData.validity">
           </div>
         </div>
-
         <div class="error" *ngIf="error">
           <ul>
             <li *ngFor="let error of error.error.errors">
@@ -104,7 +103,6 @@
           </button>
         </div>
       </form>
-
     </div>
   </div>
 </div>
