@@ -1,14 +1,40 @@
 import { AppPage } from './app.po';
+import { browser } from 'protractor';
+import * as fs from 'fs';
 
-describe('workspace-project App', () => {
+describe('Certificate Service UI', () => {
   let page: AppPage;
+  const filename = 'psu_cert.zip';
+
+  function cleanUpDownloads() {
+    if (fs.existsSync(filename)) {
+      fs.unlinkSync(filename);
+    }
+  }
 
   beforeEach(() => {
     page = new AppPage();
+    cleanUpDownloads();
   });
 
-  it('should display welcome message', () => {
+  afterEach(() => {
+    cleanUpDownloads();
+  });
+
+  it('should check headline text', () => {
     page.navigateTo();
-    expect(page.getParagraphText()).toEqual('Welcome to psd2-certificate-ui!');
+    expect(page.getDescriptionTitle()).toEqual('Certificate Service');
+  });
+
+  it('should create a certificate', () => {
+    page.clickDownloadButton();
+
+    browser.driver.wait(() => {
+      return fs.existsSync(filename);
+    }, 3000).then(() => {
+      const file = fs.readFileSync(filename, {encoding: 'utf8'});
+      expect(file).toContain('-----END RSA PRIVATE KEY-----');
+      expect(file).toContain('-----BEGIN CERTIFICATE-----');
+    });
   });
 });

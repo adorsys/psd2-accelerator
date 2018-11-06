@@ -10,6 +10,7 @@
     "test-single-headless": "ng test --browsers ChromeHeadless --watch=false",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "e2e-running": "ng e2e --devServerTarget=",
     "tslint": "tslint -p tslint.json",
     "tslint-fix": "tslint --fix -p tslint.json"
   },

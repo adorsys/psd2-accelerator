@@ -1,11 +1,17 @@
 import { browser, by, element } from 'protractor';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class AppPage {
   navigateTo() {
     return browser.get('/');
   }
 
-  getParagraphText() {
-    return element(by.css('app-root h1')).getText();
+  getDescriptionTitle() {
+    return element(by.css('.description__title')).getText();
+  }
+
+  clickDownloadButton() {
+    element(by.css('.btn-primary')).click();
   }
 }

@@ -1,19 +1,10 @@
-//@import "_variables.scss";
-////@import "~bootstrap-scss/bootstrap-reboot";
-////
-////@import "~bootstrap-scss/_alert";
-////@import "~bootstrap-scss/_buttons";
-////@import "~bootstrap-scss/_button-group";
-////@import "~bootstrap-scss/utilities/_flex";
-////@import "~bootstrap-scss/mixins/_grid-framework";
-////@import "~bootstrap-scss/mixins/_grid";
-////@import "~bootstrap-scss/grid";
+// TODO: Use just needed bootstrap modules. Not the whole package.
 @import "~bootstrap-scss";
-
 
 .page {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   color: #606060;
+  margin-bottom: 2em;
 
   .header {
     display: flex;
