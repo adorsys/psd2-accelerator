@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver.service;
+package de.adorsys.psd2.sandbox.certificateserver.service;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -6,11 +6,11 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import de.adorsys.certificateserver.domain.CertificateRequest;
-import de.adorsys.certificateserver.domain.CertificateResponse;
-import de.adorsys.certificateserver.domain.IssuerData;
-import de.adorsys.certificateserver.domain.PspRole;
-import de.adorsys.certificateserver.domain.SubjectData;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateRequest;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateResponse;
+import de.adorsys.psd2.sandbox.certificateserver.domain.IssuerData;
+import de.adorsys.psd2.sandbox.certificateserver.domain.PspRole;
+import de.adorsys.psd2.sandbox.certificateserver.domain.SubjectData;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;

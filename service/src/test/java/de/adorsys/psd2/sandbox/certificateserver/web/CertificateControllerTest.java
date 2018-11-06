@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver.web;
+package de.adorsys.psd2.sandbox.certificateserver.web;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -9,10 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.adorsys.certificateserver.domain.CertificateRequest;
-import de.adorsys.certificateserver.domain.CertificateResponse;
-import de.adorsys.certificateserver.domain.PspRole;
-import de.adorsys.certificateserver.service.CertificateService;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateRequest;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateResponse;
+import de.adorsys.psd2.sandbox.certificateserver.domain.PspRole;
+import de.adorsys.psd2.sandbox.certificateserver.service.CertificateService;
 import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;

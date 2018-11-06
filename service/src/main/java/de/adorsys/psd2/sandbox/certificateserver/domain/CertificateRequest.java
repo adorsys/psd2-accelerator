@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver.domain;
+package de.adorsys.psd2.sandbox.certificateserver.domain;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

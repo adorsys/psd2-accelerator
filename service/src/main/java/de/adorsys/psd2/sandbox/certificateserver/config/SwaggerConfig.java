@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver.config;
+package de.adorsys.psd2.sandbox.certificateserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

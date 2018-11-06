@@ -1,14 +1,14 @@
-package de.adorsys.certificateserver.service;
+package de.adorsys.psd2.sandbox.certificateserver.service;
 
 import com.nimbusds.jose.util.X509CertUtils;
-import de.adorsys.certificateserver.CertificateException;
-import de.adorsys.certificateserver.domain.CertificateRequest;
-import de.adorsys.certificateserver.domain.CertificateResponse;
-import de.adorsys.certificateserver.domain.IssuerData;
-import de.adorsys.certificateserver.domain.NcaId;
-import de.adorsys.certificateserver.domain.NcaName;
-import de.adorsys.certificateserver.domain.PspRole;
-import de.adorsys.certificateserver.domain.SubjectData;
+import de.adorsys.psd2.sandbox.certificateserver.CertificateException;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateRequest;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateResponse;
+import de.adorsys.psd2.sandbox.certificateserver.domain.IssuerData;
+import de.adorsys.psd2.sandbox.certificateserver.domain.NcaId;
+import de.adorsys.psd2.sandbox.certificateserver.domain.NcaName;
+import de.adorsys.psd2.sandbox.certificateserver.domain.PspRole;
+import de.adorsys.psd2.sandbox.certificateserver.domain.SubjectData;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

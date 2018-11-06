@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver;
+package de.adorsys.psd2.sandbox.certificateserver;
 
 public class CertificateException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver;
+package de.adorsys.psd2.sandbox.certificateserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

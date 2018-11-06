@@ -1,4 +1,4 @@
-package de.adorsys.certificateserver.domain;
+package de.adorsys.psd2.sandbox.certificateserver.domain;
 
 import java.security.PrivateKey;
 import lombok.Data;

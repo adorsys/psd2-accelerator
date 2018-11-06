@@ -1,8 +1,8 @@
-package de.adorsys.certificateserver.web;
+package de.adorsys.psd2.sandbox.certificateserver.web;
 
-import de.adorsys.certificateserver.domain.CertificateRequest;
-import de.adorsys.certificateserver.domain.CertificateResponse;
-import de.adorsys.certificateserver.service.CertificateService;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateRequest;
+import de.adorsys.psd2.sandbox.certificateserver.domain.CertificateResponse;
+import de.adorsys.psd2.sandbox.certificateserver.service.CertificateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
