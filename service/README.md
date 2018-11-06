@@ -59,13 +59,19 @@ As a result, no existing line of code should got moved and new code should just 
 
 To do real-time and on-demand scanning of Java files with CheckStyle, IntelliJ offers an appropriate realtime CheckStyle Plugin. 
 
+* First install the CheckStyle Plugin
+  * Open IntelliJ IDEA -> Preferences -> Plugins -> Type in `CheckStyle` and search for it in the repositories
 * Add realtime CheckStyle
   * Open IntelliJ IDEA -> Preferences -> Editor -> Inspections -> CheckStyle
+  (checkbox should be checked)
+* Configure `google-checkstyle.xml` as default for the plugin
+  * Open IntelliJ IDEA -> Preferences -> Other Settings -> Checkstyle
+  * Add a new checkstyle and choose the file `service/google-checkstyle.xml` as configuration. You can name it `google-checkstyle`
 * Restart IntelliJ
 
 Using the plugin IntelliJ will mark not formatted code as a Warning or even as an Error depending on your preferred configuration.
 Furthermore, from now on a new CheckStyle area right next to the Terminal and Version Control is getting displayed.
-The only possible configuration is to chose the active rule which should be either `<active configuration>` or `<Google-Checkstyle>`. 
+Choose either `<active configuration>` or `<Google-Checkstyle>`, since they are the only suitable configurations for the project. 
 The latter is the default name based on our adapted `./google-checkstyle.xml` that we use for this project.
 
 
