@@ -1,20 +1,88 @@
 <div class="page">
   <div class="page-inner">
-    <div class="border">
-      <div class="container">
-        <h1 class="container__title">Certificate Service</h1>
-        <p class="container__subtitle">Welcome to the website of the Sample Trust Service Provider.</p>
-        <div class="container__text">
-          We issue Qualified Website Authentication Certificates (QWAC) to Payment Service Providers (PSP) in order to use services offered at the Access-to-Account (XS2A) interface of the adorsys Sandbox Environment.
+    <div class="container">
+      <div class="description">
+        <h1 class="description__title">Certificate Service</h1>
+        <p class="description__intro">Welcome to the website of the Sample Trust Service
+          Provider.</p>
+        <div class="description__text">
+          We issue Qualified Website Authentication Certificates (QWAC) to Payment Service Providers
+          (PSP) in order to use services offered at the Access-to-Account (XS2A) interface of the
+          adorsys Sandbox Environment.
           <br>
-          Usually each PSP has to be registered at the National Competent Authority (NCA) to receive an Authorisation Number. We allow you to skip this step and define a fake Authorisation Number yourself.
+          Usually each PSP has to be registered at the National Competent Authority (NCA) to receive
+          an Authorisation Number. We allow you to skip this step and define a fake Authorisation
+          Number yourself.
           <br>
-          Performing the Certificate Service will generate a shared cryptographic key pair signed by the adorsys Sample Trust Service Provider. The Public Key which is also referred to a QWAC must be used for authentication purposes at XS2A.
+          Performing the Certificate Service will generate a shared cryptographic key pair signed by
+          the adorsys Sample Trust Service Provider. The Public Key which is also referred to a QWAC
+          must be used for authentication purposes at XS2A.
         </div>
       </div>
       <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
-        <div class="inputfields">
-          <div class="inputfields__input">
+        <div class="form">
+          <div class="form-group">
+            <label>
+              Authorization Number*
+            </label>
+            <input type="text" name="authorizationNumber" class="form-control" required
+                   [(ngModel)]="certData.authorizationNumber">
+          </div>
+          <div class="form-group">
+            <label>
+              Validity
+            </label>
+            <input type="text" name="validity" class="form-control"
+                   [(ngModel)]="certData.validity">
+          </div>
+
+          <div class="form-group">
+            <label>
+              Country
+            </label>
+            <input type="text" name="countryName" class="form-control"
+                   [(ngModel)]="certData.countryName">
+          </div>
+          <div class="form-group">
+            <label>
+              State
+            </label>
+            <input type="text" name="stateOrProvinceName" class="form-control"
+                   [(ngModel)]="certData.stateOrProvinceName">
+          </div>
+
+          <div class="form-group">
+            <label>
+              City
+            </label>
+            <input type="text" name="localityName" class="form-control"
+                   [(ngModel)]="certData.localityName">
+          </div>
+          <div class="form-group">
+            <label>
+              Domain
+            </label>
+            <input type="text" name="domainComponent" class="form-control"
+                   [(ngModel)]="certData.domainComponent">
+          </div>
+
+          <div class="form-group">
+            <label>
+              Organization Name*
+            </label>
+            <input type="text" name="organizationName" class="form-control" required
+                   [(ngModel)]="certData.organizationName">
+          </div>
+          <div class="form-group">
+            <label>
+              Organization Unit
+            </label>
+            <input type="text" name="organizationUnit" class="form-control"
+                   [(ngModel)]="certData.organizationUnit">
+          </div>
+
+
+          <div class="form-group">
             <label>
               Roles of PSP*
             </label>
@@ -27,66 +95,6 @@
                 </label>
               </li>
             </ul>
-          </div>
-          <div class="inputfields__input">
-            <label>
-              Authorization Number*
-            </label>
-            <input type="text" name="authorizationNumber" class="form-control" required [(ngModel)]="certData.authorizationNumber">
-          </div>
-        </div>
-
-        <div class="inputfields">
-          <div class="inputfields__input">
-            <label>
-              Country
-            </label>
-            <input type="text" name="countryName" class="form-control" [(ngModel)]="certData.countryName">
-          </div>
-          <div class="inputfields__input">
-            <label>
-              State
-            </label>
-            <input type="text" name="stateOrProvinceName" class="form-control" [(ngModel)]="certData.stateOrProvinceName">
-          </div>
-        </div>
-
-        <div class="inputfields">
-          <div class="inputfields__input">
-            <label>
-              City
-            </label>
-            <input type="text" name="localityName" class="form-control" [(ngModel)]="certData.localityName">
-          </div>
-          <div class="inputfields__input">
-            <label>
-              Domain
-            </label>
-            <input type="text" name="domainComponent" class="form-control" [(ngModel)]="certData.domainComponent">
-          </div>
-        </div>
-
-        <div class="inputfields">
-          <div class="inputfields__input">
-            <label>
-              Organization Name*
-            </label>
-            <input type="text" name="organizationName" class="form-control" required [(ngModel)]="certData.organizationName">
-          </div>
-          <div class="inputfields__input">
-            <label>
-              Organization Unit
-            </label>
-            <input type="text" name="organizationUnit" class="form-control" [(ngModel)]="certData.organizationUnit">
-          </div>
-        </div>
-
-        <div class="inputfields">
-          <div class="inputfields__input">
-            <label>
-              Validity
-            </label>
-            <input type="text" name="validity" class="form-control" [(ngModel)]="certData.validity">
           </div>
         </div>
         <div class="error" *ngIf="error">

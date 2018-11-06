@@ -1,3 +1,14 @@
+@import "_variables.scss";
+@import "~bootstrap-scss/bootstrap-reboot";
+
+@import "~bootstrap-scss/_alert";
+@import "~bootstrap-scss/_buttons";
+@import "~bootstrap-scss/_button-group";
+@import "~bootstrap-scss/utilities/_flex";
+@import "~bootstrap-scss/mixins/_grid";
+@import "~bootstrap-scss/mixins/_grid-framework";
+
+
 .page {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   color: #33333382;
@@ -7,16 +18,13 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    &__header {
-      position: relative;
-    }
   }
   .header {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    margin: 40px;
+    margin: 0 40px 20px 10px;
+    position: relative;
 
     &__logo img {
       display: inline-block;
@@ -43,18 +51,72 @@
     margin-top: 1em;
   }
 
-  .border {
+  .container {
     flex-direction: column;
     align-items: center;
     padding: 0.25%;
-    width: 57%;
+    width: 65%;
     border-width: 1px;
     border-style: outset;
     -webkit-box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
     -moz-box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
     box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
+    margin-bottom: 2em;
 
-    .container {
+    .form {
+      display: flex;
+      height: auto;
+      flex-direction: row;
+      flex-wrap: wrap;
+      background-color: #f2f8fd;
+      justify-content: space-between;
+      padding: 0 2em;
+
+      .form-group {
+        display: flex;
+        width: 45%;
+        flex-direction: column;
+
+        .checkbox {
+          list-style-type: none;
+          padding-left: 10px;
+          margin-bottom: 0px;
+        }
+
+        label {
+          display: inline-block;
+          font-size: 16px;
+          font-weight: 200;
+          padding: 2px;
+          margin-bottom: 0px;
+        }
+
+        input {
+          display: inline-block;
+          justify-content: center;
+          font-size: 15px;
+          font-weight: 300;
+        }
+
+        &__container{
+          display: flex;
+          flex-direction: column;
+        }
+        &__input {
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+          width: 40%;
+
+          .ng-invalid:not(form)  {
+            border: 2px solid #a94442; /* red */
+          }
+
+        }
+      }
+    }
+
+    .description {
 
       &__title {
         display: block;
@@ -65,9 +127,8 @@
         align-items: center;
       }
 
-      &__subtitle {
+      &__intro {
         display: block;
-        line-height: 40px;
         font-size: 23px;
         font-weight: 400;
         margin: 0 7px 7px 7px;
@@ -78,8 +139,7 @@
       &__text {
         display: block;
         text-align: justify;
-        line-height: 40px;
-        font-size: 23px;
+        font-size: 20px;
         font-weight: 300;
         margin: 0 7px 7px 7px;
         width: 96%;
@@ -87,44 +147,12 @@
       }
     }
 
-    .inputfields {
-      display: flex;
-      background-color: #f2f8fd;
-      justify-content: space-around;
-
-      &__input {
-        display: flex;
-        flex-direction: column;
-        padding: 20px;
-        width: 40%;
-
-        .ng-invalid:not(form)  {
-          border: 2px solid #a94442; /* red */
-        }
-
-        label {
-          display: inline-block;
-          font-size: 18px;
-          font-weight: 300;
-          padding: 2px;
-        }
-        input {
-          display: inline-block;
-          justify-content: center;
-          font-size: 23px;
-          font-weight: 300;
-        }
-
-        .checkbox {
-          list-style-type: none;
-        }
-      }
-    }
-
     .button-container {
       display: flex;
       justify-content: flex-end;
-      margin: 0.5% 0 0 0.5%;
+      background-color: #f2f8fd;
+      padding-right: 2em;
+      padding-bottom: 1em;
 
       button {
         display: inline-block;

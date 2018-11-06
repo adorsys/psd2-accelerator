@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
 import { AppRoutingModule } from './app-routing.module';
 import { RouterModule } from '@angular/router';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { RouterModule } from '@angular/router';
     HttpClientModule,
     FormsModule,
     RouterModule,
-
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]
