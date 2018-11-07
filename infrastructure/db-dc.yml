@@ -1,0 +1,67 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: db
+  name: db
+spec:
+  replicas: 1
+  selector:
+    app: db
+    deploymentconfig: db
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: db
+        deploymentconfig: db
+    spec:
+      containers:
+      - env:
+        - name: POSTGRESQL_USER
+          value: cms
+        - name: POSTGRESQL_PASSWORD
+          value: cms
+        - name: POSTGRESQL_DATABASE
+          value: consent
+        image: centos/postgresql-10-centos7@sha256:c7ffc7a9d8fc7794847da74d837518d9bb1fec71d71fa02bcbec25ff516b3e35
+        imagePullPolicy: Always
+        name: db
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib/pgsql/data
+          name: db-1
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: db-1
+  test: false
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - db
+      from:
+        kind: ImageStreamTag
+        name: db:latest
+        namespace: psd2-sandbox-dev
+    type: ImageChange

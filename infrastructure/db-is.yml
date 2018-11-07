@@ -1,0 +1,19 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  labels:
+    app: db
+  name: db
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations:
+      openshift.io/imported-from: centos/postgresql-10-centos7
+    from:
+      kind: DockerImage
+      name: centos/postgresql-10-centos7
+    importPolicy: {}
+    name: latest
+    referencePolicy:
+      type: Source
