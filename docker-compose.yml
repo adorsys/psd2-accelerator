@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  service:
+    build: service
+    image: adorsys/psd2-sandbox
+    ports:
+      - "8080:8080"
+  db:
+    image: centos/postgresql-10-centos7
+    environment:
+      - POSTGRESQL_USER=cms
+      - POSTGRESQL_PASSWORD=cms
+      - POSTGRESQL_DATABASE=consent
+    ports:
+      - "5432:5432"
