@@ -29,6 +29,9 @@ spec:
         deploymentconfig: psd2-sandbox
     spec:
       containers:
+      - env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:postgresql://db/consent
       - image: " "
         imagePullPolicy: Always
         name: psd2-sandbox

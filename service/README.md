@@ -28,8 +28,10 @@ In order to start the SpringBoot Application, the following steps need to be ful
     
 ```sh 
 $ git clone https://git.adorsys.de/psd2/sandbox.git
-$ cd sandbox/service
-$ mvn spring-boot:run
+$ cd sandbox
+$ docker-compose up -d db
+$ cd service
+$ mvn spring-boot:run -Drun.arguments="--spring.profiles.active=test"
 ```
 
 * Services will be available at (<http://localhost:8080/api/>)
