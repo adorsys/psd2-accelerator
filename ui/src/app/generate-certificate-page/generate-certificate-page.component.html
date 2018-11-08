@@ -1,6 +1,5 @@
 <div class="page">
-  <div class="page-inner">
-    <div class="container">
+    <div class="container container--big">
       <div class="description">
         <h1 class="description__title">Certificate Service</h1>
         <p class="description__intro">Welcome to the website of the Sample Trust Service
@@ -20,97 +19,117 @@
         </div>
       </div>
       <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
-        <div class="form">
-          <div class="form-group">
-            <label>
-              Authorization Number*
-            </label>
-            <input type="text" name="authorizationNumber" class="form-control" required
-                   [(ngModel)]="certData.authorizationNumber">
-          </div>
-          <div class="form-group">
-            <label>
-              Validity
-            </label>
-            <input type="text" name="validity" class="form-control"
-                   [(ngModel)]="certData.validity">
-          </div>
+            <div class="row">
 
-          <div class="form-group">
-            <label>
-              Country
-            </label>
-            <input type="text" name="countryName" class="form-control"
-                   [(ngModel)]="certData.countryName">
-          </div>
-          <div class="form-group">
-            <label>
-              State
-            </label>
-            <input type="text" name="stateOrProvinceName" class="form-control"
-                   [(ngModel)]="certData.stateOrProvinceName">
-          </div>
+              <div class="col-sm-6">
+                  <label>
+                  Authorization Number*
+                  </label>
+              <input type="text" name="authorizationNumber" required class="form-control"
+                     [(ngModel)]="certData.authorizationNumber">
+              </div>
 
-          <div class="form-group">
-            <label>
-              City
-            </label>
-            <input type="text" name="localityName" class="form-control"
-                   [(ngModel)]="certData.localityName">
-          </div>
-          <div class="form-group">
-            <label>
-              Domain
-            </label>
-            <input type="text" name="domainComponent" class="form-control"
-                   [(ngModel)]="certData.domainComponent">
-          </div>
-
-          <div class="form-group">
-            <label>
-              Organization Name*
-            </label>
-            <input type="text" name="organizationName" class="form-control" required
-                   [(ngModel)]="certData.organizationName">
-          </div>
-          <div class="form-group">
-            <label>
-              Organization Unit
-            </label>
-            <input type="text" name="organizationUnit" class="form-control"
-                   [(ngModel)]="certData.organizationUnit">
-          </div>
-
-
-          <div class="form-group">
-            <label>
-              Roles of PSP*
-            </label>
-            <ul class="checkbox">
-              <li *ngFor="let pspRole of pspRolesKeys">
+              <div class="col-sm-6">
                 <label>
-                  <input name="{{pspRole}}" type="checkbox" (change)="onSelectPspRole(pspRole)"
-                         [checked]="isPspRoleSelected(pspRole)">
-                  {{pspRole}}
+                  Country
                 </label>
-              </li>
-            </ul>
+                <input type="text" name="countryName" class="form-control"
+                       [(ngModel)]="certData.countryName">
+              </div>
+
+
+              <div class="col-sm-6">
+                <label>
+                  State
+                </label>
+                <input type="text" name="stateOrProvinceName" class="form-control"
+                       [(ngModel)]="certData.stateOrProvinceName">
+              </div>
+
+              <div class="col-sm-6">
+                <label>
+                  City
+                </label>
+                <input type="text" name="localityName" class="form-control"
+                       [(ngModel)]="certData.localityName">
+              </div>
+
+              <div class="col-sm-6">
+                <label>
+                  Domain
+                </label>
+                <input type="text" name="domainComponent" class="form-control"
+                       [(ngModel)]="certData.domainComponent">
+              </div>
+
+              <div class="col-sm-6">
+                <label>
+                  Organization Name*
+                </label>
+                <input type="text" name="organizationName" class="form-control" required
+                       [(ngModel)]="certData.organizationName">
+              </div>
+
+              <div class="col-sm-6">
+                <label>
+                  Organization Unit
+                </label>
+                <input type="text" name="organizationUnit" class="form-control"
+                       [(ngModel)]="certData.organizationUnit">
+              </div>
+
+
+              <div class="col-sm-6">
+                <label>
+                  Validity
+                </label>
+                <input type="text" name="validity" required class="form-control"
+                       [(ngModel)]="certData.validity">
+              </div>
+
+              <div class="col-sm-6">
+                <label>
+                  Roles of PSP*
+                </label>
+                <div class="form-group">
+                  <div *ngFor="let pspRole of pspRolesKeys" class="d-inline">
+                    <label>
+                      <input name="{{pspRole}}" type="checkbox" (change)="onSelectPspRole(pspRole)"
+                             [checked]="isPspRoleSelected(pspRole)">
+                      {{pspRole}}
+                    </label>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+        <div class="col-xm-6">
+          <div class="form-group">
+            <label for="pspRolesKeys" class="col-xs-4">Options</label>
+            <div class="checkbox"  formGroupName="options" *ngFor="let pspRole of pspRolesKeys">
+              <div class="col-xs-4">
+                <input id="{{option}}" formControlName="{{option}}" type="checkbox"
+                       [checked]=false> {{option}}
+              </div>
+            </div>
           </div>
         </div>
-        <div class="error" *ngIf="error">
-          <ul>
-            <li *ngFor="let error of error.error.errors">
+
+        <div class="clearfix">
+          <button type="submit" class="btn btn-primary float-right" [disabled]="certForm.invalid">
+            Confirm
+          </button>
+        </div>
+
+        <div *ngIf="error">
+          <ul class="alert alert-warning">
+            <li class="list-inline" *ngFor="let error of error.error.errors">
               {{error.field}}: {{error.defaultMessage}}
             </li>
           </ul>
         </div>
 
-        <div class="button-container">
-          <button type="submit" [disabled]="certForm.invalid">
-            Confirm
-          </button>
-        </div>
+
       </form>
     </div>
-  </div>
 </div>
