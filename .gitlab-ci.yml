@@ -28,6 +28,7 @@ build_ui:
   script:
     - cd ui
     - npm ci
+    - npm run tslint
     - npm run build
   artifacts:
     name: "ui-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"

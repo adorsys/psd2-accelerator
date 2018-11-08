@@ -3,11 +3,12 @@ import { CertificateService } from './certificate.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { PspRole } from '../models/pspRole';
+import { CertificateResponse } from '../models/certificateResponse';
 
 describe('CertificateService', () => {
   let service: CertificateService;
   let httpMock: HttpTestingController;
-  const certResponse = {
+  const certResponse: CertificateResponse = {
     encodedCert: '-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----',
     privateKey: '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
     keyId: '1612748784',
@@ -57,8 +58,11 @@ describe('CertificateService', () => {
 
     const mockResponse = certResponse;
 
-    service.createCertificate(certData).subscribe(certResponse => {
-      expect(certResponse).toEqual(mockResponse);
+    service.createCertificate(certData).subscribe(backendResponse => {
+      expect(backendResponse.algorithm).toBe('SHA256WITHRSA');
+      expect(backendResponse.keyId).toBe('1612748784');
+      expect(backendResponse.privateKey).toBe('-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----');
+      expect(backendResponse.encodedCert).toBe('-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----');
     });
 
     const req = httpMock.expectOne(`${service.CREATE_CERT_URL}`);
