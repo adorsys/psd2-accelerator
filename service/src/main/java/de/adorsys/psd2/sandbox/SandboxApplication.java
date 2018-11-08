@@ -14,9 +14,7 @@ import org.springframework.context.annotation.FilterType;
 @SpringBootApplication
 public class SandboxApplication {
 
-  // CHECKSTYLE:OFF
   public static void main(String[] args) {
-    // CHECKSTYLE:ON
     SpringApplication.run(SandboxApplication.class, args);
   }
 }

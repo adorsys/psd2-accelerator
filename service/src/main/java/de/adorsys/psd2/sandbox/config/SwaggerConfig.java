@@ -38,12 +38,10 @@ public class SwaggerConfig {
         .build();
   }
 
-  // CHECKSTYLE:OFF
   @Bean
   @Primary
-  public SwaggerResourcesProvider swaggerResourcesProvider(
+  SwaggerResourcesProvider swaggerResourcesProvider(
       InMemorySwaggerResourcesProvider defaultResourcesProvider) {
-    // CHECKSTYLE:ON
 
     return () -> {
       SwaggerResource swaggerResource = new SwaggerResource();

@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(secure = false)
+@WebMvcTest(value = CertificateController.class, secure = false)
 public class CertificateControllerTest {
 
   private static final String KEY_ID = "154054446";
