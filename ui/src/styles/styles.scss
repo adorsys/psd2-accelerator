@@ -13,8 +13,7 @@
 
 .page {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  color: #33333382;
-  font-weight: lighter;
+  color: #606060;
 
   .header {
     display: flex;
@@ -74,21 +73,14 @@
           display: block;
           text-align: justify;
           font-size: 20px;
-          font-weight: 300;
           padding-bottom: 3%;
-
+          font-weight: 200;
         }
       }
-
-
-
     }
 
     .ng-invalid {
       @extend .is-invalid;
     }
-
   }
-
-
 }

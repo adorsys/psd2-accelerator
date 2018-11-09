@@ -54,9 +54,6 @@ export class GenerateCertificatePageComponent implements OnInit {
     );
   }
 
-  onClickCancel() {
-  }
-
   onSelectPspRole(pspRole: string) {
     if (this.isPspRoleSelected(pspRole)) {
       this.certData.roles = this.certData.roles.filter(psp => psp !== PspRole[pspRole]);
@@ -67,6 +64,10 @@ export class GenerateCertificatePageComponent implements OnInit {
 
   isPspRoleSelected(pspRole: string): boolean {
     return this.certData.roles.includes(PspRole[pspRole]);
+  }
+
+  isPspRoleValid(): boolean {
+    return this.certData.roles.length > 0;
   }
 
   generateAndDownloadZip() {
