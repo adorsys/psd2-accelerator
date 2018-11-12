@@ -85,10 +85,10 @@
           </div>
           <div class="form-group col-sm-6">
             <label>Validity</label>
-            <input type="text" class="form-control" required type="text" name="validity"
+            <input type="number" class="form-control" required name="validity" sbMax="365" sbMin="1"
                    [(ngModel)]="certData.validity">
             <div class="invalid-feedback">
-              Please provide a Validity.
+              Please specify how many days the cert will be valid (min=1; max=365).
             </div>
           </div>
           <div class="form-group col-sm-6">

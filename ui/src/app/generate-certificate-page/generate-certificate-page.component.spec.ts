@@ -3,14 +3,16 @@ import { GenerateCertificatePageComponent } from './generate-certificate-page.co
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { CertificateRequest } from '../../models/certificateRequest';
 import { PspRole } from '../../models/pspRole';
 import { CertificateResponse } from '../../models/certificateResponse';
+import { By } from '@angular/platform-browser';
+import { MaxValidatorDirective } from '../common/validators/max-validator.directive';
+import { MinValidatorDirective } from '../common/validators/min-validator.directive';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;
   let fixture: ComponentFixture<GenerateCertificatePageComponent>;
-  let certData: CertificateRequest;
+
   const certResponse: CertificateResponse = {
     encodedCert: '-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----',
     privateKey: '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
@@ -21,16 +23,15 @@ describe('GenerateCertificatePageComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
-      declarations: [ GenerateCertificatePageComponent ]
+      declarations: [GenerateCertificatePageComponent, MaxValidatorDirective, MinValidatorDirective]
     })
-    .compileComponents();
+        .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(GenerateCertificatePageComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-    certData = {
+    component.certData = {
       roles: [PspRole.PIS],
       authorizationNumber: '87B2AC',
       countryName: 'Germany',
@@ -41,6 +42,7 @@ describe('GenerateCertificatePageComponent', () => {
       stateOrProvinceName: 'Bayern',
       validity: 365
     };
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -59,6 +61,25 @@ describe('GenerateCertificatePageComponent', () => {
     expect(component.certData.roles.includes(PspRole[role])).toBe(false);
   });
 
+  it('should set form invalid when no role is selected', () => {
+    expect(component.certForm.form.errors).toBe(null);
+    component.onSelectPspRole('PIS');
+    expect(component.certForm.form.errors).not.toBe(null);
+  });
+
+  it('should show validation message when validity is higher than allowed', async(() => {
+    fixture.whenStable().then(() => {
+      component.certForm.form.controls['validity'].setValue(400);
+      fixture.detectChanges();
+      const validationMsg = fixture
+          .debugElement
+          .query(By.css('input[name=validity] ~ div.invalid-feedback'))
+          .nativeElement;
+      expect(component.certForm.form.controls['validity'].valid).toBe(false);
+      expect(validationMsg.offsetHeight).not.toBe(0);
+    });
+  }));
+
   it('should check for current roles', () => {
     expect(component.isPspRoleSelected('PIS')).toBe(true);
     expect(component.isPspRoleSelected('AIS')).toBe(false);
@@ -74,7 +95,7 @@ describe('GenerateCertificatePageComponent', () => {
     });
   }));
 
-  it('should create zip file', async( () => {
+  it('should create zip file', async(() => {
     const blob1 = new Blob(['Blob1']);
     const blob2 = new Blob(['Blob2']);
     const zip = GenerateCertificatePageComponent.generateZipFile(blob1, blob2);

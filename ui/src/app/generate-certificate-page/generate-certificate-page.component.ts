@@ -1,17 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CertificateService } from '../certificate.service';
 import { CertificateRequest } from '../../models/certificateRequest';
 import { PspRole } from '../../models/pspRole';
-import JSZip from 'jszip';
 import { CertificateResponse } from '../../models/certificateResponse';
+import JSZip from 'jszip';
 
 @Component({
-  selector: 'app-generate-certificate-page',
+  selector: 'sb-generate-certificate-page',
   templateUrl: './generate-certificate-page.component.html',
   styleUrls: ['./generate-certificate-page.component.scss']
 })
 export class GenerateCertificatePageComponent implements OnInit {
+  @ViewChild('certForm') certForm;
   certData: CertificateRequest;
   pspRolesKeys = Object.keys(PspRole);
   error: any;
@@ -57,8 +58,12 @@ export class GenerateCertificatePageComponent implements OnInit {
   onSelectPspRole(pspRole: string) {
     if (this.isPspRoleSelected(pspRole)) {
       this.certData.roles = this.certData.roles.filter(psp => psp !== PspRole[pspRole]);
+      if (!this.isPspRoleValid()) {
+        this.certForm.form.setErrors({invalid: true});
+      }
     } else {
       this.certData.roles.push(PspRole[pspRole]);
+      this.certForm.form.setErrors(null);
     }
   }
 

@@ -7,11 +7,15 @@ import { GenerateCertificatePageComponent } from './generate-certificate-page/ge
 import { AppRoutingModule } from './app-routing.module';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { MaxValidatorDirective } from './common/validators/max-validator.directive';
+import { MinValidatorDirective } from './common/validators/min-validator.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    GenerateCertificatePageComponent
+    GenerateCertificatePageComponent,
+    MaxValidatorDirective,
+    MinValidatorDirective
   ],
   imports: [
     BrowserModule,
