@@ -73,7 +73,7 @@ public class CertificateServiceTest {
     }
 
     assertNotNull(formattedCertificate);
-    assertThat(formattedCertificate, containsString(CertificateService.NCA_ID));
+    assertThat(formattedCertificate, containsString(CertificateService.NCA_SHORT_NAME));
     assertThat(formattedCertificate, containsString("PSP_AI"));
     assertThat(formattedCertificate, not(containsString("PSP_PI")));
     assertThat(formattedCertificate, not(containsString("PSP_IC")));

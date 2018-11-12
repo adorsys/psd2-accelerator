@@ -79,7 +79,7 @@ public class CertificateService {
   private static final String ISSUER_PRIVATE_KEY = "MyRootCA.key";
   private static final ASN1ObjectIdentifier ETSI_QC_STATEMENT =
       new ASN1ObjectIdentifier("0.4.0.19495.2");
-  static final String NCA_ID = "DE-ADORSYS";
+  static final String NCA_SHORT_NAME = "FAKENCA";
 
   private static final Logger log = LoggerFactory.getLogger(CertificateService.class);
 
@@ -302,8 +302,11 @@ public class CertificateService {
   }
 
   private NcaId getNcaIdFromIssuerData() {
-    // TODO: extract NcaId from Issuer instead of hard-coded Strings? Which field?
-    return new NcaId(NCA_ID);
+    // TODO: map NcaName to NcaShortName -> dynamic generation?
+    String country = IETFUtils
+        .valueToString(issuerData.getX500name().getRDNs(BCStyle.C)[0].getFirst().getValue());
+
+    return new NcaId(country + "-" + NCA_SHORT_NAME);
   }
 
   SubjectData generateSubjectData(CertificateRequest cerData) {
