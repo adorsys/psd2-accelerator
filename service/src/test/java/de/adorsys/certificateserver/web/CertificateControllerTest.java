@@ -47,10 +47,8 @@ public class CertificateControllerTest {
   @Test
   public void createCert() throws Exception {
     CertificateResponse certificateResponse = CertificateResponse.builder()
-        .keyId(KEY_ID)
         .encodedCert(CERTIFICATE)
         .privateKey(PRIVATE_KEY)
-        .algorithm(ALGORITHM)
         .build();
 
     given(certificateService.newCertificate(anyObject())).willReturn(certificateResponse);
@@ -66,9 +64,7 @@ public class CertificateControllerTest {
             .content(objectMapper.writeValueAsString(certificateRequest)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.encodedCert").value(CERTIFICATE))
-        .andExpect(jsonPath("$.privateKey").value(PRIVATE_KEY))
-        .andExpect(jsonPath("$.keyId").value(KEY_ID))
-        .andExpect(jsonPath("$.algorithm").value(ALGORITHM));
+        .andExpect(jsonPath("$.privateKey").value(PRIVATE_KEY));
   }
 
   @Test

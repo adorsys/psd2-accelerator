@@ -205,8 +205,6 @@ public class CertificateService {
     return CertificateResponse.builder()
         .privateKey(exportToString(subjectData.getPrivateKey()))
         .encodedCert(exportToString(cert))
-        .keyId(cert.getSerialNumber().toString())
-        .algorithm(cert.getSigAlgName())
         .build();
   }
 

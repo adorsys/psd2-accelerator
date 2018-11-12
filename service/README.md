@@ -62,7 +62,7 @@ To do real-time and on-demand scanning of Java files with CheckStyle, IntelliJ o
 
 * First install the CheckStyle Plugin
   * Open IntelliJ IDEA -> Preferences -> Plugins -> Type in `CheckStyle` and search for it in the repositories
-  * Restart IntelliJ
+* Restart IntelliJ
 * Add realtime CheckStyle
   * Open IntelliJ IDEA -> Preferences -> Editor -> Inspections -> CheckStyle
   (checkbox should be checked)

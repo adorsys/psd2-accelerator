@@ -12,6 +12,4 @@ public class CertificateResponse {
 
   private String encodedCert;
   private String privateKey;
-  private String keyId;
-  private String algorithm;
 }
