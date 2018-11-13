@@ -313,6 +313,9 @@ public class CertificateService {
 
     X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
     builder.addRDN(BCStyle.O, cerData.getOrganizationName());
+
+    builder.addRDN(BCStyle.CN, "");
+
     if (cerData.getDomainComponent() != null) {
       builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
     }
@@ -320,7 +323,7 @@ public class CertificateService {
       builder.addRDN(BCStyle.OU, cerData.getOrganizationUnit());
     }
     if (cerData.getCountryName() != null) {
-      builder.addRDN(BCStyle.CN, cerData.getCountryName());
+      builder.addRDN(BCStyle.C, cerData.getCountryName());
     }
     if (cerData.getStateOrProvinceName() != null) {
       builder.addRDN(BCStyle.ST, cerData.getStateOrProvinceName());
