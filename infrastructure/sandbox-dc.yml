@@ -32,6 +32,8 @@ spec:
       - env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://db/consent
+        - name: SPRING_PROFILES_ACTIVE
+          value: test
       - image: " "
         imagePullPolicy: Always
         name: psd2-sandbox
