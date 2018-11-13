@@ -1,26 +1,42 @@
 [[section-design-decisions]]
 == Design Decisions
 
+Modular Monolith/Well Designed Monolith::
++
+We start with a monolithic approach to keep stuff simple. Unrelated Use-Cases are represented by top-level packages
+in the backend or angular modules in the frontend. We don't allow dependencies between unrelated
+features. These features are also transaction boundaries. We might enforce these rules at build time with tools like https://github.com/TNG/ArchUnit[ArchUnit] if we see that design problems are introduced despite our code-reviews and
+guidelines.
++
+This approach us to scale out later if we need it while keeping development and deployment as simple as possible.
++
+See also:
 
-[role="arc42help"]
-****
-.Contents
-Important, expensive, large scale or risky architecture decisions including rationals.
-With "decisions" we mean selecting one alternative based on given criteria.
+* https://martinfowler.com/bliki/MonolithFirst.html
+* https://www.youtube.com/watch?v=kbKxmEeuvc4
+* https://scs-architecture.org/
 
-Please use your judgement to decide whether an architectural decision should be documented
-here in this central section or whether you better document it locally
-(e.g. within the white box template of one building block).
+Stick to a Tech-Stack Commonly Found in Banks::
+We try to be conservative in our tech choice. To reduce friction we use technologies that our potential
+customers know and can handle.
++
+Right now we use:
 
-Avoid redundancy. Refer to section 4, where you already captured the most important decisions of your architecture.
+* Java 8 / Spring Boot 1 (XS2A forces us to use these versions, too)
+* Angular 7
+* Postgres 10
+* Docker (optional)
 
-.Motivation
-Stakeholders of your system should be able to comprehend and retrace your decisions.
+Deployment as a single JAR::
+To make local development and deployment easy, we try to bundle everything in the Sandbox JAR:
+* _profile_ is embedded instead of being deployed stand-alone
+* _consent-management_ is embedded instead of being deployed stand-alone
+* sandbox ui is a separate top-level Angular project but is embedded in the resulting JAR as static content
 
-.Form
-Various options:
-
-* List or table, ordered by importance and consequences or:
-* more detailed in form of separate sections per decision
-* ADR (architecture decision record) for every important decision
-****
+Monorepo::
+All our code lives in a single https://git.adorsys.de/psd2/sandbox[sandbox repository]. Every
+project / artifact gets a top-level directory (service, ui, arc42, deployment configuration). This
+allows us to
+* reflect our architecture in the repo
+* build and version everything together and at once
+* get started quickly (easy discovery and build)
