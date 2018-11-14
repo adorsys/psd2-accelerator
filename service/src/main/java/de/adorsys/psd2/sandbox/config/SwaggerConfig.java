@@ -32,6 +32,7 @@ public class SwaggerConfig {
             )
             .version("1.0.0")
             .build())
+        .groupName("Certificate Generator API")
         .select()
         .apis(RequestHandlerSelectors.basePackage("de.adorsys.psd2.sandbox.certificateserver"))
         .paths(PathSelectors.any())
@@ -45,7 +46,7 @@ public class SwaggerConfig {
 
     return () -> {
       SwaggerResource swaggerResource = new SwaggerResource();
-      swaggerResource.setName("XS2A API");
+      swaggerResource.setName("PSD2 API");
       swaggerResource.setSwaggerVersion("3.0.1");
       swaggerResource.setUrl("/psd2-api-1.2-Update-2018-08-17.yaml");
 
