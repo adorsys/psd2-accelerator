@@ -14,7 +14,7 @@ $ mvn spring-boot:run
 2.) Start the UI
 ```sh 
 $ cd ../ui
-$ ng serve
+$ npm run start
 ```
 
 - Navigate to (<http://localhost:4200/>)
@@ -26,7 +26,7 @@ For detailed information about backend service see [README.md](https://git.adors
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to (<http://localhost:4200/>). The app will automatically reload if you change any of the source files.
+Run `npm run start` for a dev server. Navigate to (<http://localhost:4200/>). The app will automatically reload if you change any of the source files. It is not possible to run the UI with `ng serve`, because the backend has not configured CORS for the UI.
 
 ## Code scaffolding
 
@@ -49,6 +49,11 @@ Run `npm run test-single-headless` to execute just one run of unit tests with a 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
 Run `npm run e2e-running` to execute the e2e tests with an already running UI application.
+
+## Running code style check
+Run `npm run tslint` to just check the project for code style errors.
+
+Run 'npm run tslint-fix' to automatically fix tslint errors. Some errors could only be fixed manually.
 
 ## Further help
 
