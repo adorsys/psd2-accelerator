@@ -47,7 +47,7 @@ public class SwaggerConfig {
       SwaggerResource swaggerResource = new SwaggerResource();
       swaggerResource.setName("XS2A API");
       swaggerResource.setSwaggerVersion("3.0.1");
-      swaggerResource.setUrl("/psd2-api-2018-08-17.yaml");
+      swaggerResource.setUrl("/psd2-api-1.2-Update-2018-08-17.yaml");
 
       ArrayList<SwaggerResource> resources = new ArrayList<>();
 
