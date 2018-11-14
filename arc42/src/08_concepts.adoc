@@ -86,3 +86,13 @@ IDE the automatic styling should apply to those rules. We decided to add a `mave
 which allows the code style check during the build process. The configuration for this plugin is based on
 the `google-checkstyle.xml` which can also be found in the `service` folder of this project.
 In case of unformatted code the ci pipeline will fail with an appropriate error message.
+
+=== SSL Client Authentication
+
+The Sandbox acts as a CA which issues SSL client certificates required to access the provided XS2A API. Every
+Sandbox deployment (e.g. every customer) initially needs to generate a new CA primary key and certificate. Those
+artifacts are then used to issue the TPP client certificate. SSL Client Authentication is only used for the XS2A API.
+
+WARNING: TODO Link to Deployment View
+
+image::ssl-client.svg[Sandbox as CA Explained]

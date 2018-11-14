@@ -20,7 +20,7 @@ Contained Building Blocks::
 | **Name**              | **Responsibility**
 
 | certificate-generator
-| Create QWAC certificates to enable access to the XS2A API
+| Create QWAC certificates to allow TPPs access to the XS2A API via <<SSL Client Authentication>>
 
 | config
 | Configure the Sandbox and XS2A API (e.g. supported payment products). Just a https://todo-link-to-file[yaml] file right now.
