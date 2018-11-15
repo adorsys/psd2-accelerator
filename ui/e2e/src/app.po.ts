@@ -1,8 +1,12 @@
 import { browser, by, element } from 'protractor';
 
 export class AppPage {
-  navigateTo() {
-    return browser.get('certificate-service');
+  navigateTo(url: string) {
+    return browser.get(url);
+  }
+
+  getDevUrl() {
+    return browser.getCurrentUrl();
   }
 
   getDescriptionTitle() {

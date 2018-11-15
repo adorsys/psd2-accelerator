@@ -1,46 +1,80 @@
 <div class="page">
   <header class="header">
-    <div class="header__logo" ><img src="../assets/adorsys.png" alt="adorsys logo" /></div>
+    <div class="header__logo"><img src="../assets/adorsys.png" alt="adorsys logo"/></div>
     <div class="header__title">Mock Bank</div>
   </header>
-  <div class ="container">
-    <h1>Developer Portal</h1>
+  <div class="container">
+    <h1 class="description__title">Developer Portal</h1>
     <h3>Technical Description</h3>
     <div>
       PSD2 instructs banks to provide a fully productive XS2A interface till September 2019.
       In order to guarantee the compliance of this deadline due to adaptions and bugs, PSD2
       claims the banks to provide a functional sandbox offering the XS2A services in a
       non-productive environment.
-      One requirement of the sandbox is the possibility to authenticate Payment Service
-      Providers (PSP) using eIDAS Certificates. Those certificates usually get issued by
-      appropriate Trusted Service Providers (TSP) which are working in cooperation with the
-      National Competent Authoritiy (NCA).
-      Issuing a real certificate just for testing purposes would be a bit too much effort,
-      which is why this application is simulating a fictional TSP issuing Qualified Website
-      Authentication Certificates (QWAC). A QWAC is part of eIDAS and might be better known
-      as X.509 certificate. For PSD2-purposes the certificate gets extended by the QCStatement
-      containing appropriate values such as the role(s) of the PSP.
-      PSD2 consists of Payment Initiation Service (PIS), Account Initiation Service (AIS)
-      and Payment Instrument Issuer Service (PIIS)
+      <br>
+      <br>
+      <h6>The sandbox environment consists of the following features:</h6>
+      As a main component we provide the XS2A interface which meets the requirements of the Berlin
+      Group and is based on Mock Data.
+      The interface itself consists of banking services to initiate payments (PIS), receive account
+      data (AIS) and get the confirmation of the availability of funds (PIIS). All appropriate
+      features like the Strong Customer Authentication (SCA) and the management of consents
+      are directly embedded in this sandbox environment.
+      <br>
+      <br>
+      Besides the actual interface, we provide the possibility to authenticate Payment Service
+      Providers
+      (PSP) using eIDAS Certificates. Those certificates usually get issued by appropriate Trust
+      Service Providers (TSP) which are working in cooperation with the National Competent
+      Authority (NCA).
+      Issuing a real certificate just for testing purposes would be a bit too much effort, which
+      is why this application is additionally simulating a fictional TSP issuing Qualified Website
+      Authentication Certificates (QWAC) <a href="http://localhost:4200/certificate-service">
+      Certificate Service</a>. A QWAC is part of eIDAS and might be better known as X.509
+      certificate. For PSD2-purposes the certificate gets extended by the QCStatement containing
+      appropriate values such as the role(s) of the PSP.
+      <br>
+      <br>
+      In order to become compliant to the PSD2, technical documentation of the XS2A interface must
+      be provided free of charge. You can visit our documentation here <a
+        href="/xs2a/swagger-ui.html">XS2A Swagger UI</a>.
     </div>
     <br>
-    <h5>Feature Set</h5>
+    <h5>Current Feature Set</h5>
     <div>
       <h6>TSP</h6>
-      At the moment generating a certificate works without registration. (User registration is
-      coming soon.)
+      The generation of client certificates works without registration.
       <h6>PIS</h6>
-      At the moment PIS only supports the generation of single payments. (SCA authentication
-      is coming soon.)
+      The only supported payment service is single payments.
+      The supported payment product is sepa-credit-transfers.
+      <h6>SCA-Approach</h6>
+      The SCA-Approch is set to embedded (SCA is coming soon.)
     </div>
   </div>
-  <div class ="container">
+  <div class="container">
     <h3>Getting started</h3>
     <div>
-      Login
-      Generate Certificate
-      Fictional PSU Data
-      Execute XS2A Calls
+      <h6>Register/Login</h6>
+      User registration/Login is coming soon.
+      <h6>Generate Certificate</h6>
+      To generate a QWAC Certificate follow this link <a
+        href="http://localhost:4200/certificate-service">Certificate Service UI</a>.
+      <h6>Fictional PSU Data</h6>
+      To execute services of XS2A, you have to use the following PSU credentials
+      <ul>
+        <li>Login: testuser</li>
+        <li>Password: 12345</li>
+        <li>IBAN: DE15500105172295759744</li>
+        <li>TAN: 54321</li>
+      </ul>
+      A full set of PSU data will be provided soon.
+      <h6>Execute XS2A Calls</h6>
+      To execute XS2A calls follow this link <a href="/xs2a/swagger-ui.html">XS2A Swagger UI</a>.
+      <br>
+      Example cURL command for a single payment initiation:
+      <pre>
+        $ curl -v "http://localhost:8080/v1/payments/sepa-credit-transfers" -H "tpp-qwac-certificate: -----BEGIN CERTIFICATE-----MIIEBjCCAu6gAwIBAgIEAmCHWTANBgkqhkiG9w0BAQsFADCBlDELMAkGA1UEBhMCREUxDzANBgNVBAgMBkhlc3NlbjESMBAGA1UEBwwJRnJhbmtmdXJ0MRUwEwYDVQQKDAxBdXRob3JpdHkgQ0ExCzAJBgNVBAsMAklUMSEwHwYDVQQDDBhBdXRob3JpdHkgQ0EgRG9tYWluIE5hbWUxGTAXBgkqhkiG9w0BCQEWCmNhQHRlc3QuZGUwHhcNMTgwODE3MDcxNzAyWhcNMTgwOTAzMDc1NzMxWjB6MRMwEQYDVQQDDApUUFAgU2FtcGxlMQwwCgYDVQQKDANvcmcxCzAJBgNVBAsMAm91MRAwDgYDVQQGEwdHZXJtYW55MQ8wDQYDVQQIDAZCYXllcm4xEjAQBgNVBAcMCU51cmVtYmVyZzERMA8GA1UEYQwIMTIzNDU5ODcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCMMnLvNLvqxkHbxdcWRcyUrZ4oy++R/7hWMiWH4U+5kLTLICnlFofN3EgIuP5hZz9Zm8aPoJkr8Y1xEyP8X4a5YTFtMmrXwAOgW6BVTaBeO7eV6Me1yc2NawzWMNp0Zz/Lsnrmj2h7/dRYaYofFHjWPFRW+gjVwv95NFhcD9+H5rr+fMwoci0ERFvy70TYnLfuRrG1BpYOwEV+wVFRIciXE3CKjEh2wbz1Yr4DhD+6FtOElU8VPkWqGRZmr1n54apuLrxL9vIbt7qsaQirsUp5ez2SFGFTydUv+WqZaPGzONVptAymOfTcIsgcxDWx/liKlpdqwyXpJaOIrrXcEnQ1AgMBAAGjeTB3MHUGCCsGAQUFBwEDBGkwZwYGBACBmCcCMF0wTDARBgcEAIGYJwEBDAZQU1BfQVMwEQYHBACBmCcBAgwGUFNQX1BJMBEGBwQAgZgnAQMMBlBTUF9BSTARBgcEAIGYJwEEDAZQU1BfSUMMBEF1dGgMBzEyMTkwODgwDQYJKoZIhvcNAQELBQADggEBAKrHWMriNquiC1vfNKkJFPINi2T2J5FmRQfamrkzS3AI5zPPXx32MzbrTkQb+Zl7qTvClmIFpDG45YC+JVYz+4/gMSJChJfW+JYtyW/Am6eeIYZ1sk+VPvXgxuTA0aZLQsVHsaeTHnQ7lZzN3S0Ao5O35AGKqBITu6Mo1t4WglNJLZHZ0iFL92yfezfV7LF9JYAD/6JFVTeuBwKKHNjPupjeVBku/C7qVDbogo1Ubiowt+hMMPLVLPjxe6Xo9SUtkGj3+5ID4Z8NGHDaaF2IGVGaJkHK9+PYTYEBRDsbc1GwgzTzbds5lao6eMyepL/Kl7iUNtn3Vox/XiSymunGCmQ=-----END CERTIFICATE-----" -H "accept: application/json" -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" -H "PSU-IP-Address: 192.168.8.78" -H "Content-Type: application/json" -d "{\"endToEndIdentification\":\"WBG-123456789\",\"debtorAccount\":{\"currency\":\"EUR\",\"iban\":\"DE52500105173911841934\"},\"instructedAmount\":{\"currency\":\"EUR\",\"amount\":\"520.00\"},\"creditorAccount\":{\"currency\":\"EUR\",\"iban\":\"DE15500105172295759744\"},\"creditorAgent\":\"AAAADEBBXXX\",\"creditorName\":\"WBG\",\"creditorAddress\":{\"buildingNumber\":\"56\",\"city\":\"Nürnberg\",\"country\":\"DE\",\"postalCode\":\"90543\",\"street\":\"WBG Straße\"},\"remittanceInformationUnstructured\":\"Ref. Number WBG-1222\"}" | python -m json.tool
+      </pre>
     </div>
   </div>
 </div>
