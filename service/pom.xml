@@ -126,7 +126,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/static</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/app</outputDirectory>
               <resources>
                 <resource>
                   <directory>../ui/dist/psd2-certificate-ui</directory>
