@@ -3,11 +3,11 @@ import { GenerateCertificatePageComponent } from './generate-certificate-page.co
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { PspRole } from '../../models/pspRole';
-import { CertificateResponse } from '../../models/certificateResponse';
+import { PspRole } from '../../../models/pspRole';
+import { CertificateResponse } from '../../../models/certificateResponse';
 import { By } from '@angular/platform-browser';
-import { MaxValidatorDirective } from '../common/validators/max-validator.directive';
-import { MinValidatorDirective } from '../common/validators/min-validator.directive';
+import { MaxValidatorDirective } from '../../common/validators/max-validator.directive';
+import { MinValidatorDirective } from '../../common/validators/min-validator.directive';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;

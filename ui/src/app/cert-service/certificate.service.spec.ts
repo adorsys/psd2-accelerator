@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { CertificateService } from './certificate.service';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { PspRole } from '../models/pspRole';
-import { CertificateResponse } from '../models/certificateResponse';
+import { PspRole } from '../../models/pspRole';
+import { CertificateResponse } from '../../models/certificateResponse';
 
 describe('CertificateService', () => {
   let service: CertificateService;

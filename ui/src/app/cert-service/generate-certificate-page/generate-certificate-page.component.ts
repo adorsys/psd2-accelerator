@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CertificateService } from '../certificate.service';
-import { CertificateRequest } from '../../models/certificateRequest';
-import { PspRole } from '../../models/pspRole';
-import { CertificateResponse } from '../../models/certificateResponse';
+import { CertificateRequest } from '../../../models/certificateRequest';
+import { PspRole } from '../../../models/pspRole';
+import { CertificateResponse } from '../../../models/certificateResponse';
 import JSZip from 'jszip';
 
 @Component({

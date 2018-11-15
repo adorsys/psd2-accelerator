@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
-import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  {path: '', component: GenerateCertificatePageComponent} // home
+  { path: '', redirectTo: 'developer-portal', pathMatch: 'full'},
+  { path: 'certificate-service', loadChildren: './cert-service/cert-service.module#CertServiceModule'},
+  { path: 'developer-portal', loadChildren: './dev-portal/dev-portal.module#DevPortalModule'},
 ];
 
 @NgModule({
@@ -12,6 +13,6 @@ const routes: Routes = [
   ],
   exports: [
     RouterModule
-  ],
+  ]
 })
 export class AppRoutingModule { }
