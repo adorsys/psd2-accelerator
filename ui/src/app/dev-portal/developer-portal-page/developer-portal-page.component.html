@@ -1,30 +1,47 @@
 <div class="page">
+  <header class="header">
+    <div class="header__logo" ><img src="../assets/adorsys.png" alt="adorsys logo" /></div>
+    <div class="header__title">Mock Bank</div>
+  </header>
   <div class ="container">
+    <h1>Developer Portal</h1>
     <h3>Technical Description</h3>
-      <div>
-        PSD2 instructs banks to provide a fully productive XS2A interface till September 2019.
-        In order to guarantee the compliance of this deadline due to adaptions and bugs, PSD2
-        claims the banks to provide a functional sandbox offering the XS2A services in a
-        non-productive environment.
-        One requirement of the sandbox is the possibility to authenticate Payment Service
-        Providers (PSP) using eIDAS Certificates. Those certificates usually get issued by
-        appropriate Trusted Service Providers (TSP) which are working in cooperation with the
-        National Competent Authoritiy (NCA).
-        Issuing a real certificate just for testing purposes would be a bit too much effort,
-        which is why this application is simulating a fictional TSP issuing Qualified Website
-        Authentication Certificates (QWAC). A QWAC is part of eIDAS and might be better known
-        as X.509 certificate. For PSD2-purposes the certificate gets extended by the QCStatement
-        containing appropriate values such as the role(s) of the PSP.
-      </div>
+    <div>
+      PSD2 instructs banks to provide a fully productive XS2A interface till September 2019.
+      In order to guarantee the compliance of this deadline due to adaptions and bugs, PSD2
+      claims the banks to provide a functional sandbox offering the XS2A services in a
+      non-productive environment.
+      One requirement of the sandbox is the possibility to authenticate Payment Service
+      Providers (PSP) using eIDAS Certificates. Those certificates usually get issued by
+      appropriate Trusted Service Providers (TSP) which are working in cooperation with the
+      National Competent Authoritiy (NCA).
+      Issuing a real certificate just for testing purposes would be a bit too much effort,
+      which is why this application is simulating a fictional TSP issuing Qualified Website
+      Authentication Certificates (QWAC). A QWAC is part of eIDAS and might be better known
+      as X.509 certificate. For PSD2-purposes the certificate gets extended by the QCStatement
+      containing appropriate values such as the role(s) of the PSP.
+      PSD2 consists of Payment Initiation Service (PIS), Account Initiation Service (AIS)
+      and Payment Instrument Issuer Service (PIIS)
+    </div>
+    <br>
+    <h5>Feature Set</h5>
+    <div>
+      <h6>TSP</h6>
+      At the moment generating a certificate works without registration. (User registration is
+      coming soon.)
+      <h6>PIS</h6>
+      At the moment PIS only supports the generation of single payments. (SCA authentication
+      is coming soon.)
+    </div>
   </div>
   <div class ="container">
     <h3>Getting started</h3>
-      <div>
-        Login
-        Generate Certificate
-        Fictional PSU Data
-        Execute XS2A Calls
-      </div>
+    <div>
+      Login
+      Generate Certificate
+      Fictional PSU Data
+      Execute XS2A Calls
+    </div>
   </div>
 </div>
 
