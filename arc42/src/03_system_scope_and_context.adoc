@@ -4,7 +4,8 @@
 
 === Business Context
 
-image::generated/context.png[Business Context Diagram]
+.business-context
+image::generated/context.png[Business Context Diagram, title="Business Context Diagram" align="center"]
 
 [options="header"]
 |===

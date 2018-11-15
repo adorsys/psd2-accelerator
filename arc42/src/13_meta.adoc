@@ -1,3 +1,2 @@
 [[section-meta]]
-<<<<
 include::../README.adoc[leveloffset=+1]

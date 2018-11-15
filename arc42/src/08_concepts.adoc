@@ -95,4 +95,5 @@ artifacts are then used to issue the TPP client certificate. SSL Client Authenti
 
 WARNING: TODO Link to Deployment View
 
-image::ssl-client.svg[Sandbox as CA Explained]
+.sandbox-as-ca
+image::ssl-client.svg[Sandbox as CA Explained, title="Sandbox as CA Explained"]

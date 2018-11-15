@@ -5,7 +5,8 @@
 
 === Whitebox Overall System
 
-image:generated/whitebox-1.png["Whitebox Overall System Level 1",60%]
+.whitebox-overall-lvl1
+image::generated/whitebox-1.png[Whitebox Overall System Level 1, 60%, title="Whitebox Overall System Level 1", align="center"]
 
 Motivation::
 
@@ -37,7 +38,8 @@ Contained Building Blocks::
 
 ==== White Box _xs2a_
 
-image:generated/whitebox-2-xs2a.png["Whitebox xs2a Level 2",60%]
+.whitebox-xs2a-lvl2
+image::generated/whitebox-2-xs2a.png[Whitebox xs2a Level 2, 60%, title="Whitebox xs2a Level 2", align="center"]
 
 [cols="1,2" options="header"]
 |===
