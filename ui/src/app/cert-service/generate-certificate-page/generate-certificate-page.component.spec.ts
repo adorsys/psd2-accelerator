@@ -1,13 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { GenerateCertificatePageComponent } from './generate-certificate-page.component';
-import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { PspRole } from '../../../models/pspRole';
 import { CertificateResponse } from '../../../models/certificateResponse';
 import { By } from '@angular/platform-browser';
-import { MaxValidatorDirective } from '../../common/validators/max-validator.directive';
-import { MinValidatorDirective } from '../../common/validators/min-validator.directive';
+import { CertServiceModule } from '../cert-service.module';
+import { RouterModule } from '@angular/router';
 
 describe('GenerateCertificatePageComponent', () => {
   let component: GenerateCertificatePageComponent;
@@ -21,9 +20,16 @@ describe('GenerateCertificatePageComponent', () => {
   };
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
-      declarations: [GenerateCertificatePageComponent, MaxValidatorDirective, MinValidatorDirective]
+    TestBed.configureTestingModule(
+        {
+          imports: [CertServiceModule]
+        }).overrideModule(CertServiceModule, {
+          remove: {
+            imports: [RouterModule]
+          },
+      add: {
+            imports: [HttpClientTestingModule, RouterTestingModule]
+      }
     })
         .compileComponents();
   }));
