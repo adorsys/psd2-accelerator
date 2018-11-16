@@ -39,10 +39,10 @@ The PSD2 Sandbox is an application that aims to fulfill the following requiremen
 The sandbox must be PSD2 compliant. Neither ease of use or cool technologies help the user if they fail the audit
 because of us.
 | Fast Onboarding    |
-As a potential user of the sandbox you should be able to get the application running within minutes. We need to provide good documentation, sensible defaults an a simple setup.
+As a potential user of the sandbox you should be able to get the application running within minutes. We need to provide good documentation, sensible defaults and a simple setup.
 | Simple Deployment  |
 The sandbox should be easy to deploy in enterprise contexts. This requires a simple architecture
-(e.g. not to many deployments, proven technology) and good documentation.
+(e.g. not too many deployments, proven technology) and good documentation.
 |===
 
 === Stakeholders

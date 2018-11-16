@@ -3,12 +3,12 @@
 
 Modular Monolith/Well Designed Monolith::
 +
-We start with a monolithic approach to keep stuff simple. Unrelated Use-Cases are represented by top-level packages
-in the backend or angular modules in the frontend. We don't allow dependencies between unrelated
+We start with a monolithic approach to keep it simple. Unrelated Use-Cases are represented by top-level packages
+in the backend or Angular modules in the frontend. We don't allow dependencies between unrelated
 features. These features are also transaction boundaries. We might enforce these rules at build time with tools like https://github.com/TNG/ArchUnit[ArchUnit] if we see that design problems are introduced despite our code-reviews and
 guidelines.
 +
-This approach us to scale out later if we need it while keeping development and deployment as simple as possible.
+This approach allows us to scale out later if we need it, while keeping development and deployment as simple as possible.
 +
 See also:
 
