@@ -5,6 +5,8 @@ import { CertificateRequest } from '../../../models/certificateRequest';
 import { PspRole } from '../../../models/pspRole';
 import { CertificateResponse } from '../../../models/certificateResponse';
 import JSZip from 'jszip';
+import { ErrorHandler } from '../../common/error-handler';
+import { HttpError } from '../../../models/httpError';
 
 @Component({
   selector: 'sb-generate-certificate-page',
@@ -15,7 +17,7 @@ export class GenerateCertificatePageComponent implements OnInit {
   @ViewChild('certForm') certForm;
   certData: CertificateRequest;
   pspRolesKeys = Object.keys(PspRole);
-  error: any;
+  errors: Array<HttpError>;
   certResponse: CertificateResponse;
 
   static generateZipFile(certBlob, keyBlob): Promise<any> {
@@ -45,12 +47,12 @@ export class GenerateCertificatePageComponent implements OnInit {
   createAndDownloadCert() {
     this.certService.createCertificate(this.certData).subscribe(
       data => {
-        this.error = undefined;
+        this.errors = undefined;
         this.certResponse = data;
         this.generateAndDownloadZip();
       },
       error => {
-        this.error = error;
+        this.errors = ErrorHandler.getErrorMessages(error);
       }
     );
   }

@@ -23,10 +23,10 @@
         </div>
       </div>
       <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
-        <div *ngIf="error">
-          <ul class="alert alert-warning">
-            <li class="list-inline" *ngFor="let error of error.error.errors">
-              {{error.field}}: {{error.defaultMessage}}
+        <div *ngIf="errors">
+          <ul class="alert alert-danger">
+            <li class="list-inline" *ngFor="let error of errors">
+              {{error.subject}}: {{error.message}}
             </li>
           </ul>
         </div>
