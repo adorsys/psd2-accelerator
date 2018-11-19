@@ -11,9 +11,13 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
 
+  /*
+    Serve index.html for every request in /app if there is no other resource. This is required for
+    the HTML5 router.
+   */
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/app/*")
+    registry.addResourceHandler("/app", "/app/", "/app/**")
         .addResourceLocations("classpath:/app/")
         .resourceChain(true)
         .addResolver(new PathResourceResolver() {
