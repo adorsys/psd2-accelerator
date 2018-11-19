@@ -29,7 +29,7 @@
       Authority (NCA).
       Issuing a real certificate just for testing purposes would be a bit too much effort, which
       is why this application is additionally simulating a fictional TSP issuing Qualified Website
-      Authentication Certificates (QWAC) <a href="http://localhost:4200/certificate-service">
+      Authentication Certificates (QWAC) <a routerLink="/certificate-service">
       Certificate Service</a>. A QWAC is part of eIDAS and might be better known as X.509
       certificate. For PSD2-purposes the certificate gets extended by the QCStatement containing
       appropriate values such as the role(s) of the PSP.
@@ -37,7 +37,7 @@
       <br>
       In order to become compliant to the PSD2, technical documentation of the XS2A interface must
       be provided free of charge. You can visit our documentation here <a
-        href="http://localhost:8080/swagger-ui.html">XS2A Swagger UI</a>.
+        href="/xs2a/swagger-ui.html">XS2A Swagger UI</a>.
     </div>
     <br>
     <h5>Current Feature Set</h5>
@@ -58,7 +58,7 @@
       User registration/Login is coming soon.
       <h6>Generate Certificate</h6>
       To generate a QWAC Certificate follow this link <a
-        href="http://localhost:4200/certificate-service">Certificate Service UI</a>.
+        routerLink="/certificate-service">Certificate Service UI</a>.
       <h6>Fictional PSU Data</h6>
       To execute services of XS2A, you have to use the following PSU credentials
       <ul>
@@ -69,7 +69,7 @@
       </ul>
       A full set of PSU data will be provided soon.
       <h6>Execute XS2A Calls</h6>
-      To execute XS2A calls follow this link <a href="http://localhost:8080/swagger-ui.html">XS2A
+      To execute XS2A calls follow this link <a href="/xs2a/swagger-ui.html">XS2A
       Swagger UI</a>.
       <br>
       Example cURL command for a single payment initiation:
