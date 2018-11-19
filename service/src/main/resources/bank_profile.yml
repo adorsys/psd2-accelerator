@@ -1,0 +1,16 @@
+setting:
+  frequencyPerDay: 5
+  combinedServiceIndicator: false
+  availablePaymentProducts: sepa
+  availablePaymentTypes: single
+  scaApproach: EMBEDDED
+  tppSignatureRequired: false
+  bankOfferedConsentSupport: true
+  multicurrencyAccountLevel: SUBACCOUNT
+  availableBookingStatuses: BOOKED, PENDING
+  consentLifetime: 0
+  transactionLifetime: 0
+  allPsd2Support: false
+  authorisationStartType: EXPLICIT
+  transactionsWithoutBalancesSupported: false
+  paymentCancellationAuthorizationMandated: false
