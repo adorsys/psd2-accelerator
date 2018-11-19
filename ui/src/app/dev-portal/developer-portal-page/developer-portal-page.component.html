@@ -37,7 +37,7 @@
       <br>
       In order to become compliant to the PSD2, technical documentation of the XS2A interface must
       be provided free of charge. You can visit our documentation here <a
-        href="/xs2a/swagger-ui.html">XS2A Swagger UI</a>.
+        href="http://localhost:8080/swagger-ui.html">XS2A Swagger UI</a>.
     </div>
     <br>
     <h5>Current Feature Set</h5>
@@ -69,11 +69,41 @@
       </ul>
       A full set of PSU data will be provided soon.
       <h6>Execute XS2A Calls</h6>
-      To execute XS2A calls follow this link <a href="/xs2a/swagger-ui.html">XS2A Swagger UI</a>.
+      To execute XS2A calls follow this link <a href="http://localhost:8080/swagger-ui.html">XS2A
+      Swagger UI</a>.
       <br>
       Example cURL command for a single payment initiation:
       <pre>
-        $ curl -v "http://localhost:8080/v1/payments/sepa-credit-transfers" -H "tpp-qwac-certificate: -----BEGIN CERTIFICATE-----MIIEBjCCAu6gAwIBAgIEAmCHWTANBgkqhkiG9w0BAQsFADCBlDELMAkGA1UEBhMCREUxDzANBgNVBAgMBkhlc3NlbjESMBAGA1UEBwwJRnJhbmtmdXJ0MRUwEwYDVQQKDAxBdXRob3JpdHkgQ0ExCzAJBgNVBAsMAklUMSEwHwYDVQQDDBhBdXRob3JpdHkgQ0EgRG9tYWluIE5hbWUxGTAXBgkqhkiG9w0BCQEWCmNhQHRlc3QuZGUwHhcNMTgwODE3MDcxNzAyWhcNMTgwOTAzMDc1NzMxWjB6MRMwEQYDVQQDDApUUFAgU2FtcGxlMQwwCgYDVQQKDANvcmcxCzAJBgNVBAsMAm91MRAwDgYDVQQGEwdHZXJtYW55MQ8wDQYDVQQIDAZCYXllcm4xEjAQBgNVBAcMCU51cmVtYmVyZzERMA8GA1UEYQwIMTIzNDU5ODcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCMMnLvNLvqxkHbxdcWRcyUrZ4oy++R/7hWMiWH4U+5kLTLICnlFofN3EgIuP5hZz9Zm8aPoJkr8Y1xEyP8X4a5YTFtMmrXwAOgW6BVTaBeO7eV6Me1yc2NawzWMNp0Zz/Lsnrmj2h7/dRYaYofFHjWPFRW+gjVwv95NFhcD9+H5rr+fMwoci0ERFvy70TYnLfuRrG1BpYOwEV+wVFRIciXE3CKjEh2wbz1Yr4DhD+6FtOElU8VPkWqGRZmr1n54apuLrxL9vIbt7qsaQirsUp5ez2SFGFTydUv+WqZaPGzONVptAymOfTcIsgcxDWx/liKlpdqwyXpJaOIrrXcEnQ1AgMBAAGjeTB3MHUGCCsGAQUFBwEDBGkwZwYGBACBmCcCMF0wTDARBgcEAIGYJwEBDAZQU1BfQVMwEQYHBACBmCcBAgwGUFNQX1BJMBEGBwQAgZgnAQMMBlBTUF9BSTARBgcEAIGYJwEEDAZQU1BfSUMMBEF1dGgMBzEyMTkwODgwDQYJKoZIhvcNAQELBQADggEBAKrHWMriNquiC1vfNKkJFPINi2T2J5FmRQfamrkzS3AI5zPPXx32MzbrTkQb+Zl7qTvClmIFpDG45YC+JVYz+4/gMSJChJfW+JYtyW/Am6eeIYZ1sk+VPvXgxuTA0aZLQsVHsaeTHnQ7lZzN3S0Ao5O35AGKqBITu6Mo1t4WglNJLZHZ0iFL92yfezfV7LF9JYAD/6JFVTeuBwKKHNjPupjeVBku/C7qVDbogo1Ubiowt+hMMPLVLPjxe6Xo9SUtkGj3+5ID4Z8NGHDaaF2IGVGaJkHK9+PYTYEBRDsbc1GwgzTzbds5lao6eMyepL/Kl7iUNtn3Vox/XiSymunGCmQ=-----END CERTIFICATE-----" -H "accept: application/json" -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" -H "PSU-IP-Address: 192.168.8.78" -H "Content-Type: application/json" -d "{\"endToEndIdentification\":\"WBG-123456789\",\"debtorAccount\":{\"currency\":\"EUR\",\"iban\":\"DE52500105173911841934\"},\"instructedAmount\":{\"currency\":\"EUR\",\"amount\":\"520.00\"},\"creditorAccount\":{\"currency\":\"EUR\",\"iban\":\"DE15500105172295759744\"},\"creditorAgent\":\"AAAADEBBXXX\",\"creditorName\":\"WBG\",\"creditorAddress\":{\"buildingNumber\":\"56\",\"city\":\"Nürnberg\",\"country\":\"DE\",\"postalCode\":\"90543\",\"street\":\"WBG Straße\"},\"remittanceInformationUnstructured\":\"Ref. Number WBG-1222\"}" | python -m json.tool
+        $ curl -v "http://localhost:8080/v1/payments/sepa-credit-transfers"
+          -H "accept: application/json"
+          -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
+          -H "PSU-IP-Address: 192.168.8.78"
+          -H "Content-Type: application/json"
+          -d '{{ '{' }}
+            "endToEndIdentification": "WBG-123456789",
+            "debtorAccount": {{ '{' }}
+              "currency": "EUR",
+              "iban": "DE52500105173911841934"
+            {{ '}' }},
+            "instructedAmount": {{ '{' }}
+              "currency": "EUR",
+              "amount": "520.00"
+            {{ '}' }},
+            "creditorAccount":{{ '{' }}
+              "currency": "EUR",
+              "iban": "DE15500105172295759744"
+            {{ '}' }},
+            "creditorAgent": "AAAADEBBXXX",
+            "creditorName": "WBG",
+            "creditorAddress": {{ '{' }}
+              "buildingNumber": "56",
+              "city": "Nürnberg",
+              "country": "DE",
+              "postalCode": "90543",
+              "street": "WBG Straße"
+            {{ '}' }},
+            "remittanceInformationUnstructured": "Ref. Number WBG-1222"
+          {{ '}' }}'
       </pre>
     </div>
   </div>
