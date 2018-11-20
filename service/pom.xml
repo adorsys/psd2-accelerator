@@ -26,6 +26,7 @@
     <lombok.version>1.18.2</lombok.version>
     <xs2a.version>1.11</xs2a.version>
     <cucumber.version>1.2.5</cucumber.version>
+    <testcontainers.version>1.10.1</testcontainers.version>
   </properties>
 
   <dependencies>
@@ -119,6 +120,19 @@
       <groupId>info.cukes</groupId>
       <artifactId>cucumber-spring</artifactId>
       <version>${cucumber.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Testcontainers -->
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

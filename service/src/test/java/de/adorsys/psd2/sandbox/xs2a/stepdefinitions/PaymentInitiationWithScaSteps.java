@@ -19,7 +19,7 @@ import de.adorsys.psd2.model.StartScaprocessResponse;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
-import de.adorsys.psd2.sandbox.SandboxApplication;
+import de.adorsys.psd2.sandbox.xs2a.AbstractIT;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
@@ -27,23 +27,14 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = SandboxApplication.class, loader = SpringBootContextLoader.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PaymentInitiationWithScaSteps {
+public class PaymentInitiationWithScaSteps extends AbstractIT {
 
   @Autowired
   private Context context;

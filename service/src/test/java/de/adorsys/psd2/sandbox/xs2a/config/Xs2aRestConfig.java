@@ -19,7 +19,7 @@ public class Xs2aRestConfig {
   private int readTimeout;
   @Value("${xs2a.config.connectionTimeoutInMs:60000}")
   private int connectionTimeout;
-  @Value("${xs2a.baseUrl:http://localhost:8080/v1/}")
+  @Value("${xs2a.baseUrl:http://localhost:8181/v1/}")
   private String baseUrl;
 
   @Bean(name = "xs2aRestTemplate")
