@@ -96,7 +96,7 @@ docker_build_deploy:
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
       service
     - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
-      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox"
+      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest"
     - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox" # tag master as latest, too
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest" # tag master as latest, too
   cache: {}
