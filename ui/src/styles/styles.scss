@@ -1,9 +1,13 @@
 // TODO: Use just needed bootstrap modules. Not the whole package.
 @import "~bootstrap-scss";
+$grey: #606060;
+$dark-grey: #484848;
+$light-grey: #e6e6e6;
+$adorsys-blue: #054f72;
 
 .page {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
-  color: #606060;
+  color: $grey;
   margin-bottom: 2em;
 
   .header {
@@ -23,13 +27,30 @@
     &__title {
       display: inline-block;
       font-size: 28px;
-      color: #0B3D5F;
-      font-weight: bolder;
+      color: $adorsys-blue;
+      font-weight: 500;
       margin: 0 0 6px;
     }
   }
 
   .container {
+    p {
+      display: block;
+      text-align: justify;
+      font-size: 20px;
+      margin-bottom: 2%;
+      font-weight: 200;
+    }
+    h2 {
+      font-size: 26px;
+      margin-bottom: 3%;
+      margin-top: 3%;
+    }
+
+    section {
+      margin-top: 3%;
+      border-top: 0.5px solid $light-grey;
+    }
 
     &--big {
       width: 57%;
@@ -40,12 +61,13 @@
       box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
       padding-bottom: 1%;
 
+
       .description {
 
         &__title {
           display: block;
           text-align: center;
-          color: #333333f0;
+          color: $dark-grey;
           font-size: 32px;
           justify-content: center;
           align-items: center;
