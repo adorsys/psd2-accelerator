@@ -71,6 +71,9 @@ package:
     key: MVN
     paths:
       - ".cache/m2"
+  dependencies:
+    - build_service
+    - build_ui
 
 docker_build_only:
   tags:
@@ -83,6 +86,8 @@ docker_build_only:
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
       service
   cache: {}
+  dependencies:
+    - package
 
 docker_build_deploy:
   tags:
@@ -100,3 +105,6 @@ docker_build_deploy:
     - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
     - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest" # tag master as latest, too
   cache: {}
+  dependencies:
+    - package
+
