@@ -104,6 +104,9 @@ docker_build_deploy:
       "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest"
     - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
     - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest" # tag master as latest, too
+  environment:
+    name: dev
+    url: http://psd2-sandbox-dev.cloud.adorsys.de
   cache: {}
   dependencies:
     - package
