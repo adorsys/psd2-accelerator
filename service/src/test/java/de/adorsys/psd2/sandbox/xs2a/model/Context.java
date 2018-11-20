@@ -6,8 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Data
-@Component
-public class Context<T> {
+public class Context {
 
   private String psuId;
   private String scaMethod;
@@ -16,6 +15,5 @@ public class Context<T> {
   private String paymentService;
   private String paymentId;
   private String authorisationId;
-  private ResponseEntity<T> actualResponse;
-  private HttpStatus actualResponseStatus;
+  private ResponseEntity actualResponse;
 }

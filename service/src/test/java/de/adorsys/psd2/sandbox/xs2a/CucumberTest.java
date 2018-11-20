@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
     features = "src/test/resources/features",
     glue = "de.adorsys.psd2.sandbox.xs2a.stepdefinitions",
-    format = {"pretty", "html:target/report"})
+    plugin = {"pretty", "html:target/report"})
 public class CucumberTest {
 
 }

@@ -19,7 +19,7 @@ import de.adorsys.psd2.model.StartScaprocessResponse;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
-import de.adorsys.psd2.sandbox.xs2a.AbstractIT;
+import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
@@ -27,21 +27,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-public class PaymentInitiationWithScaSteps extends AbstractIT {
+public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
-  @Autowired
-  private Context context;
-
-  @Autowired
-  @Qualifier("xs2a")
-  private RestTemplate template;
+  private Context context = new Context();
 
   @Given("^PSU initiated a single payment using the payment product (.*)$")
   public void initiatePayment(String paymentProduct) {

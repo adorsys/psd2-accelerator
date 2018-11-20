@@ -25,7 +25,7 @@
     <java.version>1.8</java.version>
     <lombok.version>1.18.2</lombok.version>
     <xs2a.version>1.11</xs2a.version>
-    <cucumber.version>1.2.5</cucumber.version>
+    <cucumber.version>4.2.0</cucumber.version>
     <testcontainers.version>1.10.1</testcontainers.version>
   </properties>
 
@@ -105,19 +105,19 @@
 
     <!-- Cucumber -->
     <dependency>
-      <groupId>info.cukes</groupId>
+      <groupId>io.cucumber</groupId>
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>info.cukes</groupId>
+      <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>info.cukes</groupId>
+      <groupId>io.cucumber</groupId>
       <artifactId>cucumber-spring</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
