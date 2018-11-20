@@ -1,8 +1,5 @@
 <div class="page">
-  <header class="header">
-    <div class="header__logo"><img src="assets/adorsys.svg" alt="adorsys logo"/></div>
-    <div class="header__title">Sample Trust Service Provider</div>
-  </header>
+  <sb-header text="Sample Trust Service Provider"></sb-header>
   <div class="container container--big">
     <h1 class="description__title">Certificate Service</h1>
     <div class="description">
@@ -28,10 +25,10 @@
       </div>
     </div>
     <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
-      <div *ngIf="error">
+      <div *ngIf="errors">
         <ul class="alert alert-danger">
-          <li class="list-inline" *ngFor="let error of error.error.errors">
-            {{error.field}}: {{error.defaultMessage}}
+          <li class="list-inline" *ngFor="let error of errors">
+            {{error.subject}}: {{error.message}}
           </li>
         </ul>
       </div>

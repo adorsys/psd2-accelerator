@@ -8,32 +8,31 @@ $adorsys-blue: #054f72;
 .page {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   color: $grey;
-  margin-bottom: 2em;
 
-  .header {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    margin: 0 40px 60px 10px;
-    position: relative;
+  .navbar {
+    margin-bottom: 2.5%;
 
-    &__logo img {
-      display: inline-block;
-      width: auto;
-      height: 26px;
-      padding: 0 20px 0 10px;
-    }
+    .header {
+      margin-right: 7%;
 
-    &__title {
-      display: inline-block;
-      font-size: 28px;
-      color: $adorsys-blue;
-      font-weight: 500;
-      margin: 0 0 6px;
+      &__logo img {
+        width: auto;
+        height: 26px;
+        padding: 0 20px 0 10px;
+
+      }
+
+      &__title {
+        font-size: 28px;
+        color: $adorsys-blue;
+        font-weight: 500;
+        margin: 0 0 6px;
+      }
     }
   }
 
   .container {
+    margin-bottom: 10%;
     p {
       display: block;
       text-align: justify;
@@ -60,7 +59,6 @@ $adorsys-blue: #054f72;
       -moz-box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
       box-shadow: 10px 10px 10px -8px rgba(143, 140, 143, 1);
       padding-bottom: 1%;
-
 
       .description {
 

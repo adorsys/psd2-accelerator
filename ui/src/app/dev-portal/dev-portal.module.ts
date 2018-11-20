@@ -4,15 +4,17 @@ import { RouterModule } from '@angular/router';
 import { routes } from './dev-portal.routing';
 import { FormsModule } from '@angular/forms';
 import { DeveloperPortalPageComponent } from './developer-portal-page/developer-portal-page.component';
+import { SharedModule } from '../common/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
+    SharedModule
   ],
   declarations: [
-    DeveloperPortalPageComponent
+    DeveloperPortalPageComponent,
   ]
 })
 export class DevPortalModule {

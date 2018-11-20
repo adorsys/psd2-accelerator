@@ -6,12 +6,14 @@ import { FormsModule } from '@angular/forms';
 import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
 import { MaxValidatorDirective } from '../common/validators/max-validator.directive';
 import { MinValidatorDirective } from '../common/validators/min-validator.directive';
+import { SharedModule } from '../common/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
+    SharedModule
   ],
   declarations: [
     GenerateCertificatePageComponent,

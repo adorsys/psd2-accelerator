@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand navbar-light bg-light">
+  <div class="header container-fluid">
+    <a class="navbar-brand" href="#"></a>
+    <span class="header__logo"><img src="assets/adorsys.svg" alt="adorsys logo"></span>
+    <span class="header__title">{{text}}</span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/developer-portal">Developer Portal
+            <span class="sr-only">(current)</span>
+          </a>
+        </li>
+        <li class="nav-item" routerLinkActive="active">
+          <a class="nav-link" routerLink="/certificate-service">Certificate Service</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mailto:psd2@adorsys.de">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
