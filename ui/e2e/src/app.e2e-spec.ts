@@ -24,22 +24,22 @@ describe('Certificate Service UI', () => {
   it('should check the developer portal url', () => {
     page.navigateTo('/');
     page.getDevUrl().then((url) => {
-      expect(url).toEqual('http://localhost:4200/developer-portal');
+      expect(url).toEqual('http://localhost:4200/app/developer-portal');
     });
   });
 
   it('should check certificate service headline', () => {
-    page.navigateTo('certificate-service');
+    page.navigateTo('app/certificate-service');
     expect(page.getDescriptionTitle()).toEqual('Certificate Service');
   });
 
   it('should check developer portal headline', () => {
-    page.navigateTo('developer-portal');
+    page.navigateTo('app/developer-portal');
     expect(page.getDescriptionTitle()).toEqual('Developer Portal');
   });
 
   it('should create a certificate', () => {
-    page.navigateTo('certificate-service');
+    page.navigateTo('app/certificate-service');
     page.clickDownloadButton();
 
     browser.driver.wait(() => {
