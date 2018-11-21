@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
@@ -142,14 +143,14 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         UpdatePsuAuthenticationResponse.class);
   }
 
-  @And("^PSU updated the resource with a selection of authentication method$")
-  public void updateResourceWithAuthenticationMethod() {
+  @And("^PSU updated the resource with a selection of authentication method (.*)$")
+  public void updateResourceWithAuthenticationMethod(String selectedScaMethod) {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("PSU-ID", context.getPsuId());
 
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
-    scaMethod.setAuthenticationMethodId("SMS_OTP");
+    scaMethod.setAuthenticationMethodId(selectedScaMethod);
 
     Request<SelectPsuAuthenticationMethod> request = new Request<>();
     request.setBody(scaMethod);
@@ -196,7 +197,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   public void checkResponse(String scaStatus, String code) {
     ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
 
-    assertThat(actualResponse.getStatusCode().value(), equalTo(code));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
   }
 

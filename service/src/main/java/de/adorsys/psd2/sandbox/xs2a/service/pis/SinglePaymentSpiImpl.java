@@ -7,12 +7,16 @@ import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiSinglePaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
+import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
+import java.util.Collections;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SinglePaymentSpiImpl implements SinglePaymentSpi {
+
+  private static final String MOCKED_TAN = "54321";
 
   @Override
   public @NotNull SpiResponse<SpiSinglePaymentInitiationResponse> initiatePayment(
@@ -26,7 +30,8 @@ public class SinglePaymentSpiImpl implements SinglePaymentSpi {
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentWithoutSca(
-      @NotNull SpiPsuData spiPsuData, @NotNull SpiSinglePayment spiSinglePayment,
+      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiSinglePayment spiSinglePayment,
       @NotNull AspspConsentData aspspConsentData) {
     return SpiResponse.<SpiResponse.VoidResponse>builder().success();
   }
@@ -37,6 +42,15 @@ public class SinglePaymentSpiImpl implements SinglePaymentSpi {
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiSinglePayment spiSinglePayment,
       @NotNull AspspConsentData aspspConsentData) {
-    return SpiResponse.<SpiResponse.VoidResponse>builder().success();
+
+    if (spiScaConfirmation.getTanNumber().equals(MOCKED_TAN)) {
+      return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+    }
+
+    return SpiResponse.<SpiResponse.VoidResponse>builder()
+        .aspspConsentData(aspspConsentData)
+        .payload(null)
+        .message(Collections.singletonList("Wrong PIN"))
+        .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
   }
 }
