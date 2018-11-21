@@ -9,6 +9,7 @@ target
 target/
 node_modules/
 npm-debug.log
+ui/coverage/
 
 ### STS ###
 .apt_generated

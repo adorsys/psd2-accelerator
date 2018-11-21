@@ -29,6 +29,7 @@ build_ui:
     - cd ui
     - npm ci
     - npm run tslint
+    - npm run test-ci
     - npm run build
   artifacts:
     name: "ui-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
@@ -39,6 +40,7 @@ build_ui:
     key: NPM
     paths:
       - ".cache/npm"
+  coverage: '/Statements\s+:\s+\d+\.\d+/'
 
 build_arc42:
   stage: "build"
