@@ -1,5 +1,6 @@
 // TODO: Use just needed bootstrap modules. Not the whole package.
 @import "~bootstrap-scss";
+
 $grey: #606060;
 $dark-grey: #484848;
 $light-grey: #e6e6e6;
@@ -49,6 +50,11 @@ $adorsys-blue: #054f72;
     section {
       margin-top: 3%;
       border-top: 0.5px solid $light-grey;
+
+      .image-spacing {
+        margin-top: 50px;
+        margin-bottom: 50px;
+      }
     }
 
     &--big {
