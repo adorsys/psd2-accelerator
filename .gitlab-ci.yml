@@ -14,11 +14,15 @@ build_service:
   stage: "build"
   image: "adorsys/ci-build@sha256:126924e2ef70600a101d972c9844b0bc266990043b7fb1033d107b985f778dc2"
   script:
-    - mvn -f service/pom.xml -B clean test
+    # package instead of test because we need the jacoco report
+    - mvn -f service/pom.xml -B clean package
+    - |
+      echo 'Code coverage:' $(cat service/target/site/jacoco/index.html | grep -ioE "Total[^%]+%" | grep -ioE "[[:digit:]]{1,3}%")
   cache:
     key: MVN
     paths:
       - ".cache/m2"
+  coverage: '/Code coverage: (\d+(?:\.\d+)?)%/'
 
 build_ui:
   tags:
@@ -112,4 +116,3 @@ docker_build_deploy:
   cache: {}
   dependencies:
     - package
-
