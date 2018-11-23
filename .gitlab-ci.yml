@@ -33,6 +33,7 @@ build_ui:
     - cd ui
     - npm ci
     - npm run tslint
+    - npm run prettier-check
     - npm run test-ci
     - npm run build
   artifacts:

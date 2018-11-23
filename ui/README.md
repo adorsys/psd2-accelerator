@@ -31,9 +31,25 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 Run `npm run e2e-running` to execute the e2e tests with an already running UI application.
 
 ## Running code style check
+
+### Tslint
+
 Run `npm run tslint` to just check the project for code style errors.
 
-Run 'npm run tslint-fix' to automatically fix tslint errors. Some errors could only be fixed manually.
+Run `npm run tslint-fix` to automatically fix [TSLint](https://github.com/palantir/tslint) errors. Some errors could only be fixed manually.
+
+### Prettier
+
+You can prettify files with the `prettier` plugin for IntelliJ or as cli with the following steps:
+  1. Install global prettier package: `npm install -g prettier`
+  2. Prettify single file `prettier --write`
+  3. (Prettify all files in the project with this command:)
+      ``` 
+      find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v "assets/lib" | grep -v node_modules | xargs prettier --write
+      ```
+
+## Pre-push hooks
+Before pushing changes to origin, all changed files will be checked automatically by [TSLint](https://github.com/palantir/tslint) and [Prettier](https://prettier.io/). If there are some errors in the code styling, the push will be canceled. 
 
 ## Further help
 

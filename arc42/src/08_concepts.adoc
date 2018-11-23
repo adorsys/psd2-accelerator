@@ -74,8 +74,9 @@ Currently no support for mobile devices is planned.
 For this project we decided to use two different code stylings depending on frontend or backend
 development.
 
-The frontend development is using the default Angular code style checked by https://github.com/palantir/tslint[tslint].
-The appropriate `tslint.json` can be found in the `ui` folder.
+The frontend development is using https://github.com/palantir/tslint[tslint] for code-quality rules
+ (no-unused vars,...). For code styling and formatting of HTML, Typescript and CSS/SCSS we use
+https://prettier.io/[Pretter]. The appropriate config files are `.prettierrc.json` and `tslint.json`.
 To guarantee a clean code styling on the remote branch, we decided to add a pre-push-hook which
 checks the style for errors and if possible also fixes them automatically. Furthermore, we added
 a second check embedded in the ci pipeline which fails in case of unclean code.

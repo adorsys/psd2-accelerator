@@ -13,7 +13,9 @@
     "e2e": "ng e2e",
     "e2e-running": "ng e2e --devServerTarget=",
     "tslint": "tslint -p tslint.json",
-    "tslint-fix": "tslint --fix -p tslint.json"
+    "tslint-fix": "tslint --fix -p tslint.json",
+    "prettier": "find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v \"assets/lib\" | grep -v node_modules grep -v dist | xargs prettier --write",
+    "prettier-check": "find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v \"assets/lib\" | grep -v node_modules | grep -v dist | xargs prettier-check"
   },
   "private": true,
   "dependencies": {
@@ -53,9 +55,12 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "lint-staged": "^8.0.4",
     "node-sass": "^4.9.4",
+    "prettier": "1.15.2",
+    "prettier-check": "^2.0.0",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
+    "tslint-config-prettier": "^1.16.0",
     "typescript": "~3.1.6"
   },
   "husky": {
@@ -65,7 +70,10 @@
   },
   "lint-staged": {
     "*.ts": [
-      "tslint --fix -p tslint.json",
+      "tslint --fix -p tslint.json"
+    ],
+    "*.{js,ts,json,css,scss,md,html}": [
+      "prettier --write --config ./src/.prettierrc.json",
       "git add"
     ]
   }
