@@ -11,16 +11,17 @@ describe('DeveloperPortalPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [DevPortalModule]
-    }).overrideModule(DevPortalModule, {
-      remove: {
-        imports: [RouterModule]
-      },
-      add: {
-        imports: [HttpClientTestingModule, RouterTestingModule]
-      }
+      imports: [DevPortalModule],
     })
-        .compileComponents();
+      .overrideModule(DevPortalModule, {
+        remove: {
+          imports: [RouterModule],
+        },
+        add: {
+          imports: [HttpClientTestingModule, RouterTestingModule],
+        },
+      })
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -5,17 +5,21 @@ import { CertificateResponse } from '../../models/certificateResponse';
 import { CertificateRequest } from '../../models/certificateRequest';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CertificateService {
   CREATE_CERT_URL = `/api/cert-generator`;
   certResponse: CertificateResponse;
 
-  constructor(private httpClient: HttpClient) {
-  }
+  constructor(private httpClient: HttpClient) {}
 
-  createCertificate(certData: CertificateRequest): Observable<CertificateResponse> {
-    return this.httpClient.post<CertificateResponse>(this.CREATE_CERT_URL, certData);
+  createCertificate(
+    certData: CertificateRequest
+  ): Observable<CertificateResponse> {
+    return this.httpClient.post<CertificateResponse>(
+      this.CREATE_CERT_URL,
+      certData
+    );
   }
 
   saveCertResponse(data: CertificateResponse) {

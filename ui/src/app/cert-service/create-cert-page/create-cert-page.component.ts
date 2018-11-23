@@ -10,10 +10,10 @@ import { HttpError } from '../../../models/httpError';
 
 @Component({
   selector: 'sb-generate-certificate-page',
-  templateUrl: './generate-certificate-page.component.html',
-  styleUrls: ['./generate-certificate-page.component.scss']
+  templateUrl: './create-cert-page.component.html',
+  styleUrls: ['./create-cert-page.component.scss'],
 })
-export class GenerateCertificatePageComponent implements OnInit {
+export class CreateCertPageComponent implements OnInit {
   @ViewChild('certForm') certForm;
   certData: CertificateRequest;
   pspRolesKeys = Object.keys(PspRole);
@@ -24,11 +24,14 @@ export class GenerateCertificatePageComponent implements OnInit {
     const zip = new JSZip();
     zip.file('certificate.pem', certBlob);
     zip.file('private.key', keyBlob);
-    return zip.generateAsync({type: 'blob'});
+    return zip.generateAsync({ type: 'blob' });
   }
 
-  constructor(private router: Router, private route: ActivatedRoute, private certService: CertificateService) {
-  }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private certService: CertificateService
+  ) {}
 
   ngOnInit() {
     this.certData = {
@@ -40,7 +43,7 @@ export class GenerateCertificatePageComponent implements OnInit {
       organizationName: 'Fictional Corporation AG',
       organizationUnit: 'Information Technology',
       stateOrProvinceName: 'Bayern',
-      validity: 365
+      validity: 365,
     };
   }
 
@@ -59,9 +62,11 @@ export class GenerateCertificatePageComponent implements OnInit {
 
   onSelectPspRole(pspRole: string) {
     if (this.isPspRoleSelected(pspRole)) {
-      this.certData.roles = this.certData.roles.filter(psp => psp !== PspRole[pspRole]);
+      this.certData.roles = this.certData.roles.filter(
+        psp => psp !== PspRole[pspRole]
+      );
       if (!this.isPspRoleValid()) {
-        this.certForm.form.setErrors({invalid: true});
+        this.certForm.form.setErrors({ invalid: true });
       }
     } else {
       this.certData.roles.push(PspRole[pspRole]);
@@ -82,11 +87,17 @@ export class GenerateCertificatePageComponent implements OnInit {
   }
 
   createZipUrl(): Promise<string> {
-    const blobCert = new Blob([this.certResponse.encodedCert], {type: 'text/plain'});
-    const blobKey = new Blob([this.certResponse.privateKey], {type: 'text/plain'});
-    return GenerateCertificatePageComponent.generateZipFile(blobCert, blobKey).then( zip => {
-      return window.URL.createObjectURL(zip);
+    const blobCert = new Blob([this.certResponse.encodedCert], {
+      type: 'text/plain',
     });
+    const blobKey = new Blob([this.certResponse.privateKey], {
+      type: 'text/plain',
+    });
+    return CreateCertPageComponent.generateZipFile(blobCert, blobKey).then(
+      zip => {
+        return window.URL.createObjectURL(zip);
+      }
+    );
   }
 
   downloadFile(url: string) {

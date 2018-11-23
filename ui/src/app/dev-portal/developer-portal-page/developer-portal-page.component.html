@@ -7,55 +7,72 @@
       <h2>Technical Description</h2>
       <p>
         The
-        <a href
-               ="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L2366&from=EN">
-          Payment Service Directive 2 (PSD2)</a> instructs banks to provide a fully productive
-        Access-to-Account (XS2A) interface to Third Party Provider (TPPs) until September 2019. XS2A
-        itself consists of banking services to initiate payments (PIS), request account data (AIS)
-        and get the confirmation of the availability of funds (PIIS).
-        In order to guarantee the compliance of this deadline due to adaptions and bugs, PSD2 claims
-        the banks to provide a functional sandbox offering the XS2A services in a non-productive
-        environment until March 2019.
+        <a
+          href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L2366&from=EN"
+          >Payment Service Directive 2 (PSD2)</a
+        >instructs banks to provide a fully productive Access-to-Account (XS2A)
+        interface to Third Party Provider (TPPs) until September 2019. XS2A
+        itself consists of banking services to initiate payments (PIS), request
+        account data (AIS) and get the confirmation of the availability of funds
+        (PIIS). In order to guarantee the compliance of this deadline due to
+        adaptions and bugs, PSD2 claims the banks to provide a functional
+        sandbox offering the XS2A services in a non-productive environment until
+        March 2019.
       </p>
       <p>
-        Central component of the sandbox is the XS2A interface which meets the requirements of the
-        <a href="https://www.berlin-group.org/">Berlin Group</a> (Version 1.2) and is based on test
-        data. Besides the actual interface, PSD2 instructs banks to offer a technical documentation
-        free of charge containing amongst others, information about supported payment products and
-        payment services.
+        Central component of the sandbox is the XS2A interface which meets the
+        requirements of the
+        <a href="https://www.berlin-group.org/">Berlin Group</a> (Version 1.2)
+        and is based on test data. Besides the actual interface, PSD2 instructs
+        banks to offer a technical documentation free of charge containing
+        amongst others, information about supported payment products and payment
+        services.
       </p>
       <p>
-        Usually, before accessing the XS2A services a TPP would need to register at its National
-        Competent Authority (NCA) and request
-        an <a
-          href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN">eIDAS</a>
-        certificate at an appropriate Trust Service Provider (TSP). Issuing a real certificate just
-        for testing purposes would be a bit too much effort, which is why this sandbox is
-        additionally simulating a fictional TSP issuing Qualified Website Authentication
-        Certificates (QWAC). A QWAC is part of eIDAS and might be better known as <a
-          href="https://www.ietf.org/rfc/rfc3739.txt">X.509</a> certificate.
-        For PSD2-purposes the certificate gets extended by the QcStatement containing appropriate
-        values such as the role(s) of the PSP (see <a
-          href="https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf">ETSI</a>).
+        Usually, before accessing the XS2A services a TPP would need to register
+        at its National Competent Authority (NCA) and request an
+        <a
+          href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN"
+          >eIDAS</a
+        >
+        certificate at an appropriate Trust Service Provider (TSP). Issuing a
+        real certificate just for testing purposes would be a bit too much
+        effort, which is why this sandbox is additionally simulating a fictional
+        TSP issuing Qualified Website Authentication Certificates (QWAC). A QWAC
+        is part of eIDAS and might be better known as
+        <a href="https://www.ietf.org/rfc/rfc3739.txt">X.509</a> certificate.
+        For PSD2-purposes the certificate gets extended by the QcStatement
+        containing appropriate values such as the role(s) of the PSP (see
+        <a
+          href="https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf"
+          >ETSI</a
+        >).
       </p>
       <p>
-        After embedding the QWAC in the actual XS2A request, the role and the signature get
-        validated at a central reverse proxy before it gets finally passed to the interface where
-        the banking logic happens. You can visit our documentation here <a
-          href="../swagger-ui.html">XS2A Swagger UI</a>.
+        After embedding the QWAC in the actual XS2A request, the role and the
+        signature get validated at a central reverse proxy before it gets
+        finally passed to the interface where the banking logic happens. You can
+        visit our documentation here
+        <a href="../swagger-ui.html">XS2A Swagger UI</a>.
       </p>
-      <p>The described components with their connection to each other are displayed in Figure
-        1.1:</p>
+      <p>
+        The described components with their connection to each other are
+        displayed in Figure 1.1:
+      </p>
 
       <div class="text-center image-spacing">
-        <img src="assets/sandbox.svg" width="75%">
-        <figcaption><i>Figure 1.1:</i> Components of the Sandbox Environment</figcaption>
+        <img src="assets/sandbox.svg" width="75%" />
+        <figcaption>
+          <i>Figure 1.1:</i> Components of the Sandbox Environment
+        </figcaption>
       </div>
 
       <p class="description description__intro">Configuration of XS2A:</p>
       <p>Currently the sandbox environment is configured as follows:</p>
       <ul>
-        <li>TSP: The generation of client certificates works without registration</li>
+        <li>
+          TSP: The generation of client certificates works without registration
+        </li>
         <li>Payment-Product: Sepa-credit-transfers</li>
         <li>Payment-Service: Single-payments</li>
         <li>SCA-Approach: Embedded</li>
@@ -64,16 +81,24 @@
 
     <section>
       <h2>Getting started</h2>
-      <p>In order to test the services of XS2A you need to execute the following steps:</p>
+      <p>
+        In order to test the services of XS2A you need to execute the following
+        steps:
+      </p>
       <p class="description description__intro">Register/Login</p>
       <p>User registration/Login is coming soon.</p>
       <p class="description description__intro">Generate Certificate</p>
-      <p>To generate a QWAC Certificate follow this link <a
-          routerLink="/certificate-service">Certificate Service UI</a> and embed the .pem file in
-        the response header "tpp-qwac-certficate" (see example cURL below).
+      <p>
+        To generate a QWAC Certificate follow this link
+        <a routerLink="/certificate-service">Certificate Service UI</a> and
+        embed the .pem file in the response header "tpp-qwac-certficate" (see
+        example cURL below).
       </p>
       <p class="description description__intro">Fictional PSU Data</p>
-      <p>To execute services of XS2A, you have to use the following PSU credentials</p>
+      <p>
+        To execute services of XS2A, you have to use the following PSU
+        credentials
+      </p>
       <ul>
         <li>Login: testuser</li>
         <li>Password: 12345</li>
@@ -83,9 +108,13 @@
       <p>A full set of PSU data will be provided soon.</p>
 
       <p class="description description__intro">Execute XS2A Calls</p>
-      <p>To execute XS2A calls follow this link
-        <a href="../swagger-ui.html">XS2A Swagger UI</a>.</p>
-      <p>The following code snippet is an example cURL command which is initiating a single payment:
+      <p>
+        To execute XS2A calls follow this link
+        <a href="../swagger-ui.html">XS2A Swagger UI</a>.
+      </p>
+      <p>
+        The following code snippet is an example cURL command which is
+        initiating a single payment:
       </p>
       <pre>
           <code>
@@ -125,4 +154,3 @@
     </section>
   </div>
 </div>
-

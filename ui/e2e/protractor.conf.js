@@ -5,22 +5,20 @@ const { SpecReporter } = require('jasmine-spec-reporter');
 
 exports.config = {
   allScriptsTimeout: 11000,
-  specs: [
-    './src/**/*.e2e-spec.ts'
-  ],
+  specs: ['./src/**/*.e2e-spec.ts'],
   capabilities: {
-    'browserName': 'chrome',
-    'chromeOptions': {
+    browserName: 'chrome',
+    chromeOptions: {
       args: ['--no-sandbox', '--test-type=browser'],
       prefs: {
         'plugins.always_open_pdf_externally': true,
-        'download': {
-          'prompt_for_download': false,
-          'default_directory': '',
-          'directory_upgrade': true
-        }
-      }
-    }
+        download: {
+          prompt_for_download: false,
+          default_directory: '',
+          directory_upgrade: true,
+        },
+      },
+    },
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
@@ -28,12 +26,14 @@ exports.config = {
   jasmineNodeOpts: {
     showColors: true,
     defaultTimeoutInterval: 30000,
-    print: function() {}
+    print: function() {},
   },
   onPrepare() {
     require('ts-node').register({
-      project: require('path').join(__dirname, './tsconfig.e2e.json')
+      project: require('path').join(__dirname, './tsconfig.e2e.json'),
     });
-    jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
-  }
+    jasmine
+      .getEnv()
+      .addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+  },
 };

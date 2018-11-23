@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
+import { CreateCertPageComponent } from './create-cert-page/create-cert-page.component';
 
 export const routes: Routes = [
-  { path: '', component: GenerateCertificatePageComponent },
+  { path: '', component: CreateCertPageComponent },
 ];

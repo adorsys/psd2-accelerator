@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { GenerateCertificatePageComponent } from './generate-certificate-page.component';
+import { CreateCertPageComponent } from './create-cert-page.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { PspRole } from '../../../models/pspRole';
@@ -8,34 +8,35 @@ import { By } from '@angular/platform-browser';
 import { CertServiceModule } from '../cert-service.module';
 import { RouterModule } from '@angular/router';
 
-describe('GenerateCertificatePageComponent', () => {
-  let component: GenerateCertificatePageComponent;
-  let fixture: ComponentFixture<GenerateCertificatePageComponent>;
+describe('CreateCertPageComponent', () => {
+  let component: CreateCertPageComponent;
+  let fixture: ComponentFixture<CreateCertPageComponent>;
 
   const certResponse: CertificateResponse = {
     encodedCert: '-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----',
-    privateKey: '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
+    privateKey:
+      '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
     keyId: '1612748784',
-    algorithm: 'SHA256WITHRSA'
+    algorithm: 'SHA256WITHRSA',
   };
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule(
-        {
-          imports: [CertServiceModule]
-        }).overrideModule(CertServiceModule, {
-          remove: {
-            imports: [RouterModule]
-          },
-      add: {
-            imports: [HttpClientTestingModule, RouterTestingModule]
-      }
+    TestBed.configureTestingModule({
+      imports: [CertServiceModule],
     })
-        .compileComponents();
+      .overrideModule(CertServiceModule, {
+        remove: {
+          imports: [RouterModule],
+        },
+        add: {
+          imports: [HttpClientTestingModule, RouterTestingModule],
+        },
+      })
+      .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GenerateCertificatePageComponent);
+    fixture = TestBed.createComponent(CreateCertPageComponent);
     component = fixture.componentInstance;
     component.certData = {
       roles: [PspRole.PIS],
@@ -46,7 +47,7 @@ describe('GenerateCertificatePageComponent', () => {
       organizationName: 'Fictional Corporation AG',
       organizationUnit: 'Information Technology',
       stateOrProvinceName: 'Bayern',
-      validity: 365
+      validity: 365,
     };
     fixture.detectChanges();
   });
@@ -77,10 +78,9 @@ describe('GenerateCertificatePageComponent', () => {
     fixture.whenStable().then(() => {
       component.certForm.form.controls['validity'].setValue(400);
       fixture.detectChanges();
-      const validationMsg = fixture
-          .debugElement
-          .query(By.css('input[name=validity] ~ div.invalid-feedback'))
-          .nativeElement;
+      const validationMsg = fixture.debugElement.query(
+        By.css('input[name=validity] ~ div.invalid-feedback')
+      ).nativeElement;
       expect(component.certForm.form.controls['validity'].valid).toBe(false);
       expect(validationMsg.offsetHeight).not.toBe(0);
     });
@@ -94,7 +94,9 @@ describe('GenerateCertificatePageComponent', () => {
   it('should generate an url for downloading zip', async(() => {
     component.certResponse = certResponse;
     const blob = new Blob(['Test']);
-    spyOn(GenerateCertificatePageComponent, 'generateZipFile').and.returnValue(Promise.resolve(blob));
+    spyOn(CreateCertPageComponent, 'generateZipFile').and.returnValue(
+      Promise.resolve(blob)
+    );
     const url = component.createZipUrl();
     fixture.whenStable().then(() => {
       expect(url).not.toBe(undefined);
@@ -104,7 +106,7 @@ describe('GenerateCertificatePageComponent', () => {
   it('should create zip file', async(() => {
     const blob1 = new Blob(['Blob1']);
     const blob2 = new Blob(['Blob2']);
-    const zip = GenerateCertificatePageComponent.generateZipFile(blob1, blob2);
+    const zip = CreateCertPageComponent.generateZipFile(blob1, blob2);
     fixture.whenStable().then(() => {
       expect(zip).not.toBe(undefined);
     });

@@ -23,7 +23,7 @@ describe('Certificate Service UI', () => {
 
   it('should check the developer portal url', () => {
     page.navigateTo('/');
-    page.getDevUrl().then((url) => {
+    page.getDevUrl().then(url => {
       expect(url).toEqual('http://localhost:4200/app/developer-portal');
     });
   });
@@ -42,12 +42,14 @@ describe('Certificate Service UI', () => {
     page.navigateTo('app/certificate-service');
     page.clickDownloadButton();
 
-    browser.driver.wait(() => {
-      return fs.existsSync(filename);
-    }, 3000).then(() => {
-      const file = fs.readFileSync(filename, {encoding: 'utf8'});
-      expect(file).toContain('-----END RSA PRIVATE KEY-----');
-      expect(file).toContain('-----BEGIN CERTIFICATE-----');
-    });
+    browser.driver
+      .wait(() => {
+        return fs.existsSync(filename);
+      }, 3000)
+      .then(() => {
+        const file = fs.readFileSync(filename, { encoding: 'utf8' });
+        expect(file).toContain('-----END RSA PRIVATE KEY-----');
+        expect(file).toContain('-----BEGIN CERTIFICATE-----');
+      });
   });
 });

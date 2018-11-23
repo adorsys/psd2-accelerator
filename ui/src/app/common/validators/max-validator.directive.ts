@@ -5,16 +5,23 @@ import {
   FormControl,
   ValidatorFn,
   Validators,
-  AbstractControl
+  AbstractControl,
 } from '@angular/forms';
 
 @Directive({
   selector: '[sbMax]',
-  providers: [{provide: NG_VALIDATORS, useExisting: forwardRef(() => MaxValidatorDirective), multi: true}]
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MaxValidatorDirective),
+      multi: true,
+    },
+  ],
 })
 export class MaxValidatorDirective implements Validator {
   private _validator: ValidatorFn;
-  @Input() public set sbMax(value: string) {
+  @Input()
+  public set sbMax(value: string) {
     this._validator = Validators.max(parseInt(value, 10));
   }
 

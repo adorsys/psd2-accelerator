@@ -10,13 +10,12 @@
  * Do not edit the class manually.
  */
 
-
 /**
  * Certificate Response
  */
 export interface CertificateResponse {
-    algorithm?: string;
-    encodedCert?: string;
-    keyId?: string;
-    privateKey?: string;
+  algorithm?: string;
+  encodedCert?: string;
+  keyId?: string;
+  privateKey?: string;
 }

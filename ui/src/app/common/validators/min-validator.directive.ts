@@ -5,16 +5,23 @@ import {
   FormControl,
   ValidatorFn,
   Validators,
-  AbstractControl
+  AbstractControl,
 } from '@angular/forms';
 
 @Directive({
   selector: '[sbMin]',
-  providers: [{provide: NG_VALIDATORS, useExisting: forwardRef(() => MinValidatorDirective), multi: true}]
+  providers: [
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MinValidatorDirective),
+      multi: true,
+    },
+  ],
 })
 export class MinValidatorDirective implements Validator {
   private _validator: ValidatorFn;
-  @Input() public set sbMin(value: string) {
+  @Input()
+  public set sbMin(value: string) {
     this._validator = Validators.min(parseInt(value, 10));
   }
 

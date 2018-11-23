@@ -11,11 +11,8 @@ import { SharedModule } from '../common/shared.module';
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
-    SharedModule
+    SharedModule,
   ],
-  declarations: [
-    DeveloperPortalPageComponent,
-  ]
+  declarations: [DeveloperPortalPageComponent],
 })
-export class DevPortalModule {
-}
+export class DevPortalModule {}

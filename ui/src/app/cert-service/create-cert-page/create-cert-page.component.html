@@ -1,0 +1,182 @@
+<div class="page">
+  <sb-header text="Sample Trust Service Provider"></sb-header>
+  <div class="container container--big">
+    <h1 class="description__title">Certificate Service</h1>
+    <div class="description">
+      <section>
+        <p class="description__intro">
+          Welcome to the website of the Sample Trust Service Provider.
+        </p>
+      </section>
+      <div class="description__text">
+        <p>
+          We issue Qualified Website Authentication Certificates (QWAC) to
+          Payment Service Providers (PSP) in order to use services offered at
+          the Access-to-Account (XS2A) interface of the adorsys Sandbox
+          Environment. <br />
+          Usually each PSP has to be registered at the National Competent
+          Authority (NCA) to receive an Authorisation Number. We allow you to
+          skip this step and define a fake Authorisation Number yourself. <br />
+          Performing the Certificate Service will generate a shared
+          cryptographic key pair signed by the adorsys Sample Trust Service
+          Provider. The Public Key which is also referred to a QWAC must be used
+          for authentication purposes at XS2A.
+        </p>
+      </div>
+    </div>
+    <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
+      <div *ngIf="errors">
+        <ul class="alert alert-danger">
+          <li class="list-inline" *ngFor="let error of errors">
+            {{ error.subject }}: {{ error.message }}
+          </li>
+        </ul>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-6">
+          <label>Authorization Number*</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="authorizationNumber"
+            [(ngModel)]="certData.authorizationNumber"
+          />
+          <div class="invalid-feedback">
+            Please provide an Authorization Number.
+          </div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Country</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="countryName"
+            [(ngModel)]="certData.countryName"
+          />
+          <div class="invalid-feedback">Please provide a Country.</div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>State</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="stateOrProvinceName"
+            [(ngModel)]="certData.stateOrProvinceName"
+          />
+          <div class="invalid-feedback">Please provide a State.</div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>City</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="localityName"
+            [(ngModel)]="certData.localityName"
+          />
+          <div class="invalid-feedback">Please provide a City.</div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Domain</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="domainComponent"
+            [(ngModel)]="certData.domainComponent"
+          />
+          <div class="invalid-feedback">Please provide a Domain.</div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Organization Name*</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="organizationName"
+            [(ngModel)]="certData.organizationName"
+          />
+          <div class="invalid-feedback">
+            Please provide an Organization Name.
+          </div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Organization Unit</label>
+          <input
+            type="text"
+            class="form-control"
+            required
+            type="text"
+            name="organizationUnit"
+            [(ngModel)]="certData.organizationUnit"
+          />
+          <div class="invalid-feedback">
+            Please provide an Organization Unit.
+          </div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Validity</label>
+          <input
+            type="number"
+            class="form-control"
+            required
+            name="validity"
+            sbMax="365"
+            sbMin="1"
+            [(ngModel)]="certData.validity"
+          />
+          <div class="invalid-feedback">
+            Please specify how many days the cert will be valid (min=1;
+            max=365).
+          </div>
+        </div>
+        <div class="form-group col-sm-6">
+          <label>Roles of PSP*</label>
+          <div class="form-group">
+            <div
+              class="form-check form-check-inline"
+              *ngFor="let pspRole of pspRolesKeys"
+            >
+              <input
+                type="text"
+                class="form-check-input"
+                [ngClass]="{ 'is-invalid': !isPspRoleValid() }"
+                type="checkbox"
+                [id]="pspRole"
+                (change)="onSelectPspRole(pspRole)"
+                [checked]="isPspRoleSelected(pspRole)"
+              />
+              <label [for]="pspRole" class="form-check-label">{{
+                pspRole
+              }}</label>
+            </div>
+            <div
+              class="invalid-feedback"
+              [ngClass]="{ 'd-block': !isPspRoleValid() }"
+            >
+              Please choose a Payment Service Provider.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix">
+        <button
+          type="submit"
+          class="btn btn-primary float-right"
+          [disabled]="certForm.invalid"
+        >
+          Confirm
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

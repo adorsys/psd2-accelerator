@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { routes } from './cert-service.routing';
 import { FormsModule } from '@angular/forms';
-import { GenerateCertificatePageComponent } from './generate-certificate-page/generate-certificate-page.component';
+import { CreateCertPageComponent } from './create-cert-page/create-cert-page.component';
 import { MaxValidatorDirective } from '../common/validators/max-validator.directive';
 import { MinValidatorDirective } from '../common/validators/min-validator.directive';
 import { SharedModule } from '../common/shared.module';
@@ -13,13 +13,12 @@ import { SharedModule } from '../common/shared.module';
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
-    SharedModule
+    SharedModule,
   ],
   declarations: [
-    GenerateCertificatePageComponent,
+    CreateCertPageComponent,
     MaxValidatorDirective,
-    MinValidatorDirective
-  ]
+    MinValidatorDirective,
+  ],
 })
-export class CertServiceModule {
-}
+export class CertServiceModule {}

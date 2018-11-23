@@ -1,7 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { CertificateService } from './certificate.service';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { PspRole } from '../../models/pspRole';
 import { CertificateResponse } from '../../models/certificateResponse';
 
@@ -10,15 +13,18 @@ describe('CertificateService', () => {
   let httpMock: HttpTestingController;
   const certResponse: CertificateResponse = {
     encodedCert: '-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----',
-    privateKey: '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
+    privateKey:
+      '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----',
     keyId: '1612748784',
     algorithm: 'SHA256WITHRSA',
   };
-  beforeEach(() => TestBed.configureTestingModule({
-    imports: [RouterTestingModule, HttpClientTestingModule]
-  }));
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule, HttpClientTestingModule],
+    })
+  );
 
-  beforeEach( () => {
+  beforeEach(() => {
     service = TestBed.get(CertificateService);
     httpMock = TestBed.get(HttpTestingController);
   });
@@ -53,7 +59,7 @@ describe('CertificateService', () => {
       organizationName: 'Fictional Corporation AG',
       organizationUnit: 'Information Technology',
       stateOrProvinceName: 'Bayern',
-      validity: 365
+      validity: 365,
     };
 
     const mockResponse = certResponse;
@@ -61,8 +67,12 @@ describe('CertificateService', () => {
     service.createCertificate(certData).subscribe(backendResponse => {
       expect(backendResponse.algorithm).toBe('SHA256WITHRSA');
       expect(backendResponse.keyId).toBe('1612748784');
-      expect(backendResponse.privateKey).toBe('-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----');
-      expect(backendResponse.encodedCert).toBe('-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----');
+      expect(backendResponse.privateKey).toBe(
+        '-----BEGIN RSA PRIVATE KEY-----FOO-----END RSA PRIVATE KEY-----'
+      );
+      expect(backendResponse.encodedCert).toBe(
+        '-----BEGIN CERTIFICATE-----BAR-----END CERTIFICATE-----'
+      );
     });
 
     const req = httpMock.expectOne(`${service.CREATE_CERT_URL}`);
