@@ -10,7 +10,7 @@ image::generated/whitebox-1.png[Whitebox Overall System Level 1, 60%, title="Whi
 
 Motivation::
 
-The application is designed as a modular monolith and uses Spring Boot 1.5. Every independent feature maps to a top level package (`de.adorsys.psd2.sandbox.certgen`) (backend) or a top level folder (`src/app/certgen`) (UI). The UI is
+The application is designed as a modular monolith and uses Spring Boot 1.5. Every independent feature "xyz" maps to a top level package (`de.adorsys.psd2.sandbox.xyz`) (backend) or a top level folder (`src/app/xyz`) (UI). The UI is
 implemented as an Angular app and bundled in the backend JAR.
 
 
@@ -26,8 +26,8 @@ Contained Building Blocks::
 | config
 | Configure the Sandbox and XS2A API (e.g. supported payment products). Just a https://todo-link-to-file[yaml] file right now.
 
-| documentation
-| Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place
+| developer-portal
+| Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place. The content is static but embedded in the angular app.
 
 | testdata              | Generate, import and manage test data accessible over the XS2A API
 | xs2a                  | Provides the actual XS2A REST API

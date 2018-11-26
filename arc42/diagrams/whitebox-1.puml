@@ -14,11 +14,11 @@ package sandbox {
 
   () api -- [xs2a]
   tppd --> api
-  tppd --> [documentation]
+  tppd --> [developer-portal]
   tppd --> [certificate-generator]
 
   ' only for layouting
-  api -[hidden]> [documentation]
+  api -[hidden]> [developer-portal]
 }
 
 @enduml
