@@ -13,15 +13,10 @@ $ brew install plantuml
 ```shell
 $ gem install asciidoctor
 ```
-* create PlantUML images
-+
-```shell
-$ plantuml -o "$PWD/images/generated" diagrams/*
-```
 * create architecture documentation
 +
 ```shell
-$ asciidoctor psd2-sandbox-arc42.adoc     # results in psd2-sandbox-arc42.html
+$ make arc42/psd2-sandbox-arc42.html
 ```
 
 ## Tools Used for Diagrams

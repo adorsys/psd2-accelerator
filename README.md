@@ -30,6 +30,34 @@ _Figure 1.1:_ Components of the Sandbox Environment
 
 ## Getting started 
 
+### General
+To build (and run) the backend server and the frontend application the `Makefile` can be used. The following commands are supported:
+1. Build the arc42 docs, backend and frontend application
+    ```
+    make
+    ```
+2. Build and run the application
+    ```
+    make run
+    ```
+3. Run tests
+    ```
+    make test
+    make test-ui
+    make test-service
+    ```
+4. Clean
+    ```
+    make clean
+    make clean-ui
+    make clean-service
+    ```    
+5. Help
+    ```
+    make help
+    ```    
+    
+
 ### Sandbox services
 In order to run the certificate and XS2A services you need to start the SpringBoot Application by fulfilling the following steps:
 
