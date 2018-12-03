@@ -55,8 +55,20 @@ To build (and run) the backend server and the frontend application the `Makefile
 5. Help
     ```
     make help
-    ```    
-    
+    ```   
+
+### Developer Setup
+You can run the ssl-proxy and the db against a local instance of the backend service instead of starting it with docker-compose.
+
+!Make sure, your local instance of XS2A is already running (Started in your IDE or as JAR)
+```sh
+$ XS2A_INTERNAL_URL=http://host.docker.internal:8080 docker-compose up --no-deps ssl-proxy db
+```
+
+To use the docker-compose ssl-proxy and the db with an already running instance of the ui, run the following command:
+```sh
+$ XS2A_INTERNAL_URL=http://host.docker.internal:4200 docker-compose up --no-deps ssl-proxy db
+```
 
 ### Sandbox services
 In order to run the certificate and XS2A services you need to start the SpringBoot Application by fulfilling the following steps:

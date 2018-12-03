@@ -8,6 +8,8 @@ services:
       - "8081:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db/consent
+    depends_on:
+      - db
   db:
     image: centos/postgresql-10-centos7
     environment:
@@ -16,3 +18,13 @@ services:
       - POSTGRESQL_DATABASE=consent
     ports:
       - "5432:5432"
+  ssl-proxy:
+    build: ssl-proxy
+    image: adorsys/psd2-sandbox-ssl-proxy
+    environment:
+      - XS2A_INTERNAL_URL=${XS2A_INTERNAL_URL:-http://service:8080}
+      - XS2A_EXTERNAL_URL=${XS2A_EXTERNAL_URL:-https://localhost:8443}
+    ports:
+      - "8443:8443"
+    depends_on:
+      - service
