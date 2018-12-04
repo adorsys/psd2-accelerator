@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.config;
+package de.adorsys.psd2.sandbox.app;
 
 import java.io.IOException;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 @Configuration
-public class WebMvcConfig extends WebMvcConfigurerAdapter {
+public class AppResourceConfiguration extends WebMvcConfigurerAdapter {
 
   /*
     Serve index.html for every request in /app if there is no other resource. This is required for

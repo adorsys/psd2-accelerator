@@ -5,6 +5,7 @@ services:
     image: adorsys/psd2-sandbox
     ports:
       - "8080:8080"
+      - "8081:8081"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db/consent
   db:

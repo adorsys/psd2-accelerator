@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.certificateserver.web;
+package de.adorsys.psd2.sandbox.xs2a;
 
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import javax.servlet.http.HttpServletRequest;

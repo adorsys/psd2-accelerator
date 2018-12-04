@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.webapp.web;
+package de.adorsys.psd2.sandbox.app;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-public class WebappController {
+public class AppController {
 
   @RequestMapping("/")
   public ResponseEntity redirectToWebapp() {

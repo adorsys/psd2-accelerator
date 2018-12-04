@@ -17,7 +17,6 @@ import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -29,13 +28,11 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(value = CertificateController.class, secure = false)
 public class CertificateControllerTest {
 
-  private static final String KEY_ID = "154054446";
 
   // CHECKSTYLE:OFF
   private static final String CERTIFICATE = "-----BEGIN CERTIFICATE-----Stuff-----END CERTIFICATE-----";
   private static final String PRIVATE_KEY = "-----BEGIN RSA PRIVATE KEY-----Stuff-----END RSA PRIVATE KEY-----";
   // CHECKSTYLE:ON
-  private static final String ALGORITHM = "SHA256WITHRSA";
 
   @Autowired
   private MockMvc mockMvc;
@@ -115,10 +112,4 @@ public class CertificateControllerTest {
 
     assertThat(response.getContentAsString(), is(""));
   }
-
-  @SpringBootApplication
-  static class WithoutXs2aApplication {
-
-  }
-
 }
