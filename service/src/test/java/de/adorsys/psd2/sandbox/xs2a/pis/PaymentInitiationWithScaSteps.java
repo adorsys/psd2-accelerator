@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.xs2a.stepdefinitions;
+package de.adorsys.psd2.sandbox.xs2a.pis;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {

@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestDataService {
 
-  private static final String IBAN_GIRO = "DE94500105178833114935";
-  private static final String IBAN_SAVINGS = "DE96500105179669622432";
-  private static final Currency EUR = Currency.getInstance("EUR");
-  private static final String ACCOUNT_OWNER = "Melanie Klein";
-  private static final String ACCOUNT_ID_GIRO = "9b86539d-589b-4082-90c2-d725c019777f";
-  private static final String ACCOUNT_ID_SAVINGS = "d460057b-053a-490a-a36e-c0c8afb735e9";
+  public static final String IBAN_GIRO = "DE94500105178833114935";
+  public static final String IBAN_SAVINGS = "DE96500105179669622432";
+  public static final Currency EUR = Currency.getInstance("EUR");
+  public static final String ACCOUNT_OWNER = "Melanie Klein";
+  public static final String ACCOUNT_ID_GIRO = "9b86539d-589b-4082-90c2-d725c019777f";
+  public static final String ACCOUNT_ID_SAVINGS = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
   private HashMap<String, Account> accounts;
   private HashMap<String, HashMap<String, Transaction>> transactions;

@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.xs2a;
+package de.adorsys.psd2.sandbox.xs2a.pis;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
@@ -6,9 +6,9 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-    features = "src/test/resources/features",
-    glue = "de.adorsys.psd2.sandbox.xs2a.stepdefinitions",
+    features = "src/test/java/de/adorsys/psd2/sandbox/xs2a/pis",
+    glue = "de.adorsys.psd2.sandbox.xs2a.pis",
     plugin = {"pretty", "html:target/report"})
-public class CucumberTest {
+public class CucumberPisTest {
 
 }

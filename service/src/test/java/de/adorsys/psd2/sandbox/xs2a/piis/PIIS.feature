@@ -6,8 +6,8 @@ Feature: Payment Instrument Issuer Service
     #                                                                                              #
     ################################################################################################
   Scenario Outline: Successful confirmation of funds
-    Given PSU wants to check if <amount> is available on account <iban>
-    When PSU sends the request for the confirmation of funds
+    Given PSU wants to check the availability of funds
+    When PSU sends the request with the amount <amount> and the IBAN <iban>
     Then the status <availability-status> and response code <code> are received
     Examples:
       | amount | iban                   | availability-status | code |

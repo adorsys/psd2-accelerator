@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.xs2a.stepdefinitions;
+package de.adorsys.psd2.sandbox.xs2a.piis;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -21,13 +21,19 @@ import org.springframework.http.ResponseEntity;
 
 public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
 
-  private Request<ConfirmationOfFunds> request = new Request<>();
   private Context context = new Context();
 
-  @Given("^PSU wants to check if (.*) is available on account (.*)$")
-  public void prepareConfirmationOfFundsRequest(String requestedAmount, String iban) {
+  @Given("^PSU wants to check the availability of funds$")
+  public void prepareConfirmationOfFundsRequest() {
+
+  }
+
+  @When("^PSU sends the request with the amount (.*) and the IBAN (.*)$")
+  public void getAvailabilityOfFunds(String requestedAmount, String iban) {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+
+    Request<ConfirmationOfFunds> request = new Request<>();
     request.setHeader(headers);
 
     ConfirmationOfFunds confirmation = new ConfirmationOfFunds();
@@ -44,10 +50,7 @@ public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
     confirmation.setInstructedAmount(amount);
 
     request.setBody(confirmation);
-  }
 
-  @When("^PSU sends the request for the confirmation of funds$")
-  public void getAvailabilityOfFunds() {
     HttpEntity entity = TestUtils.getHttpEntity(request);
 
     ResponseEntity response = template.exchange(
