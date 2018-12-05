@@ -1,17 +1,13 @@
-package de.adorsys.psd2.sandbox.xs2a;
+package de.adorsys.psd2.sandbox.xs2a.web.filter;
 
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
 /**
  * The intend of this class is to return a mock certificate, when we don't want to enter manually
  * everytime the qwac certificate in case of test.
  */
-@Profile("test")
-@Component
-public class QwacCertificateFilterMock extends QwacCertificateFilter {
+public class MockCertificateFilter extends QwacCertificateFilter {
 
   @Override
   public String getEncodedTppQwacCert(HttpServletRequest httpRequest) {
