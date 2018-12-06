@@ -25,10 +25,14 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       @NotNull AspspConsentData aspspConsentData) {
 
     Account account = testDataService.getAccountDetails(TestDataService.ACCOUNT_ID_GIRO);
+
+    String requestedIban = spiFundsConfirmationRequest.getPsuAccount().getIban();
     BigDecimal requestedAmount = spiFundsConfirmationRequest.getInstructedAmount().getAmount();
 
-    if (hasSufficientFunds(account, requestedAmount)) {
-      return new SpiResponse<>(true, aspspConsentData);
+    if (account.getIban().equals(requestedIban)) {
+      if (hasSufficientFunds(account, requestedAmount)) {
+        return new SpiResponse<>(true, aspspConsentData);
+      }
     }
     return new SpiResponse<>(false, aspspConsentData);
   }
