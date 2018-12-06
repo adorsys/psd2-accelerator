@@ -23,15 +23,18 @@ Contained Building Blocks::
 | certificate-generator
 | Create QWAC certificates to allow TPPs access to the XS2A API via <<SSL Client Authentication>>
 
-| config
-| Configure the Sandbox and XS2A API (e.g. supported payment products). Just a https://todo-link-to-file[yaml] file right now.
-
 | developer-portal
 | Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place. The content is static but embedded in the angular app.
 
-| testdata              | Generate, import and manage test data accessible over the XS2A API
+| ssl-proxy
+| Infrastructure component which does SSL termination and SSL Client Authentication for XS2A. The ssl-proxy forwards the SSL Client certificate to XS2A. Since the ssl-proxy is part of the infrastructure, the actual implementation varies. Our own Sandbox deployment uses our bundled nginx (which also acts as reverse proxy). Customers may substitute it with their own hard- or software solution (HA-Proxy, F5, ...).
+
 | xs2a                  | Provides the actual XS2A REST API
 
+| config
+| Configure the Sandbox and XS2A API (e.g. supported payment products). Just a https://todo-link-to-file[yaml] file right now.
+
+| testdata              | Generate, import and manage test data accessible over the XS2A API
 |===
 
 === Level 2

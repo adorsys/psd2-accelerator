@@ -8,17 +8,18 @@ actor "TPP Developer" as tppd
 
 package sandbox {
 
+  [ssl-proxy] <<infrastructure>>
+
   [xs2a] --> [testdata]
-  badmin --> [config]
-  config <-- [xs2a]
+  [config] <- badmin
+  [xs2a] -> [config]
 
   () api -- [xs2a]
-  tppd --> api
+  tppd --> [ssl-proxy]
+  [ssl-proxy] --> api
   tppd --> [developer-portal]
   tppd --> [certificate-generator]
 
-  ' only for layouting
-  api -[hidden]> [developer-portal]
 }
 
 @enduml

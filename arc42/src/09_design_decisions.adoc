@@ -33,6 +33,13 @@ To make local development and deployment easy, we try to bundle everything in th
 * _consent-management_ is embedded instead of being deployed stand-alone
 * sandbox ui is a separate top-level Angular project but is embedded in the resulting JAR as static content
 
+Different Spring Contexts for XS2A and the Sandbox::
+Our JAR hosts two Spring Web Applications on different ports. The XS2A context is isolated from the Sandbox context.
+This allows us to:
+* import the original XS2A configuration without affecting the Sandbox
+* host both applications on different subdomains
+* use two different but simpler Spring Security configurations instead of a complicated one
+
 Monorepo::
 All our code lives in a single https://git.adorsys.de/psd2/sandbox[sandbox repository]. Every
 project / artifact gets a top-level directory (service, ui, arc42, deployment configuration). This

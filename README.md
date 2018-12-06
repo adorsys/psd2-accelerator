@@ -28,39 +28,54 @@ The described components with their connection to each other are displayed in Fi
 
 _Figure 1.1:_ Components of the Sandbox Environment
 
-## Getting started 
+## Getting started
 
-### General
+### Get Everything Up And Running 
+
+NOTE:
+In order to be able to use virtual hosts in development we use `*.vcap.me` hostnames, which always resolve to `127.0.0.1`
+
 To build (and run) the backend server and the frontend application the `Makefile` can be used. The following commands are supported:
 1. Build the arc42 docs, backend and frontend application
-    ```
-    make
+    ```sh
+    $ git clone https://git.adorsys.de/psd2/sandbox.git
+    $ cd sandbox
+    $ make
     ```
 2. Build and run the application
+    ```sh
+    $ make run
     ```
-    make run
-    ```
+
+    - starts the SSL proxy on port 8443 with subdomains for
+      - XS2A (with SSL authentication) (<https://api.sandbox.vcap.me:8443/swagger-ui.html>)
+      - sandbox (<https://sandbox.vcap.me:8443/app>)
+    - starts XS2A on port 8080 (<http://localhost:8080/swagger-ui.html>)
+    - starts the Sandbox on port 8081 (<http://localhost:8081/app>)
+
 3. Run tests
-    ```
-    make test
-    make test-ui
-    make test-service
+    ```sh
+    $ make test
+    $ make test-ui
+    $ make test-service
     ```
 4. Clean
+    ```sh
+    $ make clean
+    $ make clean-ui
+    $ make clean-service
     ```
-    make clean
-    make clean-ui
-    make clean-service
-    ```    
 5. Help
+    ```sh
+    $ make help
     ```
-    make help
-    ```   
 
-### Developer Setup
-You can run the ssl-proxy and the db against a local instance of the backend service instead of starting it with docker-compose.
+### Developer Workflow
 
-!Make sure, your local instance of XS2A is already running (Started in your IDE or as JAR)
+You can run the ssl-proxy and the db against a local instance of the backend service instead of starting everything with docker-compose.
+
+NOTE: Make sure, your local instance of XS2A is already running (Started in your IDE or as JAR)
+
 ```sh
 $ XS2A_INTERNAL_URL=http://host.docker.internal:8080 docker-compose up --no-deps ssl-proxy db
 ```
@@ -70,22 +85,25 @@ To use the docker-compose ssl-proxy and the db with an already running instance 
 $ XS2A_INTERNAL_URL=http://host.docker.internal:4200 docker-compose up --no-deps ssl-proxy db
 ```
 
-### Sandbox services
-In order to run the certificate and XS2A services you need to start the SpringBoot Application by fulfilling the following steps:
+### Sandbox Services
+
+In order to run the certificate and XS2A services you need to start the Spring Boot Application by fulfilling the following steps:
 
 ```sh 
-$ git clone https://git.adorsys.de/psd2/sandbox.git
 $ cd sandbox
 $ docker-compose up -d db
 $ cd service
 $ mvn spring-boot:run -Drun.arguments="--spring.profiles.active=test"
 ```
 
-* Services will be available at (<http://localhost:8080/api/>)
-* Swagger-Documentation is provided at (<http://localhost:8080/swagger-ui.html>)
+- XS2A API will be available at <http://localhost:8080/swagger-ui.htm>
+- Developer Portal will be available at <http://localhost:8081/app>
 
-### UI for developer portal
-After starting the SpringBoot Application you can run the UI for certificate generation by executing the steps described bellow:
+See the [Service README.md](./service/README.md) for mor details.
+
+### Developer Portal App
+
+After starting the Spring Boot application you can run the Angular dev server against the backend:
 
 ```sh 
 $ cd ../ui
@@ -93,8 +111,10 @@ $ npm install
 $ npm run start
 ```
 
-* Developer Portal will be available at (<http://localhost:4200/>)
-* Certificate Service will be available at (<http://localhost:4200/app/certificate-service>)
+- Developer Portal will be available at (<http://localhost:4200/>)
+- Certificate Service will be available at (<http://localhost:4200/app/certificate-service>)
+
+See the [UI README.md](./ui/README.md) for mor details.
 
 ## How to Release
 
@@ -113,7 +133,8 @@ $ git push --follow-tags --atomic
 Don't. Fail forward, create a new release and tell everybody you messed up. Won't happen again.
 
 ## Built with
-* [Java, version 1.8](http://java.oracle.com) - The main language of implementation
-* [Maven, version 3.0](https://maven.apache.org/) - Dependency Management
-* [Spring Boot, version 1.5.17](https://projects.spring.io/spring-boot/) - Spring boot as core Java framework
-* [Angular CLI, version 6.2.2](https://github.com/angular/angular-cli) 
+
+- [Java, version 1.8](http://java.oracle.com) - The main language of implementation
+- [Maven, version 3.0](https://maven.apache.org/) - Dependency Management
+- [Spring Boot, version 1.5.17](https://projects.spring.io/spring-boot/) - Spring Boot as core Java framework
+- [Angular CLI, version 6.2.2](https://github.com/angular/angular-cli)
