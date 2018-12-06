@@ -1,6 +1,9 @@
 package de.adorsys.psd2.sandbox.xs2a.util;
 
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +31,19 @@ public class TestUtils {
   }
 
   /**
+   * @return QwacCertificate as String
+   */
+  public static String getTppQwacCertificate() {
+    StringBuilder sb = new StringBuilder();
+    try {
+      Files.lines(Paths.get("src/test/resources/testData/testCertificate.pem"))
+          .forEach(sb::append);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return sb.toString();
+  }
+  /**
    * @param headersMap xs2a headers
    * @return HttpHeaders
    */
@@ -39,4 +55,5 @@ public class TestUtils {
 
     return headers;
   }
+
 }

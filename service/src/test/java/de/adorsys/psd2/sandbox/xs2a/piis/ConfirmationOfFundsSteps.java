@@ -32,6 +32,7 @@ public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
   public void getAvailabilityOfFunds(String requestedAmount, String iban) {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Request<ConfirmationOfFunds> request = new Request<>();
     request.setHeader(headers);

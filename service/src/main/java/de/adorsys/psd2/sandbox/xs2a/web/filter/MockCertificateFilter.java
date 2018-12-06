@@ -4,7 +4,7 @@ import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * The intend of this class is to return a mock certificate, when we don't want to enter manually
+ * The intent of this class is to return a mock certificate, when we don't want to enter manually
  * everytime the qwac certificate in case of test.
  */
 public class MockCertificateFilter extends QwacCertificateFilter {

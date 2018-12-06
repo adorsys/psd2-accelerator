@@ -43,6 +43,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("psu-ip-address", "192.168.0.26");
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
@@ -97,6 +98,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("psu-ip-address", "192.168.0.26");
     headers.put("date", LocalDate.now().toString());
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Request request = new Request<>();
     request.setHeader(headers);
@@ -120,6 +122,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("PSU-ID", context.getPsuId());
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     PsuData psuData = new PsuData();
     psuData.setPassword(password);
@@ -147,6 +150,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("PSU-ID", context.getPsuId());
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
     scaMethod.setAuthenticationMethodId(selectedScaMethod);
@@ -171,6 +175,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("PSU-ID", context.getPsuId());
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     TransactionAuthorisation authorisationData = new TransactionAuthorisation();
     authorisationData.scaAuthenticationData(tan);
