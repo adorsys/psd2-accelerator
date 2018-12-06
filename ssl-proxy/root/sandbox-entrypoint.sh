@@ -1,10 +1,16 @@
 #!/bin/sh
 
-envsubst '$XS2A_INTERNAL_URL
-          $XS2A_EXTERNAL_URL' \
- < /opt/app-root/etc/nginx.default.d/sandbox-server.conf > /opt/app-root/etc/nginx.default.d/sandbox-server.TMP
+envsubst '$PORTAL_INTERNAL_URL \
+          $PORTAL_EXTERNAL_URL' \
+ < /opt/app-root/etc/nginx.d/sandbox-portal-server.conf > /opt/app-root/etc/nginx.d/sandbox-portal-server.TMP
 
-mv /opt/app-root/etc/nginx.default.d/sandbox-server.TMP /opt/app-root/etc/nginx.default.d/sandbox-server.conf
+mv /opt/app-root/etc/nginx.d/sandbox-portal-server.TMP /opt/app-root/etc/nginx.d/sandbox-portal-server.conf
+
+envsubst '$API_INTERNAL_URL \
+          $API_EXTERNAL_URL' \
+ < /opt/app-root/etc/nginx.d/sandbox-xs2a-server.conf > /opt/app-root/etc/nginx.d/sandbox-xs2a-server.TMP
+
+mv /opt/app-root/etc/nginx.d/sandbox-xs2a-server.TMP /opt/app-root/etc/nginx.d/sandbox-xs2a-server.conf
 
 # envsubst
 exec /docker-entrypoint.sh "$@"

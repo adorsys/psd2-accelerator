@@ -22,8 +22,10 @@ services:
     build: ssl-proxy
     image: adorsys/psd2-sandbox-ssl-proxy
     environment:
-      - XS2A_INTERNAL_URL=${XS2A_INTERNAL_URL:-http://service:8080}
-      - XS2A_EXTERNAL_URL=${XS2A_EXTERNAL_URL:-https://localhost:8443}
+      - API_INTERNAL_URL=${API_INTERNAL_URL:-http://service:8080}
+      - API_EXTERNAL_URL=${API_EXTERNAL_URL:-https://api.sandbox.vcap.me:8443}
+      - PORTAL_INTERNAL_URL=${PORTAL_INTERNAL_URL:-http://service:8081}
+      - PORTAL_EXTERNAL_URL=${PORTAL_EXTERNAL_URL:-https://portal.sandbox.vcap.me:8443}
     ports:
       - "8443:8443"
     depends_on:
