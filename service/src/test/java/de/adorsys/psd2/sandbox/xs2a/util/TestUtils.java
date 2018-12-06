@@ -36,6 +36,7 @@ public class TestUtils {
   public static String getTppQwacCertificate() {
     StringBuilder sb = new StringBuilder();
     try {
+      // TODO: testCertificate will be invalid in a year. Validity = 365 days
       Files.lines(Paths.get("src/test/resources/testData/testCertificate.pem"))
           .forEach(sb::append);
     } catch (IOException e) {
