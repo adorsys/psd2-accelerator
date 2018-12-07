@@ -1,4 +1,5 @@
 .DS_Store
+*.versionsBackup
 
 ### Services ###
 target
@@ -28,9 +29,7 @@ ui/coverage/
 
 ### NetBeans ###
 nbproject/private/
-build/
 nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-

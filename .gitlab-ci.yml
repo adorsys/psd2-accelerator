@@ -8,6 +8,9 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.cache/m2"
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
 
+.releases: &releases
+  - /^v\d+\.\d+\.\d+(-.*)?$/
+
 build_service:
   tags:
     - docker
@@ -35,7 +38,7 @@ build_ui:
     - npm run tslint
     - npm run prettier-check
     - npm run test-ci
-    - npm run build
+    - npm run build -- --prod
   artifacts:
     name: "ui-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
     paths:
@@ -88,6 +91,7 @@ docker_build_only:
   stage: "deploy"
   except:
     - master
+    - tags
   script:
     - docker build --pull
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
@@ -114,6 +118,22 @@ docker_build_deploy:
   environment:
     name: dev
     url: http://psd2-sandbox-dev.cloud.adorsys.de
+  cache: {}
+  dependencies:
+    - package
+
+docker_build_release:
+  tags:
+    - docker
+  stage: "deploy"
+  only: *releases
+  script:
+    - source infrastructure/build/bash_functions.sh
+    - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
+    - docker build --pull
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+      service
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$(git2dockerTag $CI_COMMIT_REF_NAME)"
   cache: {}
   dependencies:
     - package

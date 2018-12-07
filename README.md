@@ -84,6 +84,21 @@ $ npm run start
 * Developer Portal will be available at (<http://localhost:4200/>)
 * Certificate Service will be available at (<http://localhost:4200/app/certificate-service>)
 
+## How to Release
+
+Releases are built on tag on GitLab CI. Tags must follow the [semver format](https://semver.org/). There is a helper script which patches the right files (pom.xml/package.json) and creates the commits and tags locally.
+
+```sh
+# create a tag v1.1.0 and then bump to 1.2.0-SNAPSHOT
+$ ./infrastructure/build/release.sh 1.1.0 1.2.0
+[...]
+# review everything locally before publishing!
+$ git push --follow-tags --atomic
+```
+
+### How to Undo a Release
+
+Don't. Fail forward, create a new release and tell everybody you messed up. Won't happen again.
 
 ## Built with
 * [Java, version 1.8](http://java.oracle.com) - The main language of implementation
