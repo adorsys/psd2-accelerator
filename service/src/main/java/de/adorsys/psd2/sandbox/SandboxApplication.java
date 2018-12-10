@@ -13,7 +13,27 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-
+@SpringBootApplication(exclude = {
+    // TODO no persistence for now
+    DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class,
+    // TODO disable security for now
+    SecurityAutoConfiguration.class,
+    ManagementWebSecurityAutoConfiguration.class
+})
+@PropertySource(
+    value = {
+        "classpath:sandbox-application.properties",
+        "classpath:sandbox-application-${spring.profiles.active}.properties"
+    },
+    ignoreResourceNotFound = true
+)
+@EnableSwagger2
+@ComponentScan(
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.REGEX,
+        pattern = "de\\.adorsys\\.psd2\\.sandbox\\.xs2a\\.(.*)"
+    ))
 public class SandboxApplication {
 
   /**
@@ -24,34 +44,9 @@ public class SandboxApplication {
   public static void main(String[] args) {
     new SpringApplicationBuilder()
         .parent(EmptyConfiguration.class).web(false)
-        .child(SandboxConfiguration.class).web(true)
+        .child(SandboxApplication.class).web(true)
         .sibling(Xs2aConfig.class).web(true)
         .run(args);
-  }
-
-  @SpringBootApplication(exclude = {
-      // TODO no persistence for now
-      DataSourceAutoConfiguration.class,
-      HibernateJpaAutoConfiguration.class,
-      // TODO disable security for now
-      SecurityAutoConfiguration.class,
-      ManagementWebSecurityAutoConfiguration.class
-  })
-  @PropertySource(
-      value = {
-          "classpath:sandbox-application.properties",
-          "classpath:sandbox-application-${spring.profiles.active}.properties"
-      },
-      ignoreResourceNotFound = true
-  )
-  @EnableSwagger2
-  @ComponentScan(
-      excludeFilters = @ComponentScan.Filter(
-          type = FilterType.REGEX,
-          pattern = "de\\.adorsys\\.psd2\\.sandbox\\.xs2a\\.(.*)"
-      ))
-  static class SandboxConfiguration {
-
   }
 
   /*
