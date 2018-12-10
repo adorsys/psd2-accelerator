@@ -43,3 +43,14 @@ Using the plugin IntelliJ will mark not formatted code as a Warning or even as a
 Furthermore, from now on a new CheckStyle area right next to the Terminal and Version Control is getting displayed.
 Choose either `<active configuration>` or `<Google-Checkstyle>`, since they are the only suitable configurations for the project.
 The latter is the default name based on our adapted `./google-checkstyle.xml` that we use for this project.
+
+## Database Migration
+
+By default the database schema does not get migrated automatically. You can achieve the migration by performing one of the following options:
+
+* Set the the property `liquibase.enabled=true` to enable an automatic database migration.
+* Execute the sandbox.jar file:
+
+  ```sh
+  $ java -jar ./target/sandbox-*.jar migrate --spring.datasource.username=cms --spring.datasource.password=cms --spring.datasource.url=jdbc:postgresql://localhost/consent
+  ```

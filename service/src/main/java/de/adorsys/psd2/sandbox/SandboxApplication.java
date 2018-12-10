@@ -1,5 +1,6 @@
 package de.adorsys.psd2.sandbox;
 
+import de.adorsys.psd2.sandbox.migration.MigrationRunner;
 import de.adorsys.psd2.sandbox.xs2a.Xs2aConfig;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,7 +10,6 @@ import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
@@ -29,11 +29,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
     ignoreResourceNotFound = true
 )
 @EnableSwagger2
-@ComponentScan(
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.REGEX,
-        pattern = "de\\.adorsys\\.psd2\\.sandbox\\.xs2a\\.(.*)"
-    ))
+@ComponentScan(basePackages = "de.adorsys.psd2.sandbox.portal")
 public class SandboxApplication {
 
   /**
@@ -42,11 +38,17 @@ public class SandboxApplication {
    * @param args CLI args
    */
   public static void main(String[] args) {
-    new SpringApplicationBuilder()
-        .parent(EmptyConfiguration.class).web(false)
-        .child(SandboxApplication.class).web(true)
-        .sibling(Xs2aConfig.class).web(true)
-        .run(args);
+    if (args.length != 0 && args[0].matches("migrate|generate-schema")) {
+      new SpringApplicationBuilder()
+          .parent(MigrationRunner.class).web(false)
+          .run(args);
+    } else {
+      new SpringApplicationBuilder()
+          .parent(EmptyConfiguration.class).web(false)
+          .child(SandboxApplication.class).web(true)
+          .sibling(Xs2aConfig.class).web(true)
+          .run(args);
+    }
   }
 
   /*
@@ -56,5 +58,4 @@ public class SandboxApplication {
   static class EmptyConfiguration {
 
   }
-
 }

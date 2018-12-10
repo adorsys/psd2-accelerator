@@ -93,7 +93,13 @@ In order to run the certificate and XS2A services you need to start the Spring B
 $ cd sandbox
 $ docker-compose up -d db
 $ cd service
-$ mvn spring-boot:run -Drun.arguments="--spring.profiles.active=test"
+$ mvn clean package
+# create DB schema
+$ java -jar ./target/sandbox-*.jar migrate --spring.datasource.username=cms \
+  --spring.datasource.password=cms \
+  --spring.datasource.url=jdbc:postgresql://localhost/consent
+# Start Application
+$ mvn spring-boot:run
 ```
 
 - XS2A API will be available at <http://localhost:8080/swagger-ui.htm>

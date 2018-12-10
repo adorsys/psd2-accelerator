@@ -1,7 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.piis;
 
-import de.adorsys.psd2.sandbox.testdata.TestDataService;
-import de.adorsys.psd2.sandbox.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
