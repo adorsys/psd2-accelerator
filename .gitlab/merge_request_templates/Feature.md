@@ -1,6 +1,8 @@
-## Summary
+# Summary
 
-## Checklist for Definition of Done
+_(What is this feature about)_
+
+# Checklist for Definition of Done
 
 Depending on the task some of the following jobs are not relevant. Please check the items or cross them out (`~~`text`~~`).
 
