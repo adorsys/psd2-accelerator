@@ -1,7 +1,6 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  annotations:
   labels:
     app: psd2-sandbox
   name: psd2-sandbox
@@ -22,8 +21,6 @@ spec:
       updatePeriodSeconds: 1
     type: Rolling
   template:
-    metadata:
-      annotations:
       labels:
         app: psd2-sandbox
         deploymentconfig: psd2-sandbox
@@ -32,33 +29,112 @@ spec:
       - env:
         - name: SPRING_DATASOURCE_URL
           value: jdbc:postgresql://db/consent
-        - name: SPRING_PROFILES_ACTIVE
-          value: test
-      - image: " "
+        - name: CERTIFICATE_FILTER
+          value: tab
+        image: " "
         imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8081
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8081
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         name: psd2-sandbox
         ports:
         - containerPort: 8080
           protocol: TCP
         resources:
           limits:
-            memory: 768M
+            memory: 768Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+      - env:
+        - name: API_INTERNAL_URL
+          value: http://localhost:8080
+        - name: API_EXTERNAL_URL
+          value: sandbox-api.dev.adorsys.de
+        - name: PORTAL_INTERNAL_URL
+          value: http://localhost:8081
+        - name: PORTAL_EXTERNAL_URL
+          value: sandbox-portal.dev.adorsys.de
+        image: " "
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8090
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8443
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: ssl-proxy
+        ports:
+        - containerPort: 8443
+          protocol: TCP
+        resources:
+          limits:
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/app-root/etc/nginx.pem
+          name: nginx-certs
+          readOnly: true
+          subPath: tls.crt
+        - mountPath: /opt/app-root/etc/nginx.key
+          name: nginx-certs
+          readOnly: true
+          subPath: tls.key
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+      - name: nginx-certs
+        secret:
+          defaultMode: 420
+          secretName: dev.adorsys.de
   test: false
   triggers:
-  - type: ConfigChange
   - imageChangeParams:
       automatic: true
       containerNames:
       - psd2-sandbox
       from:
         kind: ImageStreamTag
-        name: psd2-sandbox:ci
+        name: psd2-sandbox:latest
         namespace: psd2-sandbox-dev
     type: ImageChange
+  - imageChangeParams:
+      automatic: true
+      containerNames:
+      - ssl-proxy
+      from:
+        kind: ImageStreamTag
+        name: psd2-sandbox-ssl-proxy:latest
+        namespace: psd2-sandbox-dev
+    type: ImageChange
+  - type: ConfigChange

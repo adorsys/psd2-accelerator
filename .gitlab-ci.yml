@@ -7,6 +7,8 @@ variables:
   OPENSHIFT_NAMESPACE: "psd2-sandbox-dev"
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.cache/m2"
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
+  SANDBOX_IMAGE: "psd2-sandbox"
+  SSL_PROXY_IMAGE: "psd2-sandbox-ssl-proxy"
 
 .releases: &releases
   - /^v\d+\.\d+\.\d+(-.*)?$/
@@ -96,6 +98,8 @@ docker_build_only:
     - docker build --pull
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
       service
+    - docker build --pull -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$CI_COMMIT_REF_SLUG"
+      ssl-proxy
   cache: {}
   dependencies:
     - package
@@ -108,13 +112,22 @@ docker_build_deploy:
     - master
   script:
     - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
+    # build sandbox
     - docker build --pull
-      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$CI_COMMIT_REF_SLUG"
       service
-    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
-      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest"
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:latest" # tag master as latest, too
+    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$CI_COMMIT_REF_SLUG"
+      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:latest"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:latest" # tag master as latest, too
+    # build ssl-proxy
+    - docker build --pull
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$CI_COMMIT_REF_SLUG"
+      ssl-proxy
+    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$CI_COMMIT_REF_SLUG"
+      "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:latest"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:latest" # tag master as latest, too
   environment:
     name: dev
     url: http://psd2-sandbox-dev.cloud.adorsys.de
@@ -129,11 +142,17 @@ docker_build_release:
   only: *releases
   script:
     - source infrastructure/build/bash_functions.sh
+    # build sandbox
     - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
     - docker build --pull
-      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
       service
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+    # build ss-proxy
+    - docker build --pull
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+      ssl-proxy
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
   cache: {}
   dependencies:
     - package

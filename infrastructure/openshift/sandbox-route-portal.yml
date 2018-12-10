@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: psd2-sandbox
+  name: portal
+spec:
+  host: sandbox-portal.dev.adorsys.de
+  port:
+    targetPort: 8443-tcp
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
+  to:
+    kind: Service
+    name: psd2-sandbox
+    weight: 100
+  wildcardPolicy: None

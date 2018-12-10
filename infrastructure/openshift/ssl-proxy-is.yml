@@ -1,7 +1,7 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: psd2-sandbox
+  name: psd2-sandbox-ssl-proxy
 spec:
   lookupPolicy:
     local: false
