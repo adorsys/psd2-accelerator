@@ -123,41 +123,40 @@
         The following code snippet is an example cURL command which is
         initiating a single payment:
       </p>
-      <pre>
-          <code>
-          $ curl -v "http://localhost:8080/v1/payments/sepa-credit-transfers"
-            -H "accept: application/json"
-            -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721"
-            -H "Tpp-Qwac-Certificate: #Insert base64 encoded certificate#"
-            -H "PSU-IP-Address: 192.168.8.78"
-            -H "Content-Type: application/json"
-            -d '{{ '{' }}
-              "endToEndIdentification": "WBG-123456789",
-              "debtorAccount": {{ '{' }}
-                "currency": "EUR",
-                "iban": "DE52500105173911841934"
-              {{ '}' }},
-              "instructedAmount": {{ '{' }}
-                "currency": "EUR",
-                "amount": "520.00"
-              {{ '}' }},
-              "creditorAccount":{{ '{' }}
-                "currency": "EUR",
-                "iban": "DE15500105172295759744"
-              {{ '}' }},
-              "creditorAgent": "AAAADEBBXXX",
-              "creditorName": "WBG",
-              "creditorAddress": {{ '{' }}
-                "buildingNumber": "56",
-                "city": "Nürnberg",
-                "country": "DE",
-                "postalCode": "90543",
-                "street": "WBG Straße"
-              {{ '}' }},
-              "remittanceInformationUnstructured": "Ref. Number WBG-1222"
-            {{ '}' }}'
-            </code>
-         </pre>
+      <pre class="code-sample"><code>
+curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "PSU-IP-Address: 192.168.8.78" \
+  -H "Content-Type: application/json" \
+  `# get these two files from the sandbox certificate generator` \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{{ '{' }}
+    "endToEndIdentification": "WBG-123456789",
+    "debtorAccount": {{ '{' }}
+      "currency": "EUR",
+      "iban": "DE52500105173911841934"
+    {{ '}' }},
+    "instructedAmount": {{ '{' }}
+      "currency": "EUR",
+      "amount": "520.00"
+    {{ '}' }},
+    "creditorAccount":{{ '{' }}
+      "currency": "EUR",
+      "iban": "DE15500105172295759744"
+    {{ '}' }},
+    "creditorAgent": "AAAADEBBXXX",
+    "creditorName": "WBG",
+    "creditorAddress": {{ '{' }}
+      "buildingNumber": "56",
+      "city": "Nürnberg",
+      "country": "DE",
+      "postalCode": "90543",
+      "street": "WBG Straße"
+    {{ '}' }},
+    "remittanceInformationUnstructured": "Ref. Number WBG-1222"
+  {{ '}' }}'</code></pre>
     </section>
   </div>
 </div>
