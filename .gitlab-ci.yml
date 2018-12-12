@@ -56,7 +56,7 @@ build_arc42:
   stage: "build"
   image: "adorsys/arc42-tools"
   script:
-    - make arc42/psd2-sandbox-arc42.adoc
+    - make arc42/psd2-sandbox-arc42.html
   artifacts:
     name: "arc42-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
     paths:
@@ -93,6 +93,7 @@ docker_build_only:
     - master
     - tags
   script:
+    - echo $OPENSHIFT_TOKEN | docker login --password-stdin -u openshift $OPENSHIFT_REGISTRY
     - docker build --pull
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/psd2-sandbox:$CI_COMMIT_REF_SLUG"
       service
@@ -109,7 +110,7 @@ docker_build_deploy:
   only:
     - master
   script:
-    - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
+    - echo $OPENSHIFT_TOKEN | docker login --password-stdin -u openshift $OPENSHIFT_REGISTRY
     # build sandbox
     - docker build --pull
       -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$CI_COMMIT_REF_SLUG"
@@ -140,17 +141,40 @@ docker_build_release:
   only: *releases
   script:
     - source infrastructure/build/bash_functions.sh
+    - echo $OPENSHIFT_TOKEN | docker login --password-stdin -u openshift $OPENSHIFT_REGISTRY
+    - echo $DOCKERHUB_PASSWORD | docker login --password-stdin -u adorsysserviceaccount
     # build sandbox
-    - docker login -u openshift -p $OPENSHIFT_TOKEN $OPENSHIFT_REGISTRY
     - docker build --pull
-      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)"
       service
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)"
+    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SANDBOX_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)" "adorsys/psd2-sandbox:$(git2dockerTag $CI_COMMIT_TAG)"
+    - docker push "adorsys/psd2-sandbox:$(git2dockerTag $CI_COMMIT_TAG)"
     # build ss-proxy
     - docker build --pull
-      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+      -t "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)"
       ssl-proxy
-    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_REF_NAME)"
+    - docker push "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)"
+    - docker tag "$OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:$(git2dockerTag $CI_COMMIT_TAG)" "adorsys/psd2-sandbox-ssl-proxy:$(git2dockerTag $CI_COMMIT_TAG)"
+    - docker push "adorsys/psd2-sandbox-ssl-proxy:$(git2dockerTag $CI_COMMIT_TAG)"
   cache: {}
   dependencies:
     - package
+
+# deploy to GitLab Pages
+pages:
+  stage: "deploy"
+  only:
+    - master
+  script:
+    - mkdir public
+    - cp -r arc42/images public
+    - cp arc42/psd2-sandbox-arc42.html public/index.html
+    - cp arc42/psd2-sandbox-deployment.html public/deployment.html
+  artifacts:
+    paths:
+      - "public"
+  cache: {}
+  dependencies:
+    - build_arc42
+

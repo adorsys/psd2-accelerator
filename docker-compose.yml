@@ -2,7 +2,7 @@ version: "3.7"
 services:
   service:
     build: service
-    image: harbor.adorsys.de/psd2-sandbox/sandbox
+    image: adorsys/psd2-sandbox
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -20,7 +20,7 @@ services:
       - "5432:5432"
   ssl-proxy:
     build: ssl-proxy
-    image: harbor.adorsys.de/psd2-sandbox/ssl-proxy
+    image: adorsys/psd2-sandbox-ssl-proxy
     environment:
       - API_INTERNAL_URL=${API_INTERNAL_URL:-http://service:8080}
       - API_EXTERNAL_URL=${API_EXTERNAL_URL:-api.sandbox.vcap.me}
