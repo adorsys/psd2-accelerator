@@ -11,11 +11,11 @@ image::generated/context.png[Business Context Diagram, title="Business Context D
 |===
 | Neighbor           | Description
 | 👤  TPP Developer
-| Registers at the Sandbox in order to gain access to the test API and documentation
+| Registers at the PSD2 Sandbox in order to gain access to the test API and documentation
 | 👤  Bank Admin
-| Configures the Sandbox and manages TPPs
+| Configures the PSD2 Sandbox and manages TPPs
 | 👤  Bank Ops
-| Deploys the Sandbox. Needs proper documentation, access to logs, ... Simple deployment
+| Deploys the PSD2 Sandbox. Needs proper documentation, access to logs, ... Simple deployment
 is a central quality goal we design for, so the user is mentioned here.
 | Bank CMS
 a|

@@ -149,6 +149,13 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <!--
+          Allows us to load JDBC driver from FS. See
+          https://docs.spring.io/spring-boot/docs/1.5.17.RELEASE/reference/html/build-tool-plugins-gradle-plugin.html#build-tool-plugins-gradle-configuration-layouts
+          -->
+          <layout>ZIP</layout>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>

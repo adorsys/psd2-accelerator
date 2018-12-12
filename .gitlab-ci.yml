@@ -56,9 +56,7 @@ build_arc42:
   stage: "build"
   image: "adorsys/arc42-tools"
   script:
-    - cd arc42
-    - plantuml -o "$PWD/images/generated" diagrams/*
-    - asciidoctor psd2-sandbox-arc42.adoc
+    - make arc42/psd2-sandbox-arc42.adoc
   artifacts:
     name: "arc42-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
     paths:

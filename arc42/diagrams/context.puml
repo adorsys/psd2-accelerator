@@ -14,7 +14,7 @@ skinparam Component {
   fontSize<<system>> 40
 }
 
-[Sandbox] as sandbox <<system>>
+[PSD2 Sandbox] as sandbox <<system>>
 [Bank CMS] as cms
 
 tppd --> sandbox : Use

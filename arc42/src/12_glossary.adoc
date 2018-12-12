@@ -44,4 +44,5 @@ Potentially more columns in case you need translations.
 | <TPP>        | <Third Party Provider>                                         | In this context a TPP is a FinTech corporation that develops applications in scope of AISP, PISP or PIISP.
 | <TSP>        | <Trusted Services Provider>                                    | Institution certified by the NCA issuing eIDAS Certificates to registered TPPs.
 | <XS2A>       | <Access-to-Account>                                            | Interface provided by ASPSPs offering payment services to TPPs
+| <LB>         | <Load Balancer>                                                | A infrastructure component which routes HTTP traffic to backend services and often does things like SSL termination.
 |===

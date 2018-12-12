@@ -3,84 +3,278 @@
 
 == Deployment View
 
-[role="arc42help"]
-****
-.Content
-The deployment view describes:
+=== adorsys Sample Setup
 
- 1. the technical infrastructure used to execute your system, with infrastructure elements like geographical locations, environments, computers, processors, channels and net topologies as well as other infrastructure elements and
+.deployment-view
+image::deployment-view.svg[Deployment View, 100%, align="center"]
 
-2. the mapping of (software) building blocks to that infrastructure elements.
+The PSD2 Sandbox consists of two deployments. The _sandbox_ itself provides the XS2A API and a web application (and its API) for the developer portal. These two components are provided by a single fat JAR but served on different ports. XS2A is hosted on port `:8080` and the _developer portal_ is hosted on port `:8081` (both configurable). XS2A needs access to a database to persist the Consent Management state. The configuration for the _sandbox_ is completely externalized (see <<Configuration>>).
 
-Often systems are executed in different environments, e.g. development environment, test environment, production environment. In such cases you should document all relevant environments.
+---
 
-Especially document the deployment view when your software is executed as distributed system with more then one computer, processor, server or container or when you design and construct your own hardware processors and chips.
+The _ssl-proxy_ deployment is responsible for <<SSL Client Authentication>> required by XS2A. It forwards the certificate body to the _sandbox_ in an HTTP header (`tpp-qwac-certificate`). So SSL termination has to happen here, at least for the XS2A API part. The _ssl-proxy_ only validates the SSL client certificate because certain parts of the API are accessible without authentication (e.g. the Swagger file and Swagger UI). +
+The _sandbox_ _developer portal_ acts as a Certificate Authority (CA) and provides SSL Client Certificates to the TPP developers. The _ssl-proxy_ needs access to the _sandbox_ CA certificate in order to verify the TPP SSL client certificates (see <<Configuration>>).
 
-From a software perspective it is sufficient to capture those elements of the infrastructure that are needed to show the deployment of your building blocks. Hardware architects can go beyond that and describe the infrastructure to any level of detail they need to capture.
+_ssl_proxy_ listens on `:8443` (actual reverse proxy) and `:8090` (health check).
 
-.Motivation
-Software does not run without hardware.
-This underlying infrastructure can and will influence your system and/or some
-cross-cutting concepts. Therefore, you need to know the infrastructure.
+WARNING: The supplied _ssl-proxy_ is only meant to be used in development and must be substituted by an equivalent infrastructure component in prod (see <<Deploy on Your Own Infrastructure>>).
 
-.Form
+In our own setup on OpenShift both components of the _sandbox_ are available on different subdomains. The OpenShift loadbalancer terminates SSL for the _developer portal_ and does SSL passthrough for the _XS2A_ API so that the _ssl-proxy_ can terminate SSL itself.
 
-Maybe the highest level deployment diagram is already contained in section 3.2. as
-technical context with your own infrastructure as ONE black box. In this section you will
-zoom into this black box using additional deployment diagrams:
+NOTE: In reality all (SSL) traffic get passed through the Load Balancer to the _ssl-proxy_. The _ssl-proxy_ then does SSL termination *for both endpoints*  but SSL client authentication only for the XS2A API. We need this so we can start the exact same setup as on OpenShift with docker-compose for local development. _This is not a good idea for production._
 
-* UML offers deployment diagrams to express that view. Use it, probably with nested diagrams,
-when your infrastructure is more complex.
-* When your (hardware) stakeholders prefer other kinds of diagrams rather than the deployment diagram, let them use any kind that is able to show nodes and channels of the infrastructure.
-****
+=== Release Artifacts
 
-=== Infrastructure Level 1
+Images are released to https://cloud.docker.com/u/adorsys/repository/docker/adorsys/psd2-sandbox[adorsys DockerHub account].
 
-[role="arc42help"]
-****
-Describe (usually in a combination of diagrams, tables, and text):
+[options="header"]
+|=======
+| Artifact  | Image Name
+| sandbox   | adorsys/psd2-sandbox:{sandbox-version}
+| ssl-proxy | adorsys/psd2-sandbox-ssl-proxy:{sandbox-version}
+|=======
 
-*  the distribution of your system to multiple locations, environments, computers, processors, .. as well as the physical connections between them
-*  important justification or motivation for this deployment structure
-* Quality and/or performance features of the infrastructure
-*  the mapping of software artifacts to elements of the infrastructure
+If you want to deploy the JAR without Docker please extract it from the Docker image. Use this command to copy the JAR to your current directory.
 
-For multiple environments or alternative deployments please copy that section of arc42 for all relevant environments.
-****
+[subs=attributes+]
+[source,shell]
+----
+$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox:{sandbox-version} sh -c "cp /opt/app-root/src/*.jar /target"
+----
 
-_**<Overview Diagram>**_
+To build your own Docker images get the JAR from our image or use Docker Multi Stage Builds:
 
-Motivation::
+[subs=attributes+]
+[source,Dockerfile]
+----
+FROM openjdk:8
 
-_<explanation in text form>_
+COPY --from=adorsys/psd2-sandbox:{sandbox-version} /opt/app-root/src/sandbox-{sandbox-version}.jar .
 
-Quality and/or Performance Features::
+CMD java -jar sandbox-{sandbox-version}.jar
+----
 
-_<explanation in text form>_
+=== Configuration
 
-Mapping of Building Blocks to Infrastructure::
-_<description of the mapping>_
+Configuration is done via https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot Externalized Configuration] and can be set via CLI arg, system property or environment variable. Since we intensively use Docker in our setup and environment variables are the idiomatic approach to configuration there, we stick to environment variables in the examples.
+
+NOTE: Spring Boot automatically translates properties to environment variables. The environment variable `SPRING_DATASOURCE_URL` sets the property `spring.datasource.url`. Consult the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/htmlsingle/#boot-features-external-config-application-property-files[Spring Boot documentation] for more information.
+
+==== sandbox
+
+.Required Properties for sandbox
+[options="header"]
+|=======
+| Property                   | Description        | Default
+| BANK_PROFILE_PATH
+a| File path to the customized `bank_profile.yml`.
+
+Possible values could be `bank_profile.yml` (relative) or `/mnt/my_bank_profile.yml`
+
+This is the actual business configuration reflecting the PSD2 features your bank offers. You can find the relevant documentation for this file at the https://github.com/adorsys/xs2a/blob/1.11/aspsp-profile/README.md[XS2A GitHub Project].
+
+For an example and the actual default values used in the sandbox see the <<sample-bank-profile>> below.
+
+| Points to the default `bank_profile.yml` YML embedded in the application
+| CERTIFICATE_FILTER
+a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` header. This value depends on your SSL-Proxy configuration. Possible values are:
+
+- _default_ for https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail[PEM] format without line breaks
+- _tab_ for https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail[PEM] format with tabs (`\t`) instead of line breaks
+- _mock_ disables the QWAC authentication and uses a hard coded test certificate instead (*do not use in prod!*)
+
+| _tab_
+| SPRING_DATASOURCE_PASSWORD                     | DB password                         | _(not set)_
+| SPRING_DATASOURCE_URL                          | JDBC URL                            | _(not set)_
+| SPRING_DATASOURCE_USERNAME                     | DB username                         | _(not set)_
+| SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
+| DB schema name (depends on used DB and configuration)
+| _(not set)_
+|=======
+
+[[sample-bank-profile]]
+.Sample bank_profile.yml
+[source,yaml]
+----
+include::../../service/src/main/resources/bank_profile.yml[]
+----
+
+==== ssl-proxy
+
+.Required Properties for ssl-proxy
+[options="header"]
+|=======
+| Property  | Description | Default
+| API_INTERNAL_URL    | Internal URL where the XS2A API is reachable (set in docker-compose) | `http://service:8080`
+| API_EXTERNAL_URL    | External URL where the XS2A API is reachable (set in docker-compose) | `api.sandbox.vcap.me`
+| PORTAL_INTERNAL_URL | Internal URL where the Sandbox is reachable (set in docker-compose)  | `http://service:8081`
+| PORTAL_EXTERNAL_URL | External URL where the Sandbox is reachable (set in docker-compose)  | `portal.sandbox.vcap.me`
+|=======
+
+.Required Files for ssl-proxy
+[options="header"]
+|=======
+| File                        | Description            | Default
+| /opt/app-root/etc/nginx.pem | SSL Certificate        | self signed one from adorsys
+| /opt/app-root/etc/nginx.key | PK to SSL Certificate  | random PK for the self signed certificate
+| /opt/app-root/etc/ca.crt    | Sandbox CA Certificate | default adorsys CA certificate
+|=======
+
+NOTE: The Sandbox CA certificate (ca.crt) is already embedded in the _ssl-proxy_. If you supply your own instance of this component you need to configure the proper SSL and CA certificates there. You can get the Sandbox CA certificate by extracting it from the _ssl-proxy_ image. See <<Deploy on Your Own Infrastructure>> for more details.
 
 
-=== Infrastructure Level 2
+=== Deploy on Your Own Infrastructure
 
-[role="arc42help"]
-****
-Here you can include the internal structure of (some) infrastructure elements from level 1.
+The PSD2 Sandbox deployment is quite flexible. The only required component is the _sandbox_ and its DB.
 
-Please copy the structure from level 1 for each selected element.
-****
+While we release Docker images only, the _sandbox_ can be run on any machine providing a recent JDK 8 (see <<Technology Requirements>>). See <<Release Artifacts>> to find out how to get the JAR.
 
-==== _<Infrastructure Element 1>_
+WARNING: As of now we release Docker Images with a Spring Boot fat JAR with an embedded Tomcat only. We do not release the PSD2 Sandbox as a WAR (yet).
 
-_<diagram + explanation>_
+The _ssl-proxy_ can (and should) be substituted by existing infrastructure. There are many options which components can replace our _ssl-proxy_. Most likely it's going to be some kind of load balancer in hardware (F5) or software (HAProxy, some API Gateway). It's only purpose is SSL Client Authentication and forwarding the SSL Client Certificate (QWAC) in PEM format (single line or tab delimited, see <<Configuration>>) in an HTTP header named `tpp-qwac-certificate` to the sandbox (see <<adorsys Sample Setup>>).
 
-==== _<Infrastructure Element 2>_
+The connection between _sandbox_ and any SSL-Proxy is made on the SSL-Proxy side with custom configuration. The only information that comes from the _sandbox_ is the Sandbox CA Certificate (ca.crt). You will need to make this file accessible to your SSL-Proxy.
 
-_<diagram + explanation>_
+[subs=attributes+]
+[source,shell]
+----
+# copy ca.crt from the image to the current directory
+$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox-ssl-proxy:{sandbox-version} sh -c "cp /opt/app-root/etc/ca.crt /target"
+----
 
-...
+See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
 
-==== _<Infrastructure Element n>_
+==== Technical Requirements / Sizing
 
-_<diagram + explanation>_
+- the _sandbox_ needs a recent JDK 8 (if you aren't using the Docker Image)
+- HA setup is possible, all state is shared in the DB
+- supported databases (see <<Use Your Own Database>>):
+  ** PostgreSQL 9+
+  ** Oracle 11g+
+  ** MariaDB 10+
+- 2-4 GB RAM per _sandbox_ deployment is a good starting point for prod *(monitor this!)*
+- _ssl-proxy_ needs 128 - 512 RAM MiB *(don't use in prod!)*
+- the DB schema needs enough disk space because consents are persisted here (grows over time) *(monitor this!)*
+
+==== Health Checks
+
+There are health check endpoints for both deployments. They return `200 OK` when healthy.
+
+- `GET http://sandbox:8081/health`
+- `GET http://ssl-proxy:8090/healthz`
+
+==== Use Your Own Database
+
+We bundle a recent PostgreSQL JDBC driver in the _sandbox_ JAR. For other databases you need to supply the correct JDBC driver. We use Springs https://docs.spring.io/spring-boot/docs/1.5.17.RELEASE/reference/html/executable-jar.html#executable-jar-property-launcher-features[PropertiesLauncher] to allow adding JARs to the classpath. The default `CMD` in our Dockerfile adds the folder `/opt/app-root/src/lib` per default. Put your JDBC driver there so it gets loaded on application start:
+
+[subs=attributes+]
+[source,shell]
+----
+$ docker run -it --rm -v $PWD/ojdbc8.jar:/opt/app-root/src/lib adorsys/psd2-sandbox:{sandbox-version}
+----
+
+If you run the PSD2 Sandbox without Docker, you need to set `loader.path` yourself:
+
+[subs=attributes+]
+[source,shell]
+----
+$ ls lib
+ojdbc8.jar
+# adds all JARs in "./lib" to the classpath
+$ java -jar -Dloader.path="lib" sandbox-{sandbox-version}.jar
+----
+
+Only databases listed in <<Technical Requirements / Sizing>> are supported. The Liquibase migration may fail with others.
+
+WARNING: Please make sure to set the right `SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA` depending on your setup.
+
+==== Database Migration
+
+There are three options to do database migration.
+
+NOTE: Every approach needs at least read access to the DB.
+
+===== Automatically with Liquibase
+
+Set the configuration property `liquibase.enabled=true` and migration will be run automatically with the configured connection details.
+
+===== Manually with Liquibase
+
+The `sandbox-{sandbox-version}.jar` can be used as CLI application to do the migration with different credentials than the actual deployment.
+
+[subs=attributes+,source,shell]
+----
+$ java -jar sandbox-{sandbox-version}.jar migrate --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
+----
+
+===== Manually with self-generated SQL schema
+
+The CLI can echo the full schema instead of doing the actual migration, too. This command creates a file `database-migration.sql` which contains the SQL that Liquibase would run to update the schema.
+
+[subs=attributes+,source,shell]
+----
+$ java -jar sandbox-{sandbox-version}.jar create-schema --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
+----
+
+=== Build Pipeline
+
+We use https://git.adorsys.de/psd2/sandbox/pipelines[GitLab CI] for the pipeline. Build, release, testing, Code coverage, linting and compilation/deployment of this architecture documentation are automated. Every artifact we build is also kept for one week and can be downloaded in corresponding pipeline/job.
+
+Every commit on master pushes images for _sandbox_ and _ssl-proxy_ to the adorsys OpenShift. An image change trigger then starts a new deployment. The arc42 documentation is also built on every commit and published with the https://git.adorsys.de/psd2/sandbox/pipelines[GitLab Pages] feature.
+
+Each tag which follows the semver pattern with a leading `v` like `v1.0.0` results in a tagged release. Tags are pushed to https://harbor.adorsys.de (see <<Release Artifacts>>). Releases are created locally with our `infrastructure/build/release.sh` script.
+
+=== Deployment Samples
+
+==== docker-compose
+
+This docker-compose setup will start the _sandbox_ on port `:8080`/`:8081` and the _ssl-proxy_ on port `:8443`. The _ssl-proxy_ knows how to serve the domains https://portal.sandbox.vcap.me and https://api.sandbox.vcap.me locally with a self signed SSL certificate.
+
+.docker-compose.yml
+[source,yaml]
+----
+include::../../docker-compose.yml[]
+----
+
+==== OpenShift Deployment Config
+
+This is an excerpt of the adorsys OpenShift deployment on https://sandbox-api.dev.adorsys.de/swagger-ui.html and https://sandbox-portal.dev.adorsys.de. The PostgreSQL deployment we use is not shown here.
+
+.sandbox-dc.yml
+[source,yaml]
+----
+include::../../infrastructure/openshift/sandbox-dc.yml[]
+----
+
+.sandbox-svc.yml
+[source,yaml]
+----
+include::../../infrastructure/openshift/sandbox-svc.yml[]
+----
+
+.sandbox-route-api.yml
+[source,yaml]
+----
+include::../../infrastructure/openshift/sandbox-route-api.yml[]
+----
+
+.sandbox-route-portal.yml
+[source,yaml]
+----
+include::../../infrastructure/openshift/sandbox-route-portal.yml[]
+----
+
+==== NGINX SSL Configuration
+
+.Relevant Samples of our NGINX SSL Configuration
+[source]
+----
+# sandbox-xs2a-server.conf
+include::../../ssl-proxy/root/opt/app-root/etc/nginx.d/sandbox-xs2a-server.conf[]
+----
+
+[source]
+----
+# sandbox-portal-server.conf
+include::../../ssl-proxy/root/opt/app-root/etc/nginx.d/sandbox-portal-server.conf[]
+----

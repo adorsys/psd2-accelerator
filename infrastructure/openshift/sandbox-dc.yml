@@ -31,7 +31,7 @@ spec:
           value: jdbc:postgresql://db/consent
         - name: CERTIFICATE_FILTER
           value: tab
-        image: " "
+        image: "psd2-sandbox-dev/psd2-sandbox:latest"
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
@@ -69,7 +69,7 @@ spec:
           value: http://localhost:8081
         - name: PORTAL_EXTERNAL_URL
           value: sandbox-portal.dev.adorsys.de
-        image: " "
+        image: "psd2-sandbox-dev/psd2-sandbox-ssl-proxy:latest"
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3

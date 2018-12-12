@@ -1,55 +1,6 @@
 [[section-concepts]]
 == Cross-cutting Concepts
 
-
-[role="arc42help"]
-****
-.Content
-This section describes overall, principal regulations and solution ideas that are
-relevant in multiple parts (= cross-cutting) of your system.
-Such concepts are often related to multiple building blocks.
-They can include many different topics, such as
-
-* domain models
-* architecture patterns or design patterns
-* rules for using specific technology
-* principal, often technical decisions of overall decisions
-* implementation rules
-
-.Motivation
-Concepts form the basis for _conceptual integrity_ (consistency, homogeneity)
-of the architecture. Thus, they are an important contribution to achieve inner qualities of your system.
-
-Some of these concepts cannot be assigned to individual building blocks
-(e.g. security or safety). This is the place in the template that we provided for a
-cohesive specification of such concepts.
-
-.Form
-The form can be varied:
-
-* concept papers with any kind of structure
-* cross-cutting model excerpts or scenarios using notations of the architecture views
-* sample implementations, especially for technical concepts
-* reference to typical usage of standard frameworks (e.g. using Hibernate for object/relational mapping)
-
-.Structure
-A potential (but not mandatory) structure for this section could be:
-
-* Domain concepts
-* User Experience concepts (UX)
-* Safety and security concepts
-* Architecture and design patterns
-* "Under-the-hood"
-* development concepts
-* operational concepts
-
-Note: it might be difficult to assign individual concepts to one specific topic
-on this list.
-
-image:08-Crosscutting-Concepts-Structure-EN.png["Possible topics for crosscutting concepts"]
-****
-
-
 === Definition of Done
 
 * Code is technically reviewed by the developer
@@ -74,27 +25,15 @@ Currently no support for mobile devices is planned.
 For this project we decided to use two different code stylings depending on frontend or backend
 development.
 
-The frontend development is using https://github.com/palantir/tslint[tslint] for code-quality rules
- (no-unused vars,...). For code styling and formatting of HTML, Typescript and CSS/SCSS we use
-https://prettier.io/[Pretter]. The appropriate config files are `.prettierrc.json` and `tslint.json`.
-To guarantee a clean code styling on the remote branch, we decided to add a pre-push-hook which
-checks the style for errors and if possible also fixes them automatically. Furthermore, we added
-a second check embedded in the ci pipeline which fails in case of unclean code.
+The frontend development is using https://github.com/palantir/tslint[tslint] for code-quality rules (no-unused vars,...). For code styling and formatting of HTML, Typescript and CSS/SCSS we use https://prettier.io/[Pretter]. The appropriate config files are `.prettierrc.json` and `tslint.json`. To guarantee a clean code styling on the remote branch, we decided to add a pre-push-hook which checks the style for errors and if possible also fixes them automatically. Furthermore, we added a second check embedded in the ci pipeline which fails in case of unclean code.
 
-The backend development (mostly Java code) is using the https://github.com/google/styleguide[Google Code Style] which can
-be found in the `service` folder named `google-checkstyle.xml`. After adding this file to the local
-IDE the automatic styling should apply to those rules. We decided to add a `maven-checkstyle-plugin`
-which allows the code style check during the build process. The configuration for this plugin is based on
-the `google-checkstyle.xml` which can also be found in the `service` folder of this project.
-In case of unformatted code the ci pipeline will fail with an appropriate error message.
+The backend development (mostly Java code) is using the https://github.com/google/styleguide[Google Code Style] which can be found in the `service` folder named `google-checkstyle.xml`. After adding this file to the local IDE the automatic styling should apply to those rules. We decided to add a `maven-checkstyle-plugin` which allows the code style check during the build process. The configuration for this plugin is based on the `google-checkstyle.xml` which can also be found in the `service` folder of this project. In case of unformatted code the ci pipeline will fail with an appropriate error message.
 
 === SSL Client Authentication
 
-The Sandbox acts as a CA which issues SSL client certificates required to access the provided XS2A API. Every
-Sandbox deployment (e.g. every customer) initially needs to generate a new CA primary key and certificate. Those
-artifacts are then used to issue the TPP client certificate. SSL Client Authentication is only used for the XS2A API.
+The PSD2 Sandbox acts as a CA which issues SSL client certificates required to access the provided XS2A API. Every PSD2 Sandbox deployment (e.g. every customer) initially needs to generate a new CA primary key and certificate. Those artifacts are then used to issue the TPP client certificate. SSL Client Authentication is only used for the XS2A API.
 
-WARNING: TODO Link to Deployment View
+See also <<adorsys Sample Setup>> for more information about the SSL authentication setup.
 
 .sandbox-as-ca
-image::ssl-client.svg[Sandbox as CA Explained, title="Sandbox as CA Explained"]
+image::ssl-client.svg[PSD2 Sandbox as CA Explained, title="PSD2 Sandbox as CA Explained"]
