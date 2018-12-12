@@ -52,48 +52,40 @@
           <input
             type="text"
             class="form-control"
-            required
             type="text"
             name="countryName"
             [(ngModel)]="certData.countryName"
           />
-          <div class="invalid-feedback">Please provide a Country.</div>
         </div>
         <div class="form-group col-sm-6">
           <label>State</label>
           <input
             type="text"
             class="form-control"
-            required
             type="text"
             name="stateOrProvinceName"
             [(ngModel)]="certData.stateOrProvinceName"
           />
-          <div class="invalid-feedback">Please provide a State.</div>
         </div>
         <div class="form-group col-sm-6">
           <label>City</label>
           <input
             type="text"
             class="form-control"
-            required
             type="text"
             name="localityName"
             [(ngModel)]="certData.localityName"
           />
-          <div class="invalid-feedback">Please provide a City.</div>
         </div>
         <div class="form-group col-sm-6">
           <label>Domain</label>
           <input
             type="text"
             class="form-control"
-            required
             type="text"
             name="domainComponent"
             [(ngModel)]="certData.domainComponent"
           />
-          <div class="invalid-feedback">Please provide a Domain.</div>
         </div>
         <div class="form-group col-sm-6">
           <label>Organization Name*</label>
@@ -114,17 +106,13 @@
           <input
             type="text"
             class="form-control"
-            required
             type="text"
             name="organizationUnit"
             [(ngModel)]="certData.organizationUnit"
           />
-          <div class="invalid-feedback">
-            Please provide an Organization Unit.
-          </div>
         </div>
         <div class="form-group col-sm-6">
-          <label>Validity</label>
+          <label>Validity*</label>
           <input
             type="number"
             class="form-control"

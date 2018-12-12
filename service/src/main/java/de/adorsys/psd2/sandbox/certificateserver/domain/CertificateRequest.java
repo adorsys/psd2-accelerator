@@ -60,6 +60,7 @@ public class CertificateRequest {
       notes = "Number of days the certificate is valid", position = 2)
   @Min(1)
   @Max(365)
+  @NotNull
   @Builder.Default
   private int validity = 365;
 
