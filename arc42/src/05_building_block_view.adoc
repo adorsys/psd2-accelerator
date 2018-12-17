@@ -24,7 +24,7 @@ Contained Building Blocks::
 | Create QWAC certificates to allow TPPs access to the XS2A API via <<SSL Client Authentication>>
 
 | developer-portal
-| Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place. The content is static but embedded in the angular app.
+| Provide documentation about the API (e.g. OpenAPI), supported use cases (XS2A), getting started and examples in one place. The content is static but embedded in the Angular app.
 
 | ssl-proxy
 | Infrastructure component which does SSL termination and SSL Client Authentication for XS2A. The ssl-proxy forwards the SSL Client certificate to XS2A. Since the ssl-proxy is part of the infrastructure, the actual implementation varies. Our own PSD2 Sandbox deployment uses our bundled NGINX (which also acts as reverse proxy). Customers may substitute it with their own hard- or software solution (HA-Proxy, F5, ...).

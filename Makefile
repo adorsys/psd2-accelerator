@@ -28,8 +28,8 @@ ui/dist: ui/node_modules $(TS_SRC) ## Build the UI package (HTML/JS)
 ui/node_modules: ui/package.json ui/package-lock.json ## Install NPM dependencies
 	cd ui && npm install
 
-arc42/psd2-sandbox-arc42.html: arc42/images/generated $(ARC42_SRC) arc42/psd2-sandbox-arc42.adoc ui/package.json ## Generate arc42 html documentation
-	cd arc42 && asciidoctor -a sandbox-version=$(SANDBOX_VERSION)  psd2-sandbox-arc42.adoc
+arc42/psd2-sandbox-arc42.html arc42/psd2-sandbox-deployment.html: arc42/images/generated $(ARC42_SRC) arc42/psd2-sandbox-arc42.adoc arc42/psd2-sandbox-deployment.adoc ui/package.json ## Generate arc42 html documentation
+	cd arc42 && asciidoctor -a sandbox-version=$(SANDBOX_VERSION) psd2-sandbox-arc42.adoc && asciidoctor -a sandbox-version=$(SANDBOX_VERSION) psd2-sandbox-deployment.adoc
 
 arc42/images/generated: $(PLANTUML_SRC) ## Generate images from .puml files
 # Note: Because plantuml doesnt update the images/generated timestamp we need to touch it afterwards

@@ -68,7 +68,7 @@ The PSD2 Sandbox is an application that aims to fulfill the following requiremen
 
 * Get banks compliant to the law in March 2019
 * Be easily deployable on the banks existing infrastructure
-* Be configurable to match the business features bank
+* Be configurable to match the banks business features
 * Make the technical documentation of the XS2A interface accessible
 * Allow TPPs to test services based on test data
 * QWAC (certificate for authentication as specified in https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf[ETSI], https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN[eIDAS]) can be issued by the TPP itself and used as in the real world
@@ -80,7 +80,7 @@ The PSD2 Sandbox is an application that aims to fulfill the following requiremen
 |===
 | Quality Goal       | Scenario
 | PSD2 Compliance    |
-The sandbox must be PSD2 compliant. Neither ease of use or cool technologies help the user if they fail the audit
+The sandbox must be PSD2 compliant. Neither ease of use nor cool technologies help the user if they fail the audit
 because of us.
 | Fast Onboarding    |
 As a potential user of the sandbox you should be able to get the application running within minutes. We need to provide good documentation, sensible defaults and a simple setup.

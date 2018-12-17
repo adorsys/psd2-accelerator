@@ -3,9 +3,10 @@
 //
 // ====================================
 
-= image:arc42-logo.png[PSD2] Sandbox Architecture Documentation
-// toc-title definition MUST follow document title without blank line!
-:toc-title: Table of Contents
+// configure EN settings for asciidoc
+include::src/config.adoc[]
+
+= PSD2 Sandbox {sandbox-version} Architecture Documentation
 
 //additional style for arc42 help callouts
 ifdef::basebackend-html[]
@@ -21,9 +22,6 @@ ifdef::basebackend-html[]
 </style>
 ++++
 endif::basebackend-html[]
-
-// configure EN settings for asciidoc
-include::src/config.adoc[]
 
 // numbering from here on
 :numbered:
