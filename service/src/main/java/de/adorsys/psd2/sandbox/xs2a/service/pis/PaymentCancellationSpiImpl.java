@@ -4,6 +4,7 @@ import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
+import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentCancellationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
@@ -25,16 +26,16 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
   }
 
   @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentCancellationWithoutSca(
+  public @NotNull SpiResponse<SpiResponse.VoidResponse> cancelPaymentWithoutSca(
       @NotNull SpiPsuData spiPsuData, @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
     return null;
   }
 
   @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> cancelPaymentWithoutSca(
-      @NotNull SpiPsuData spiPsuData, @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+  public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndCancelPayment(
+      @NotNull SpiPsuData spiPsuData, @NotNull SpiScaConfirmation spiScaConfirmation,
+      @NotNull SpiPayment spiPayment, @NotNull AspspConsentData aspspConsentData) {
     return null;
   }
 

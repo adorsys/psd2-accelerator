@@ -2,6 +2,9 @@ package de.adorsys.psd2.sandbox.xs2a;
 
 import de.adorsys.psd2.sandbox.xs2a.web.filter.MockCertificateFilter;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.TabDelimitedCertificateFilter;
+import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
+import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
+import de.adorsys.psd2.xs2a.web.config.EnableXs2aSwagger;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -32,6 +35,7 @@ import org.springframework.context.annotation.PropertySource;
     },
     ignoreResourceNotFound = true
 )
+@EnableXs2aSwagger
 public class Xs2aConfig {
 
   @Configuration
@@ -41,14 +45,16 @@ public class Xs2aConfig {
     private String certFilter;
 
     @Bean
-    QwacCertificateFilter setCertificateFilter() {
+    QwacCertificateFilter setCertificateFilter(
+        TppRoleValidationService roleValidationService, TppInfoHolder tppInfoHolder
+    ) {
       switch (certFilter) {
         case "tab":
-          return new TabDelimitedCertificateFilter();
+          return new TabDelimitedCertificateFilter(roleValidationService, tppInfoHolder);
         case "mock":
-          return new MockCertificateFilter();
+          return new MockCertificateFilter(roleValidationService, tppInfoHolder);
         default:
-          return new QwacCertificateFilter();
+          return new QwacCertificateFilter(roleValidationService, tppInfoHolder);
       }
     }
   }

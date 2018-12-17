@@ -1,5 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.web.filter;
 
+import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
+import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import javax.servlet.http.HttpServletRequest;
 
@@ -8,6 +10,13 @@ import javax.servlet.http.HttpServletRequest;
  * everytime the qwac certificate in case of test.
  */
 public class MockCertificateFilter extends QwacCertificateFilter {
+
+  public MockCertificateFilter(
+      TppRoleValidationService tppRoleValidationService,
+      TppInfoHolder tppInfoHolder
+  ) {
+    super(tppRoleValidationService, tppInfoHolder);
+  }
 
   @Override
   public String getEncodedTppQwacCert(HttpServletRequest httpRequest) {

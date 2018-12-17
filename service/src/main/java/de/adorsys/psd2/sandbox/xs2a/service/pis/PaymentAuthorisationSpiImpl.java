@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.psd2.sandbox.xs2a.service.domain.SpiAspspAuthorisationData;
 import de.adorsys.psd2.xs2a.component.JsonConverter;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.sca.ChallengeData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
@@ -79,10 +80,14 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
   @Override
   public @NotNull SpiResponse<SpiAuthorizationCodeResult> requestAuthorisationCode(
       @NotNull SpiPsuData spiPsuData,
-      @NotNull String s,
+      @NotNull String selectedScaMethod,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
     SpiAuthorizationCodeResult result = new SpiAuthorizationCodeResult();
+    SpiAuthenticationObject selected = new SpiAuthenticationObject();
+    selected.setAuthenticationMethodId(selectedScaMethod);
+    result.setSelectedScaMethod(selected);
+    result.setChallengeData(new ChallengeData()); // NPE otherwise
     return new SpiResponse<>(result, aspspConsentData);
   }
 }

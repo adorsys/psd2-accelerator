@@ -1,16 +1,23 @@
+---
 setting:
   frequencyPerDay: 5
   combinedServiceIndicator: false
-  availablePaymentProducts: sepa
+  availablePaymentProducts: sepa-credit-transfers
   availablePaymentTypes: single
   scaApproach: EMBEDDED
   tppSignatureRequired: false
-  bankOfferedConsentSupport: true
+  bankOfferedConsentSupport: false
+  pisRedirectUrlToAspsp: http://localhost:4200/pis/
+  aisRedirectUrlToAspsp: http://localhost:4200/ais/
   multicurrencyAccountLevel: SUBACCOUNT
   availableBookingStatuses: BOOKED, PENDING
+  supportedAccountReferenceFields: MSISDN
   consentLifetime: 0
   transactionLifetime: 0
   allPsd2Support: false
-  authorisationStartType: EXPLICIT
   transactionsWithoutBalancesSupported: false
+  signingBasketSupported: false
   paymentCancellationAuthorizationMandated: false
+  piisConsentSupported: false
+  deltaReportSupported: false
+  redirectUrlExpirationTimeMs: 600000

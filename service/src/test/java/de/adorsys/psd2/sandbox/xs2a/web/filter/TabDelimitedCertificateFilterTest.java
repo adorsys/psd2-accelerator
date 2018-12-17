@@ -8,7 +8,7 @@ import org.mockito.Mockito;
 
 public class TabDelimitedCertificateFilterTest {
 
-  private TabDelimitedCertificateFilter tabDelimitedCertificateFilter = new TabDelimitedCertificateFilter();
+  private TabDelimitedCertificateFilter tabDelimitedCertificateFilter = new TabDelimitedCertificateFilter(null, null);
 
   @Test
   public void delimitateTabsSuccessful() {

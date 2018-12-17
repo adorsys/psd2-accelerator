@@ -33,13 +33,13 @@ public class AccountSpiImpl implements AccountSpi {
   }
 
   @Override
-  public SpiResponse<SpiTransactionReport> requestTransactionsForAccount(boolean b,
+  public SpiResponse<SpiTransactionReport> requestTransactionsForAccount(String s, boolean b,
       @NotNull LocalDate localDate, @NotNull LocalDate localDate1,
       @NotNull SpiAccountReference spiAccountReference,
-      @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAccountConsent spiAccountConsent, @NotNull AspspConsentData aspspConsentData) {
     return null;
   }
+
 
   @Override
   public SpiResponse<SpiTransaction> requestTransactionForAccountByTransactionId(
