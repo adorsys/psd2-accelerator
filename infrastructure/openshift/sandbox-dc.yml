@@ -31,6 +31,8 @@ spec:
           value: jdbc:postgresql://db/consent
         - name: CERTIFICATE_FILTER
           value: tab
+        - name: SPRING_PROFILES_ACTIVE
+          value: dev
         image: "psd2-sandbox-dev/psd2-sandbox:latest"
         imagePullPolicy: Always
         livenessProbe:

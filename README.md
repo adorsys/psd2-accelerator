@@ -99,7 +99,7 @@ $ java -jar ./target/sandbox-*.jar migrate --spring.datasource.username=cms \
   --spring.datasource.password=cms \
   --spring.datasource.url=jdbc:postgresql://localhost/consent
 # Start Application
-$ mvn spring-boot:run
+$ java -jar -Dspring.profiles.active=dev target/sandbox-*.jar
 ```
 
 - XS2A API will be available at <http://localhost:8080/swagger-ui.htm>
