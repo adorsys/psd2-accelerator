@@ -122,6 +122,11 @@ include::../../service/src/main/resources/bank_profile.yml[]
 
 NOTE: The Sandbox CA certificate (ca.crt) is already embedded in the _ssl-proxy_. If you supply your own instance of this component you need to configure the proper SSL and CA certificates there. You can get the Sandbox CA certificate by extracting it from the _ssl-proxy_ image. See <<Deploy on Your Own Infrastructure>> for more details.
 
+==== Logging
+
+We use the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration] and log everything to stdout.
+
+The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=WARN` (global) or with `LOGGING_LEVEL_de.adorsys.psd2=WARN` (for everything below `de.adorsys.psd2`; please notice the casing).
 
 === Deploy on Your Own Infrastructure
 
