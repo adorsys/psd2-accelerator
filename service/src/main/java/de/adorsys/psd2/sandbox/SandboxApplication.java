@@ -2,12 +2,16 @@ package de.adorsys.psd2.sandbox;
 
 import de.adorsys.psd2.sandbox.migration.MigrationRunner;
 import de.adorsys.psd2.sandbox.xs2a.Xs2aConfig;
+import org.springframework.boot.ExitCodeGenerator;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationFailedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -45,8 +49,8 @@ public class SandboxApplication {
     } else {
       new SpringApplicationBuilder()
           .parent(EmptyConfiguration.class).web(false)
-          .child(SandboxApplication.class).web(true)
-          .sibling(Xs2aConfig.class).web(true)
+          .child(SandboxApplication.class).listeners(new StartFailedListener()).web(true)
+          .sibling(Xs2aConfig.class).listeners(new StartFailedListener()).web(true)
           .run(args);
     }
   }
@@ -57,5 +61,14 @@ public class SandboxApplication {
   @Configuration
   static class EmptyConfiguration {
 
+  }
+
+  private static class StartFailedListener implements ApplicationListener<ApplicationFailedEvent> {
+
+    @Override
+    public void onApplicationEvent(ApplicationFailedEvent applicationFailedEvent) {
+      SpringApplication.exit(applicationFailedEvent.getApplicationContext().getParent(),
+          (ExitCodeGenerator) () -> 1);
+    }
   }
 }
