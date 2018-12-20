@@ -79,7 +79,7 @@ For an example and the actual default values used in the sandbox see the <<sampl
 | CERTIFICATE_FILTER
 a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` header. This value depends on your SSL-Proxy configuration. Possible values are:
 
-- _default_ for https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail[PEM] format without line breaks
+- _default_ for https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail[PEM] format without line breaks. Also known as "base64" format of the certificate.
 - _tab_ for https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail[PEM] format with tabs (`\t`) instead of line breaks
 - _mock_ disables the QWAC authentication and uses a hard coded test certificate instead (*do not use in prod!*)
 
