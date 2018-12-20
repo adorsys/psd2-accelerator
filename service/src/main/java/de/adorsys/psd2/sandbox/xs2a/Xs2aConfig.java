@@ -35,7 +35,6 @@ import org.springframework.context.annotation.PropertySource;
     },
     ignoreResourceNotFound = true
 )
-@EnableXs2aSwagger
 public class Xs2aConfig {
 
   @Configuration

@@ -243,7 +243,7 @@ include::../../docker-compose.yml[]
 
 ==== OpenShift Deployment Config
 
-This is an excerpt of the adorsys OpenShift deployment on https://sandbox-api.dev.adorsys.de/swagger-ui.html and https://sandbox-portal.dev.adorsys.de. The PostgreSQL deployment we use is not shown here.
+This is an excerpt of the adorsys OpenShift deployment on https://sandbox-api.dev.adorsys.de and https://sandbox-portal.dev.adorsys.de. The PostgreSQL deployment we use is not shown here.
 
 .sandbox-dc.yml
 [source,yaml]
