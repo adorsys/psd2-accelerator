@@ -1,5 +1,6 @@
 package de.adorsys.psd2.sandbox.portal.app;
 
+import de.adorsys.psd2.sandbox.features.SandboxFeatures;
 import java.io.IOException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -9,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.resource.PathResourceResolver;
 
 @Configuration
-public class AppResourceConfiguration extends WebMvcConfigurerAdapter {
+public class AppResourceConfig extends WebMvcConfigurerAdapter {
 
   /*
     Serve index.html for every request in /app if there is no other resource. This is required for
@@ -17,6 +18,9 @@ public class AppResourceConfiguration extends WebMvcConfigurerAdapter {
    */
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    if (SandboxFeatures.UI.isDisabled()) {
+      return;
+    }
     registry.addResourceHandler("/app", "/app/", "/app/**")
         .addResourceLocations("classpath:/app/")
         .resourceChain(true)
@@ -25,7 +29,8 @@ public class AppResourceConfiguration extends WebMvcConfigurerAdapter {
           protected Resource getResource(String resourcePath,
               Resource location) throws IOException {
             Resource requestedResource = location.createRelative(resourcePath);
-            return requestedResource.exists() && requestedResource.isReadable() ? requestedResource
+            return requestedResource.exists() && requestedResource.isReadable()
+                ? requestedResource
                 : new ClassPathResource("/app/index.html");
           }
         });

@@ -1,10 +1,10 @@
 package de.adorsys.psd2.sandbox.xs2a;
 
+import de.adorsys.psd2.sandbox.ContextHolder;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.MockCertificateFilter;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.TabDelimitedCertificateFilter;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
-import de.adorsys.psd2.xs2a.web.config.EnableXs2aSwagger;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.PropertySource;
     },
     ignoreResourceNotFound = true
 )
+@Import(ContextHolder.class)
 public class Xs2aConfig {
 
   @Configuration
