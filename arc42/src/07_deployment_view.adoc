@@ -84,6 +84,9 @@ a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` heade
 - _mock_ disables the QWAC authentication and uses a hard coded test certificate instead (*do not use in prod!*)
 
 | _tab_
+| SANDBOX_FEATURE_UI_ENABLED                     | Enables/Disables the Sandbox UI.
+
+ Possible values are: _true_ or _false_                   | _true_
 | SPRING_DATASOURCE_PASSWORD                     | DB password                         | _(not set)_
 | SPRING_DATASOURCE_URL                          | JDBC URL                            | _(not set)_
 | SPRING_DATASOURCE_USERNAME                     | DB username                         | _(not set)_
