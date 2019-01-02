@@ -228,6 +228,43 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Make licenses blacklistable -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.16</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+              <!-- License blacklist -->
+              <excludedLicenses>
+                <excludedLicense>GNU General Public License, v2.0</excludedLicense>
+              </excludedLicenses>
+              <!-- Fail mvn build if there are some dependencies with no license -->
+              <failOnMissing>false</failOnMissing>
+              <!-- Fail mvn build if there are some dependencies with blacklisted license -->
+              <failOnBlacklist>true</failOnBlacklist>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Create license report -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>license-report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 

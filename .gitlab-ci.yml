@@ -9,6 +9,7 @@ variables:
   NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.cache/npm"
   SANDBOX_IMAGE: "psd2-sandbox"
   SSL_PROXY_IMAGE: "psd2-sandbox-ssl-proxy"
+  JAVA_TOOL_OPTIONS: "-Xmx1g"
 
 .releases: &releases
   - /^v\d+\.\d+\.\d+(-.*)?$/
@@ -23,6 +24,12 @@ build_service:
     - mvn -f service/pom.xml -B clean package
     - |
       echo 'Code coverage:' $(cat service/target/site/jacoco/index.html | grep -ioE "Total[^%]+%" | grep -ioE "[[:digit:]]{1,3}%")
+  artifacts:
+    # generated license information
+    name: "service-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
+    paths:
+      - service/target/site/*
+    expire_in: "1 week"
   cache:
     key: MVN
     paths:
@@ -167,14 +174,21 @@ pages:
   only:
     - master
   script:
+    # arc42 documentation
     - mkdir public
     - cp -r arc42/images public
     - cp arc42/psd2-sandbox-arc42.html public/index.html
     - cp arc42/psd2-sandbox-deployment.html public/deployment.html
+    # license information
+    - mkdir public/licenses
+    - cp -r service/target/site/css public/licenses
+    - cp -r service/target/site/images public/licenses
+    - cp service/target/site/dependencies.html public/licenses/dependencies.html
   artifacts:
     paths:
       - "public"
   cache: {}
   dependencies:
     - build_arc42
+    - build_service
 
