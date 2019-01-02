@@ -1,5 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.model;
 
+import de.adorsys.psd2.model.AccountAccess;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 
@@ -13,5 +14,7 @@ public class Context {
   private String paymentService;
   private String paymentId;
   private String authorisationId;
+  private String consentId;
+  private AccountAccess consentAccountAccess;
   private ResponseEntity actualResponse;
 }

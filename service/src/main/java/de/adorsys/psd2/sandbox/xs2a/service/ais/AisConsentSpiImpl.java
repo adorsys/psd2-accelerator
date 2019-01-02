@@ -20,7 +20,8 @@ public class AisConsentSpiImpl implements AisConsentSpi {
   public SpiResponse<SpiResponse.VoidResponse> initiateAisConsent(
       @NotNull SpiPsuData spiPsuData, SpiAccountConsent spiAccountConsent,
       AspspConsentData aspspConsentData) {
-    return null;
+
+    return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
   }
 
   @Override
