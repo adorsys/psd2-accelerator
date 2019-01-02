@@ -48,9 +48,9 @@ To build (and run) the backend server and the frontend application the `Makefile
     ```
 
     - starts the SSL proxy on port 8443 with subdomains for
-      - XS2A (with SSL authentication) (<https://api.sandbox.vcap.me:8443/swagger-ui.html>)
+      - XS2A API (with SSL authentication) (<https://api.sandbox.vcap.me:8443>)
       - sandbox (<https://sandbox.vcap.me:8443/app>)
-    - starts XS2A on port 8080 (<http://localhost:8080/swagger-ui.html>)
+    - starts XS2A API on port 8080 (<http://localhost:8080>)
     - starts the Sandbox on port 8081 (<http://localhost:8081/app>)
 
 3. Run tests
@@ -102,7 +102,7 @@ $ java -jar ./target/sandbox-*.jar migrate --spring.datasource.username=cms \
 $ java -jar -Dspring.profiles.active=dev target/sandbox-*.jar
 ```
 
-- XS2A API will be available at <http://localhost:8080/swagger-ui.htm>
+- XS2A API will be available at <http://localhost:8080>
 - Developer Portal will be available at <http://localhost:8081/app>
 
 See the [Service README.md](./service/README.md) for mor details.

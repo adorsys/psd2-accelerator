@@ -14,6 +14,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Configuration
 @EnableAutoConfiguration
@@ -39,24 +43,36 @@ import org.springframework.context.annotation.PropertySource;
 @Import(ContextHolder.class)
 public class Xs2aConfig {
 
-  @Configuration
-  public static class CertificateConfig {
-
-    @Value("${certificate.filter}")
-    private String certFilter;
-
-    @Bean
-    QwacCertificateFilter setCertificateFilter(
-        TppRoleValidationService roleValidationService, TppInfoHolder tppInfoHolder
-    ) {
-      switch (certFilter) {
-        case "tab":
-          return new TabDelimitedCertificateFilter(roleValidationService, tppInfoHolder);
-        case "mock":
-          return new MockCertificateFilter(roleValidationService, tppInfoHolder);
-        default:
-          return new QwacCertificateFilter(roleValidationService, tppInfoHolder);
-      }
+  @Bean
+  QwacCertificateFilter sandboxCertificateFilter(
+      TppRoleValidationService roleValidationService,
+      TppInfoHolder tppInfoHolder,
+      @Value("${certificate.filter}") String certificateFilterType
+  ) {
+    switch (certificateFilterType) {
+      case "tab":
+        return new TabDelimitedCertificateFilter(roleValidationService, tppInfoHolder);
+      case "mock":
+        return new MockCertificateFilter(roleValidationService, tppInfoHolder);
+      default:
+        return new QwacCertificateFilter(roleValidationService, tppInfoHolder);
     }
+  }
+
+  // Looks like swagger-ui can't be disabled via config
+  @Controller
+  public static class SwaggerUiDisabler {
+
+    @RequestMapping("swagger-ui.html")
+    public void nope() {
+      // for proper default 404 error page instead of blank 404
+      throw new ForcedNotFoundException();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private static class ForcedNotFoundException extends RuntimeException {
+
+    }
+
   }
 }
