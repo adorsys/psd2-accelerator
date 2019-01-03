@@ -5,7 +5,7 @@
 # TODO
 # looks like this file should/could be split in three: https://stackoverflow.com/questions/17873044/how-to-make-makefile-find-target-in-subdirectory-makefile
 
-.PHONY: all run test test-ui test-service clean clean-ui clean-service clean-arc42 help
+.PHONY: all run test test-ui test-service clean clean-ui clean-service clean-arc42 check help
 
 # use jq or node to get the version
 SANDBOX_VERSION=$(shell jq -r .version ui/package.json)
@@ -13,6 +13,7 @@ JAVA_SRC = $(shell find service/src)
 TS_SRC = $(shell find ui/src)
 ARC42_SRC = $(shell find arc42/src)
 PLANTUML_SRC = $(shell find arc42/diagrams -type f -name '*.puml')
+DEPENDENCIES = jq npm plantuml asciidoctor docker-compose mvn
 
 all: service/target arc42/psd2-sandbox-arc42.html ## Build all components
 
@@ -54,6 +55,10 @@ clean-service: ## Clean service temp files
 
 clean-arc42: ## Clean arc42 temp files
 	cd arc42 && rm -rf images/generated && rm -rf psd2-sandbox-arc42.html
+
+check: ## Check required dependencies ("@:" hides nothing to be done for...)
+	@: $(foreach exec,$(DEPENDENCIES),\
+          $(if $(shell command -v $(exec) 2> /dev/null ),$(info (OK) $(exec) is installed),$(info (FAIL) $(exec) is missing)))
 
 # TODO this breaks on targets (= ignores) with slashes in the path
 help: ## Display this help

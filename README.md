@@ -36,13 +36,17 @@ NOTE:
 In order to be able to use virtual hosts in development we use `*.vcap.me` hostnames, which always resolve to `127.0.0.1`
 
 To build (and run) the backend server and the frontend application the `Makefile` can be used. The following commands are supported:
-1. Build the arc42 docs, backend and frontend application
+1. First of all you should check if all build dependencies are installed
     ```sh
     $ git clone https://git.adorsys.de/psd2/sandbox.git
     $ cd sandbox
+    $ make check
+    ```
+2. Build the arc42 docs, backend and frontend application
+    ```sh
     $ make
     ```
-2. Build and run the application
+3. Build and run the application
     ```sh
     $ make run
     ```
@@ -53,19 +57,19 @@ To build (and run) the backend server and the frontend application the `Makefile
     - starts XS2A API on port 8080 (<http://localhost:8080>)
     - starts the Sandbox on port 8081 (<http://localhost:8081/app>)
 
-3. Run tests
+4. Run tests
     ```sh
     $ make test
     $ make test-ui
     $ make test-service
     ```
-4. Clean
+5. Clean
     ```sh
     $ make clean
     $ make clean-ui
     $ make clean-service
     ```
-5. Help
+6. Help
     ```sh
     $ make help
     ```
