@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -66,12 +65,10 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     request.setBody(consent);
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     ResponseEntity<ConsentsResponse201> response = template.exchange(
         "consents",
         HttpMethod.POST,
-        entity,
+        request.toHttpEntity(),
         ConsentsResponse201.class);
 
     context.setConsentId(response.getBody().getConsentId());
@@ -105,12 +102,10 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     Request request = new Request();
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     ResponseEntity<ConsentInformationResponse200Json> response = template.exchange(
         "consents/" + context.getConsentId(),
         HttpMethod.GET,
-        entity,
+        request.toHttpEntity(),
         ConsentInformationResponse200Json.class);
 
     context.setActualResponse(response);

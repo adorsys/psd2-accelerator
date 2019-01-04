@@ -15,7 +15,6 @@ import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import java.util.HashMap;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -52,12 +51,10 @@ public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
 
     request.setBody(confirmation);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     ResponseEntity response = template.exchange(
         "funds-confirmations",
         HttpMethod.POST,
-        entity,
+        request.toHttpEntity(),
         InlineResponse200.class);
 
     context.setActualResponse(response);

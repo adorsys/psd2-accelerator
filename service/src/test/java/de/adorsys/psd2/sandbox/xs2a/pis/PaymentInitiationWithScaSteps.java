@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -80,13 +79,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(payment);
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct(),
         HttpMethod.POST,
-        entity,
+        request.toHttpEntity(),
         PaymentInitationRequestResponse201.class);
 
     context.setPaymentId(response.getBody().getPaymentId());
@@ -103,13 +100,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     Request request = new Request<>();
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntityWithoutBody(headers);
-
     ResponseEntity<StartScaprocessResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentId() + "/authorisations",
         HttpMethod.POST,
-        entity,
+        request.toHttpEntity(),
         StartScaprocessResponse.class);
 
     context.setAuthorisationId(extractAuthorisationId(response));
@@ -134,14 +129,12 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(authenticationData);
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentId() + "/authorisations/" +
             context.getAuthorisationId(),
         HttpMethod.PUT,
-        entity,
+        request.toHttpEntity(),
         UpdatePsuAuthenticationResponse.class);
   }
 
@@ -159,14 +152,12 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(scaMethod);
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentId() + "/authorisations/" +
             context.getAuthorisationId(),
         HttpMethod.PUT,
-        entity,
+        request.toHttpEntity(),
         SelectPsuAuthenticationMethodResponse.class);
   }
 
@@ -184,14 +175,12 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(authorisationData);
     request.setHeader(headers);
 
-    HttpEntity entity = TestUtils.getHttpEntity(request);
-
     ResponseEntity<ScaStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentId() + "/authorisations/" +
             context.getAuthorisationId(),
         HttpMethod.PUT,
-        entity,
+        request.toHttpEntity(),
         ScaStatusResponse.class);
 
     context.setActualResponse(response);
