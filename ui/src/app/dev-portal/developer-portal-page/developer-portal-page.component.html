@@ -1,10 +1,10 @@
 <div class="page">
-  <sb-header text="Sandbox"></sb-header>
+  <sb-header></sb-header>
 
   <div class="container container--big">
     <h1 class="description description__title">Developer Portal</h1>
     <section>
-      <h2>Technical Description</h2>
+      <h2>Introduction</h2>
       <p>
         The
         <a
@@ -21,8 +21,8 @@
         March 2019.
       </p>
       <p>
-        Central component of the sandbox is the XS2A interface which meets the
-        requirements of the
+        Central component of the PSD2 Accelerator is the XS2A interface which
+        meets the requirements of the
         <a href="https://www.berlin-group.org/">Berlin Group</a> (Version 1.2)
         and is based on test data. Besides the actual interface, PSD2 instructs
         banks to offer a technical documentation free of charge containing
@@ -37,8 +37,8 @@
           >eIDAS</a
         >
         certificate at an appropriate Trust Service Provider (TSP). Issuing a
-        real certificate just for testing purposes would be a bit too much
-        effort, which is why this sandbox is additionally simulating a fictional
+        real certificate just for testing purposes would be too much effort,
+        which is why the PSD2 Accelerator is additionally simulating a fictional
         TSP issuing Qualified Website Authentication Certificates (QWAC). A QWAC
         is part of eIDAS and might be better known as
         <a href="https://www.ietf.org/rfc/rfc3739.txt">X.509</a> certificate.
@@ -62,14 +62,14 @@
       </p>
 
       <div class="text-center image-spacing">
-        <img src="assets/sandbox.svg" width="75%" />
+        <img src="assets/accelerator.svg" width="75%" />
         <figcaption>
-          <i>Figure 1.1:</i> Components of the Sandbox Environment
+          <i>Figure 1.1:</i> Components of the PSD2 Accelerator
         </figcaption>
       </div>
 
       <p class="description description__intro">Configuration of XS2A:</p>
-      <p>Currently the sandbox environment is configured as follows:</p>
+      <p>Currently the PSD2 Accelerator is configured as follows:</p>
       <ul>
         <li>
           TSP: The generation of client certificates works without registration
@@ -129,7 +129,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "PSU-IP-Address: 192.168.8.78" \
   -H "Content-Type: application/json" \
-  `# get these two files from the sandbox certificate generator` \
+  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
   -d '{{ '{' }}

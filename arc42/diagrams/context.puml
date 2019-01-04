@@ -14,20 +14,16 @@ skinparam Component {
   fontSize<<system>> 40
 }
 
-[PSD2 Sandbox] as sandbox <<system>>
+[PSD2 Accelerator] as acc <<system>>
 [Bank CMS] as cms
 
-tppd --> sandbox : Use
-ba --> sandbox : Configure
-bo --> sandbox : Deploy
-sandbox <.. cms : include docs
+tppd --> acc : Use
+ba --> acc : Configure
+bo --> acc : Deploy
+acc <.. cms : include docs
 
-note right of cms #lightgoldenrodyellow
-  Under consideration
-end note
-
-note top of sandbox #gold
-  NOTE: we have no dependencies
+note top of acc
+  NOTE: we have no technical dependencies
   to external systems (yet)
 end note
 

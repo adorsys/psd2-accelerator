@@ -6,19 +6,30 @@ scale 1200 width
 actor "Bank Admin" as badmin
 actor "TPP Developer" as tppd
 
-package sandbox {
+package psd2-accelerator {
+  file config
 
   [ssl-proxy] <<infrastructure>>
 
-  [xs2a] --> [testdata]
-  [config] <- badmin
-  [xs2a] -> [config]
+  badmin -> [config]
+  [ssl-proxy] -> config
 
-  () api -- [xs2a]
-  tppd --> [ssl-proxy]
-  [ssl-proxy] --> api
-  tppd --> [developer-portal]
-  tppd --> [certificate-generator]
+  package sandbox {
+
+    [ssl-proxy] -> () api
+
+    [xs2a] --> [testdata]
+    [xs2a] -> [config]
+
+    tppd --> [ssl-proxy]
+
+    () api -- [xs2a]
+    api -[hidden] [certificate-generator]
+    api -[hidden] [developer-portal]
+
+    tppd --> [developer-portal]
+    tppd --> [certificate-generator]
+  }
 
 }
 

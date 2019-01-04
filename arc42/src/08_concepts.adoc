@@ -31,9 +31,9 @@ The backend development (mostly Java code) is using the https://github.com/googl
 
 === SSL Client Authentication
 
-The PSD2 Sandbox acts as a CA which issues SSL client certificates required to access the provided XS2A API. Every PSD2 Sandbox deployment (e.g. every customer) initially needs to generate a new CA primary key and certificate. Those artifacts are then used to issue the TPP client certificate. SSL Client Authentication is only used for the XS2A API.
+The Sandbox acts as a CA which issues SSL client certificates required to access the provided XS2A API. Every Sandbox deployment (e.g. every customer) initially needs to generate a new CA primary key and certificate. Those artifacts are then used to issue the TPP client certificate. SSL Client Authentication is only used for the XS2A API.
 
 See also <<adorsys Sample Setup>> for more information about the SSL authentication setup.
 
 .sandbox-as-ca
-image::ssl-client.svg[PSD2 Sandbox as CA Explained, title="PSD2 Sandbox as CA Explained"]
+image::ssl-client.svg[Sandbox as CA Explained, title="Sandbox as CA Explained"]

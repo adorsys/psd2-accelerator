@@ -1,5 +1,5 @@
 FROM adorsys/nginx
-LABEL maintainer "https://git.adorsys.de/psd2/sandbox"
+LABEL maintainer "https://github.com/adorsys/psd2-accelerator"
 
 ADD root /
 

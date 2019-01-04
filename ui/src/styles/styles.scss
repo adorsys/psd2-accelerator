@@ -22,13 +22,6 @@ $adorsys-blue: #054f72;
         height: 26px;
         padding: 0 20px 0 10px;
       }
-
-      &__title {
-        font-size: 28px;
-        color: $adorsys-blue;
-        font-weight: 500;
-        margin: 0 0 6px;
-      }
     }
   }
 
@@ -75,14 +68,6 @@ $adorsys-blue: #054f72;
           justify-content: center;
           align-items: center;
           padding: 2%;
-        }
-
-        &__intro {
-          display: block;
-          font-size: 20px;
-          font-weight: 400;
-          padding-top: 23px;
-          margin: 0;
         }
 
         &__text {

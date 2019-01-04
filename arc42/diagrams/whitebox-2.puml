@@ -5,33 +5,33 @@ scale 1200 width
 
 () api
 [testdata]
-[config]
+file config
 
 package xs2a {
 
-  [xs2a-impl] as ximpl <<library>>
+  [xs2a-impl] as xs2alib <<library>>
   [profile]<<library>>
   [consent-management] as cms <<library>>
 
-  api --> ximpl
+  api --> xs2alib
   api --> profile
 
-  ximpl -> profile
+  xs2alib -> profile
   config <- profile
 
-  ximpl <-- [PIS] : impl
-  ximpl <-- [AIS] : impl
-  ximpl <-- [PIIS] : impl
-  ximpl --> cms
+  xs2alib <|.. [PIS] : impl
+  xs2alib <|.. [AIS] : impl
+  xs2alib <|.. [PIIS] : impl
+  xs2alib --> cms
 
   PIS -> testdata
   AIS -> testdata
   PIIS -> testdata
 
   ' only for layouting
-  cms -[hidden]> AIS
-  cms -[hidden]> PIS
-  cms -[hidden]> PIIS
+  cms -[hidden] AIS
+  cms -[hidden] PIS
+  cms -[hidden] PIIS
 
 }
 

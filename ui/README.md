@@ -1,12 +1,13 @@
-# UI
+# Component _ui_
 
-This component represents the user interface for generating a QWAC certificate.
+This component serves the UI for the developer portal including documentation and certificate generation. The compiled
+result gets embedded in the _service_ JAR.
 
-For a general technical description of the provided features see [README.md](../README.md)
+For a general description of the PSD2 Accelerator see [README.md](../README.md)
 
 ## Development Server
 
-Run `npm run start` for a dev server. Navigate to (<http://localhost:4200/>). The app will automatically reload if you change any of the source files. It is not possible to run the UI with `ng serve`, because the backend has not configured CORS for the UI.
+Run `npm run start` for a dev server. Navigate to (<http://localhost:4200/>). The app will automatically reload if you change any of the source files.
 
 ## Code Scaffolding
 
@@ -45,8 +46,8 @@ You can prettify files with the `prettier` plugin for IntelliJ or as cli with th
   1. Install global prettier package: `npm install -g prettier`
   2. Prettify single file `prettier --write`
   3. (Prettify all files in the project with this command:)
-      ``` 
-      find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v "assets/lib" | grep -v node_modules | xargs prettier --write
+      ```sh 
+      $ find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v "assets/lib" | grep -v node_modules | xargs prettier --write
       ```
 
 ## Pre-Push Hooks

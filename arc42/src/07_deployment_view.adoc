@@ -8,12 +8,12 @@
 .deployment-view
 image::deployment-view.svg[Deployment View, 100%, align="center"]
 
-The PSD2 Sandbox consists of two deployments. The _sandbox_ itself provides the XS2A API and a web application (and its API) for the developer portal. These two components are provided by a single fat JAR but served on different ports. XS2A is hosted on port `:8080` and the _developer portal_ is hosted on port `:8081` (both configurable). XS2A needs access to a database to persist the Consent Management state. The configuration for the _sandbox_ is completely externalized (see <<Configuration>>).
+The PSD2 Accelerator consists of two deployments. The _sandbox_ itself provides the XS2A API and a web application (and its API) for the developer portal. These two components are provided by a single fat JAR but served on different ports. XS2A is hosted on port `:8080` and the _developer portal_ is hosted on port `:8081` (both configurable). XS2A needs access to a database to persist the Consent Management state. The configuration for the _sandbox_ is completely externalized (see <<Configuration>>).
 
 ---
 
 The _ssl-proxy_ deployment is responsible for <<SSL Client Authentication>> required by XS2A. It forwards the certificate body to the _sandbox_ in an HTTP header (`tpp-qwac-certificate`). So SSL termination has to happen here, at least for the XS2A API part. The _ssl-proxy_ only validates the SSL client certificate because certain parts of the API are accessible without authentication (e.g. the Swagger file and Swagger UI). +
-The _sandbox_ _developer portal_ acts as a Certificate Authority (CA) and provides SSL Client Certificates to the TPP developers. The _ssl-proxy_ needs access to the _sandbox_ CA certificate in order to verify the TPP SSL client certificates (see <<Configuration>>).
+The _sandbox_ acts as a Certificate Authority (CA) and provides SSL Client Certificates to the TPP developers. The _ssl-proxy_ needs access to the _sandbox_ CA certificate in order to verify the TPP SSL client certificates (see <<Configuration>>).
 
 _ssl_proxy_ listens on `:8443` (actual reverse proxy) and `:8090` (health check).
 
@@ -25,13 +25,13 @@ NOTE: In reality all (SSL) traffic get passed through the Load Balancer to the _
 
 === Release Artifacts
 
-Images are released to https://cloud.docker.com/u/adorsys/repository/docker/adorsys/psd2-sandbox[adorsys DockerHub account].
+Images are released to https://hub.docker.com/u/adorsys[adorsys DockerHub account].
 
 [options="header"]
 |=======
 | Artifact  | Image Name
-| sandbox   | adorsys/psd2-sandbox:{sandbox-version}
-| ssl-proxy | adorsys/psd2-sandbox-ssl-proxy:{sandbox-version}
+| sandbox   | adorsys/psd2-sandbox:{acc-version}
+| ssl-proxy | adorsys/psd2-sandbox-ssl-proxy:{acc-version}
 |=======
 
 If you want to deploy the JAR without Docker please extract it from the Docker image. Use this command to copy the JAR to your current directory.
@@ -39,7 +39,7 @@ If you want to deploy the JAR without Docker please extract it from the Docker i
 [subs=attributes+]
 [source,shell]
 ----
-$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox:{sandbox-version} sh -c "cp /opt/app-root/src/*.jar /target"
+$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox:{acc-version} sh -c "cp /opt/app-root/src/*.jar /target"
 ----
 
 To build your own Docker images get the JAR from our image or use Docker Multi Stage Builds:
@@ -49,9 +49,9 @@ To build your own Docker images get the JAR from our image or use Docker Multi S
 ----
 FROM openjdk:8
 
-COPY --from=adorsys/psd2-sandbox:{sandbox-version} /opt/app-root/src/sandbox-{sandbox-version}.jar .
+COPY --from=adorsys/psd2-sandbox:{acc-version} /opt/app-root/src/sandbox-{acc-version}.jar .
 
-CMD java -jar sandbox-{sandbox-version}.jar
+CMD java -jar sandbox-{acc-version}.jar
 ----
 
 === Configuration
@@ -108,22 +108,22 @@ include::../../service/src/main/resources/bank_profile.yml[]
 [options="header"]
 |=======
 | Property  | Description | Default
-| API_INTERNAL_URL    | Internal URL where the XS2A API is reachable (set in docker-compose) | `http://service:8080`
-| API_EXTERNAL_URL    | External URL where the XS2A API is reachable (set in docker-compose) | `api.sandbox.vcap.me`
-| PORTAL_INTERNAL_URL | Internal URL where the Sandbox is reachable (set in docker-compose)  | `http://service:8081`
-| PORTAL_EXTERNAL_URL | External URL where the Sandbox is reachable (set in docker-compose)  | `portal.sandbox.vcap.me`
+| API_INTERNAL_URL    | Internal URL where the _XS2A API_ is reachable (set in docker-compose) | `http://service:8080`
+| API_EXTERNAL_URL    | External URL where the _XS2A API_ is reachable (set in docker-compose) | `api.psd2-accelerator.vcap.me`
+| PORTAL_INTERNAL_URL | Internal URL where the _developer portal_ is reachable (set in docker-compose)  | `http://service:8081`
+| PORTAL_EXTERNAL_URL | External URL where the _developer portal_ is reachable (set in docker-compose)  | `portal.psd2-accelerator.vcap.me`
 |=======
 
 .Required Files for ssl-proxy
 [options="header"]
 |=======
-| File                        | Description            | Default
-| /opt/app-root/etc/nginx.pem | SSL Certificate        | self signed one from adorsys
-| /opt/app-root/etc/nginx.key | PK to SSL Certificate  | random PK for the self signed certificate
-| /opt/app-root/etc/ca.crt    | Sandbox CA Certificate | default adorsys CA certificate
+| File                        | Description                     | Default
+| /opt/app-root/etc/nginx.pem | SSL Certificate                 | self signed one from adorsys
+| /opt/app-root/etc/nginx.key | PK to SSL Certificate           | random PK for the self signed certificate
+| /opt/app-root/etc/ca.crt    | PSD2 Accelerator CA Certificate | default adorsys CA certificate
 |=======
 
-NOTE: The Sandbox CA certificate (ca.crt) is already embedded in the _ssl-proxy_. If you supply your own instance of this component you need to configure the proper SSL and CA certificates there. You can get the Sandbox CA certificate by extracting it from the _ssl-proxy_ image. See <<Deploy on Your Own Infrastructure>> for more details.
+NOTE: The PSD2 Accelerator CA certificate (ca.crt) is already embedded in the _ssl-proxy_. If you supply your own instance of this component you need to configure the proper SSL and CA certificates there. You can get the PSD2 Accelerator CA certificate by extracting it from the _ssl-proxy_ image. See <<Deploy on Your Own Infrastructure>> for more details.
 
 ==== Logging
 
@@ -133,13 +133,13 @@ The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=
 
 === Deploy on Your Own Infrastructure
 
-The PSD2 Sandbox deployment is quite flexible. The only required component is the _sandbox_ and its DB.
+The PSD2 Accelerator deployment is quite flexible. The only required component is the _sandbox_ and its DB.
 
 While we release Docker images only, the _sandbox_ can be run on any machine providing a recent JDK 8 (see <<Technology Requirements>>). See <<Release Artifacts>> to find out how to get the JAR.
 
-WARNING: As of now we release Docker Images with a Spring Boot fat JAR with an embedded Tomcat only. We do not release the PSD2 Sandbox as a WAR (yet).
+WARNING: As of now we release Docker Images with a Spring Boot fat JAR with an embedded Tomcat only. We do not release the _sandbox_ as a WAR (yet).
 
-The _ssl-proxy_ can (and should) be substituted by existing infrastructure. There are many options which components can replace our _ssl-proxy_. Most likely it's going to be some kind of load balancer in hardware (F5) or software (HAProxy, some API Gateway). It's only purpose is SSL Client Authentication and forwarding the SSL Client Certificate (QWAC) in PEM format (single line or tab delimited, see <<Configuration>>) in an HTTP header named `tpp-qwac-certificate` to the sandbox (see <<adorsys Sample Setup>>).
+The _ssl-proxy_ can (and should) be substituted by existing infrastructure. There are many options which components can replace our _ssl-proxy_. Most likely it's going to be some kind of load balancer in hardware (F5) or software (HAProxy, some API Gateway). It's only purpose is SSL Client Authentication and forwarding the SSL Client Certificate (QWAC) in PEM format (single line or tab delimited, see <<Configuration>>) in an HTTP header named `tpp-qwac-certificate` to the _sandbox_ (see <<adorsys Sample Setup>>).
 
 The connection between _sandbox_ and any SSL-Proxy is made on the SSL-Proxy side with custom configuration. The only information that comes from the _sandbox_ is the Sandbox CA Certificate (ca.crt). You will need to make this file accessible to your SSL-Proxy.
 
@@ -147,7 +147,7 @@ The connection between _sandbox_ and any SSL-Proxy is made on the SSL-Proxy side
 [source,shell]
 ----
 # copy ca.crt from the image to the current directory
-$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox-ssl-proxy:{sandbox-version} sh -c "cp /opt/app-root/etc/ca.crt /target"
+$ docker run -it --rm -v $PWD:/target adorsys/psd2-sandbox-ssl-proxy:{acc-version} sh -c "cp /opt/app-root/etc/ca.crt /target"
 ----
 
 See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
@@ -160,8 +160,8 @@ See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
   ** PostgreSQL 9+
   ** Oracle 11g+
   ** MariaDB 10+
-- 2-4 GB RAM per _sandbox_ deployment is a good starting point for prod *(monitor this!)*
-- _ssl-proxy_ needs 128 - 512 RAM MiB *(don't use in prod!)*
+- 2-4 GiB RAM per _sandbox_ deployment is a good starting point for prod *(monitor this!)*
+- _ssl-proxy_ needs 128 - 512 MiB RAM *(don't use in prod!)*
 - the DB schema needs enough disk space because consents are persisted here (grows over time) *(monitor this!)*
 
 ==== Health Checks
@@ -178,10 +178,10 @@ We bundle a recent PostgreSQL JDBC driver in the _sandbox_ JAR. For other databa
 [subs=attributes+]
 [source,shell]
 ----
-$ docker run -it --rm -v $PWD/ojdbc8.jar:/opt/app-root/src/lib adorsys/psd2-sandbox:{sandbox-version}
+$ docker run -it --rm -v $PWD/ojdbc8.jar:/opt/app-root/src/lib adorsys/psd2-sandbox:{acc-version}
 ----
 
-If you run the PSD2 Sandbox without Docker, you need to set `loader.path` yourself:
+If you run the _sandbox_ without Docker, you need to set `loader.path` yourself:
 
 [subs=attributes+]
 [source,shell]
@@ -189,7 +189,7 @@ If you run the PSD2 Sandbox without Docker, you need to set `loader.path` yourse
 $ ls lib
 ojdbc8.jar
 # adds all JARs in "./lib" to the classpath
-$ java -jar -Dloader.path="lib" sandbox-{sandbox-version}.jar
+$ java -jar -Dloader.path="lib" sandbox-{acc-version}.jar
 ----
 
 Only databases listed in <<Technical Requirements / Sizing>> are supported. The Liquibase migration may fail with others.
@@ -208,11 +208,11 @@ Set the configuration property `liquibase.enabled=true` and migration will be ru
 
 ===== Manually with Liquibase
 
-The `sandbox-{sandbox-version}.jar` can be used as CLI application to do the migration with different credentials than the actual deployment.
+The `sandbox-{acc-version}.jar` can be used as CLI application to do the migration with different credentials than the actual deployment.
 
 [subs=attributes+,source,shell]
 ----
-$ java -jar sandbox-{sandbox-version}.jar migrate --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
+$ java -jar sandbox-{acc-version}.jar migrate --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
 ----
 
 ===== Manually with self-generated SQL schema
@@ -221,22 +221,25 @@ The CLI can echo the full schema instead of doing the actual migration, too. Thi
 
 [subs=attributes+,source,shell]
 ----
-$ java -jar sandbox-{sandbox-version}.jar create-schema --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
+$ java -jar sandbox-{acc-version}.jar create-schema --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
 ----
 
 === Build Pipeline
 
-We use https://git.adorsys.de/psd2/sandbox/pipelines[GitLab CI] for the pipeline. Build, release, testing, Code coverage, linting and compilation/deployment of this architecture documentation are automated. Every artifact we build is also kept for one week and can be downloaded in corresponding pipeline/job.
+NOTE: This is no longer accurate. +
+TODO: document build with Travis CI when done.
 
-Every commit on master pushes images for _sandbox_ and _ssl-proxy_ to the adorsys OpenShift. An image change trigger then starts a new deployment. The arc42 documentation is also built on every commit and published with the https://git.adorsys.de/psd2/sandbox/pipelines[GitLab Pages] feature.
+We use https://github.com/adorsys/psd2-accelerator/pipelines[GitLab CI] for the pipeline. Build, release, testing, Code coverage, linting and compilation/deployment of this architecture documentation are automated. Every artifact we build is also kept for one week and can be downloaded in corresponding pipeline/job.
 
-Each tag which follows the semver pattern with a leading `v` like `v1.0.0` results in a tagged release. Tags are pushed to https://harbor.adorsys.de (see <<Release Artifacts>>). Releases are created locally with our `infrastructure/build/release.sh` script.
+Every commit on master pushes images for _sandbox_ and _ssl-proxy_ to the adorsys OpenShift. An image change trigger then starts a new deployment. The arc42 documentation is also built on every commit and published with the http://adorsys.github.io/psd2-accelerator[GitHub Pages] feature.
+
+Each tag which follows the semver pattern with a leading `v` like `v1.0.0` results in a tagged release. Tags are pushed to https://hub.docker.com/u/adorsys/[DockerHub] (see <<Release Artifacts>>). Releases are created locally with our `infrastructure/build/release.sh` script.
 
 === Deployment Samples
 
 ==== docker-compose
 
-This docker-compose setup will start the _sandbox_ on port `:8080`/`:8081` and the _ssl-proxy_ on port `:8443`. The _ssl-proxy_ knows how to serve the domains https://portal.sandbox.vcap.me and https://api.sandbox.vcap.me locally with a self signed SSL certificate.
+This docker-compose setup will start the _sandbox_ on port `:8080`/`:8081` and the _ssl-proxy_ on port `:8443`. The _ssl-proxy_ knows how to serve the domains https://portal.psd2-accelerator.vcap.me and https://api.psd2-accelerator.vcap.me locally with a self signed SSL certificate.
 
 .docker-compose.yml
 [source,yaml]

@@ -24,9 +24,9 @@ services:
     image: adorsys/psd2-sandbox-ssl-proxy
     environment:
       - API_INTERNAL_URL=${API_INTERNAL_URL:-http://service:8080}
-      - API_EXTERNAL_URL=${API_EXTERNAL_URL:-api.sandbox.vcap.me}
+      - API_EXTERNAL_URL=${API_EXTERNAL_URL:-api.psd2-accelerator.vcap.me}
       - PORTAL_INTERNAL_URL=${PORTAL_INTERNAL_URL:-http://service:8081}
-      - PORTAL_EXTERNAL_URL=${PORTAL_EXTERNAL_URL:-portal.sandbox.vcap.me}
+      - PORTAL_EXTERNAL_URL=${PORTAL_EXTERNAL_URL:-portal.psd2-accelerator.vcap.me}
     ports:
       - "8443:8443"
     depends_on:

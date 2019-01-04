@@ -1,22 +1,24 @@
-# About the PSD2 Sandbox Architecture Documentation
+# About the PSD2 Accelerator Architecture Documentation
 
-## How to build
+## How to Build
 
-* install _plantuml_
+* check if you have _jq_, _plantuml_ and _asiidoctor_ installed
 +
-```shell
-$ brew install plantuml
+```sh
+$ make check
 ```
 
-* install _asciidoctor_
+* install if needed
 +
-```shell
+```sh
+$ brew install plantuml jq
 $ gem install asciidoctor
 ```
+
 * create architecture documentation
 +
-```shell
-$ make arc42/psd2-sandbox-arc42.html
+```sh
+$ make arc42/psd2-accelerator-arc42.html
 ```
 
 ## Tools Used for Diagrams
@@ -26,5 +28,5 @@ diagram sources under source control. PlantUML diagrams are put into the `diagra
 are named `*.puml`. At build time we generate PNGs from them and put them in the ignored folder
 `images/generated`.
 
-More complex diagrams (like the diagram in <<SSL Client Authentication>>) are created with https://draw.io, which is now completely free and even offers a https://about.draw.io/integrations[desktop app]. draw.io diagrams are saved as XML, also put in the `diagrams` folder and have the
-extension `*.drawio.xml` (convention for us). We *manually* export them to `images/*.svg`.
+More complex diagrams (like the diagram in SSL Client Authentication) are created with https://draw.io, which is now completely free and even offers a https://about.draw.io/integrations[desktop app]. _draw.io_ diagrams are saved as XML, also put in the `diagrams` folder and have the
+extension `\*.drawio.xml` (convention for us). We **manually** export them to `images/*.svg`.

@@ -8,14 +8,14 @@
 .PHONY: all run test test-ui test-service clean clean-ui clean-service clean-arc42 check help
 
 # use jq or node to get the version
-SANDBOX_VERSION=$(shell jq -r .version ui/package.json)
+ACCELERATOR_VERSION=$(shell jq -r .version ui/package.json)
 JAVA_SRC = $(shell find service/src)
 TS_SRC = $(shell find ui/src)
 ARC42_SRC = $(shell find arc42/src)
 PLANTUML_SRC = $(shell find arc42/diagrams -type f -name '*.puml')
 DEPENDENCIES = jq npm plantuml asciidoctor docker-compose mvn
 
-all: service/target arc42/psd2-sandbox-arc42.html ## Build all components
+all: service/target arc42/psd2-accelerator-arc42.html ## Build all components
 
 run: all ## Run everything with docker-compose after building
 	docker-compose up --build
@@ -29,8 +29,8 @@ ui/dist: ui/node_modules $(TS_SRC) ## Build the UI package (HTML/JS)
 ui/node_modules: ui/package.json ui/package-lock.json ## Install NPM dependencies
 	cd ui && npm install
 
-arc42/psd2-sandbox-arc42.html arc42/psd2-sandbox-deployment.html: arc42/images/generated $(ARC42_SRC) arc42/psd2-sandbox-arc42.adoc arc42/psd2-sandbox-deployment.adoc ui/package.json ## Generate arc42 html documentation
-	cd arc42 && asciidoctor -a sandbox-version=$(SANDBOX_VERSION) psd2-sandbox-arc42.adoc && asciidoctor -a sandbox-version=$(SANDBOX_VERSION) psd2-sandbox-deployment.adoc
+arc42/psd2-accelerator-arc42.html arc42/psd2-accelerator-deployment.html: arc42/images/generated $(ARC42_SRC) arc42/psd2-accelerator-arc42.adoc arc42/psd2-accelerator-deployment.adoc ui/package.json ## Generate arc42 html documentation
+	cd arc42 && asciidoctor -a acc-version=$(ACCELERATOR_VERSION) psd2-accelerator-arc42.adoc && asciidoctor -a acc-version=$(ACCELERATOR_VERSION) psd2-accelerator-deployment.adoc
 
 arc42/images/generated: $(PLANTUML_SRC) ## Generate images from .puml files
 # Note: Because plantuml doesnt update the images/generated timestamp we need to touch it afterwards
@@ -54,7 +54,7 @@ clean-service: ## Clean service temp files
 	cd service && mvn clean
 
 clean-arc42: ## Clean arc42 temp files
-	cd arc42 && rm -rf images/generated && rm -rf psd2-sandbox-arc42.html
+	cd arc42 && rm -rf images/generated && rm -rf psd2-*.html
 
 check: ## Check required dependencies ("@:" hides nothing to be done for...)
 	@: $(foreach exec,$(DEPENDENCIES),\

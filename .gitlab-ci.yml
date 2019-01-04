@@ -63,7 +63,7 @@ build_arc42:
   stage: "build"
   image: "adorsys/arc42-tools"
   script:
-    - make arc42/psd2-sandbox-arc42.html
+    - make arc42/psd2-accelerator-arc42.html
   artifacts:
     name: "arc42-$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA"
     paths:

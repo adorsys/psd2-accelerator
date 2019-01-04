@@ -22,3 +22,18 @@ Motivate what you have decided and why you decided that way,
 based upon your problem statement, the quality goals and key constraints.
 Refer to details in the following sections.
 ****
+
+NOTE: This area is TODO! (rat)
+
+image::accelerator.svg[High-level Architecture PSD2 Accelerator, 80%, title="High-level Architecture PSD2 Accelerator", align="center"]
+
+The PSD2 Accelerator bundles two top level components: the _sandbox_ and the _ssl-proxy_. The _sandbox_ contains the XS2A API, does the certificate handling and provides documentation in the developer portal. The _ssl-proxy_ is responsible for doing <<SSL Client Authentication>> and is basically "just" infrastructure which does the SSL part and forwards the certificate as HTTP header. Most customers will provide their own implementation of it.
+
+
+=== TPP Certificate Handling
+
+Issuing a real certificate just for testing purposes would be a bit too much effort, which is why the PSD2 Accelerator acts as a TSP issuing Qualified Website Authentication Certificates (QWAC) valid only for the PSD2 Accelerator. A QWAC is defined in https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32014R0910&from=EN[eIDAS] and is implemented as a https://www.ietf.org/rfc/rfc3739.txt[X.509] certificate.
+
+For PSD2-purposes the certificate gets extended by the QcStatement containing appropriate values such as the role(s) of the PSP (see https://www.etsi.org/deliver/etsi_ts/119400_119499/119495/01.01.02_60/ts_119495v010102p.pdf[ETSI]).
+
+After embedding the QWAC in the actual XS2A request, the role and the signature get validated at a central reverse proxy before it gets finally passed to the interface where the banking logic happens. The technical documentation of the XS2A interface can be accessed https://sandbox-portal.dev.adorsys.de/swagger-ui.html?urls.primaryName=PSD2%20API[here].

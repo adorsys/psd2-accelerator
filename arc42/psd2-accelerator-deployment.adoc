@@ -6,7 +6,9 @@
 // configure EN settings for asciidoc
 include::src/config.adoc[]
 
-= PSD2 Sandbox {sandbox-version} Deployment Documentation
+= image:logo/psd2-accelerator.svg[PSD2 Accelerator, 120] Deployment Documentation
+Sandbox Team <psd2-sandbox@adorsys.de>
+{acc-version}, {docdate}
 
 //additional style for arc42 help callouts
 ifdef::basebackend-html[]
@@ -19,6 +21,7 @@ ifdef::basebackend-html[]
 @media print {
 	.arc42help {display:hidden;}
 }
+h1 span img {vertical-align: baseline; margin-right: 10px}
 </style>
 ++++
 endif::basebackend-html[]
@@ -31,7 +34,7 @@ include::src/07_deployment_view.adoc[]
 
 ***
 
-NOTE: This Deployment Documentation is extracted from the PSD2 Sandbox Architecture Documentation and uses the arc42 template.
+NOTE: This Deployment Documentation is extracted from the PSD2 Accelerator Architecture Documentation and uses the arc42 template.
 
 ***
 
