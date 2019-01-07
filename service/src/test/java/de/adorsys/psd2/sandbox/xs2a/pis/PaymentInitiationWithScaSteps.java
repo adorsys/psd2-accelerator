@@ -25,8 +25,6 @@ import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -39,10 +37,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     context.setPaymentService("payments");
     context.setPaymentProduct(paymentProduct);
 
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("psu-ip-address", "192.168.0.26");
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
@@ -91,11 +87,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @And("^PSU created an authorisation resource$")
   public void createAuthorisationResource() {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("psu-ip-address", "192.168.0.26");
-    headers.put("date", LocalDate.now().toString());
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Request request = new Request<>();
     request.setHeader(headers);
@@ -107,17 +100,16 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         request.toHttpEntity(),
         StartScaprocessResponse.class);
 
-    context.setAuthorisationId(extractAuthorisationId(response));
+    context.setAuthorisationId(TestUtils.extractAuthorisationId(
+        (String) response.getBody().getLinks().get("startAuthorisationWithPsuAuthentication")));
   }
 
   @And("^PSU updated the resource with his (.*) and (.*)$")
   public void updateResourceWithPassword(String psuId, String password) {
     context.setPsuId(psuId);
 
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", context.getPsuId());
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     PsuData psuData = new PsuData();
     psuData.setPassword(password);
@@ -140,10 +132,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @And("^PSU updated the resource with a selection of authentication method (.*)$")
   public void updateResourceWithAuthenticationMethod(String selectedScaMethod) {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", context.getPsuId());
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
     scaMethod.setAuthenticationMethodId(selectedScaMethod);
@@ -163,10 +153,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @When("^PSU updates the resource with a (.*)$")
   public void updateResourceWithTan(String tan) {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", context.getPsuId());
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     TransactionAuthorisation authorisationData = new TransactionAuthorisation();
     authorisationData.scaAuthenticationData(tan);
@@ -192,16 +180,5 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
-  }
-
-  private String extractAuthorisationId(ResponseEntity<StartScaprocessResponse> response) {
-    String regex = "\\/authorisations\\/(.*?)$";
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher((CharSequence) response.getBody().getLinks().get(
-        "startAuthorisationWithPsuAuthentication"));
-    while (matcher.find()) {
-      return matcher.group(1);
-    }
-    return null;
   }
 }

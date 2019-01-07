@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestDataService {
 
+  public static final String PSU_ID = "PSU-1";
+  public static final String PSU_PASSWORD = "12345";
   public static final String IBAN_GIRO = "DE94500105178833114935";
   public static final String IBAN_SAVINGS = "DE96500105179669622432";
   public static final Currency EUR = Currency.getInstance("EUR");

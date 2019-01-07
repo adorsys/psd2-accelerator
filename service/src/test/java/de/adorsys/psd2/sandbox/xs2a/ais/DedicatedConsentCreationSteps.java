@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -43,15 +41,12 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
   @Given("PSU created a consent on dedicated accounts for account information (.*), balances (.*) and transactions (.*)")
   public void psu_created_a_consent_on_dedicated_account(String accounts, String balances,
       String transactions) {
-
     String[] ibansForAccountAccess = accounts.split(";");
     String[] ibansForBalances = balances.split(";");
     String[] ibansForTransactions = transactions.split(";");
 
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("psu-ip-address", "192.168.0.26");
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Consents consent = new Consents();
 
@@ -104,11 +99,8 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
 
   @When("PSU accesses the consent data")
   public void psu_accesses_the_consent_data() {
-
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", context.getPsuId());
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Request request = new Request();
     request.setHeader(headers);
@@ -124,7 +116,6 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
 
   @Then("the appropriate data and response code (.*) are received")
   public void the_appropriate_data_and_response_code_are_received(String code) {
-
     ResponseEntity<ConsentInformationResponse200Json> actualResponse = context.getActualResponse();
 
     AccountAccess actualAccess = actualResponse.getBody().getAccess();
@@ -148,9 +139,7 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
 
   @When("PSU requests the consent status")
   public void getConsentStatus() {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
+    HashMap<String, String> headers = TestUtils.createSession();
 
     Request request = new Request();
     request.setHeader(headers);
@@ -176,10 +165,8 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
   @Given("PSU authorised the consent with psu-id (.*), password (.*), sca-method (.*) and tan (.*)")
   public void authoriseConsent(String psuId, String password, String selectedScaMethod,
       String tan) {
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", psuId);
-    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
     Request startAuthorisationRequest = new Request<>();
     startAuthorisationRequest.setHeader(headers);
@@ -190,7 +177,9 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
         startAuthorisationRequest.toHttpEntity(),
         StartScaprocessResponse.class);
 
-    String authorisationId = extractAuthorisationId(startScaResponse);
+    String authorisationId = TestUtils
+        .extractAuthorisationId((String) startScaResponse.getBody().getLinks()
+            .get("startAuthorisationWithPsuAuthentication"));
 
     PsuData psuData = new PsuData();
     psuData.setPassword(password);
@@ -238,7 +227,6 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
   }
 
   private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {
-
     LinkedHashMap<String, String> tmpActualEntry;
     HashSet<String> actualHashValues = new HashSet<>();
 
@@ -256,16 +244,5 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     }
 
     assertThat(actualHashValues.equals(expectedHashValues), equalTo(true));
-  }
-
-  private String extractAuthorisationId(ResponseEntity<StartScaprocessResponse> response) {
-    String regex = "\\/authorisations\\/(.*?)$";
-    Pattern pattern = Pattern.compile(regex);
-    Matcher matcher = pattern.matcher((CharSequence) response.getBody().getLinks().get(
-        "startAuthorisationWithPsuAuthentication"));
-    while (matcher.find()) {
-      return matcher.group(1);
-    }
-    return null;
   }
 }
