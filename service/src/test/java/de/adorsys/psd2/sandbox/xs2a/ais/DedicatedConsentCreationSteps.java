@@ -10,6 +10,7 @@ import de.adorsys.psd2.model.AccountAccess;
 import de.adorsys.psd2.model.AccountReferenceIban;
 import de.adorsys.psd2.model.ConsentInformationResponse200Json;
 import de.adorsys.psd2.model.ConsentStatus;
+import de.adorsys.psd2.model.ConsentStatusResponse200;
 import de.adorsys.psd2.model.Consents;
 import de.adorsys.psd2.model.ConsentsResponse201;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
@@ -133,6 +134,31 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getFrequencyPerDay(), equalTo(5));
     assertThat(actualResponse.getBody().getRecurringIndicator(), equalTo(true));
+  }
+
+  @When("PSU requests the consent status")
+  public void getConsentStatus() {
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<ConsentStatusResponse200> response = template.exchange(
+        "consents/" + context.getConsentId() + "/status",
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        ConsentStatusResponse200.class);
+
+    context.setActualResponse(response);
+  }
+
+  @Then("the appropriate status and response code (.*) are received")
+  public void checkConsentStatus(String code) {
+    ResponseEntity<ConsentStatusResponse200> actualResponse = context.getActualResponse();
+    assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.RECEIVED));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
   private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {

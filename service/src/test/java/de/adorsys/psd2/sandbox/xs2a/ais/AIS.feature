@@ -15,3 +15,16 @@ Feature: AIS
       | DE94500105178833114935                        | null                   | DE94500105178833114935 | 200  |
       | null                                          | DE94500105178833114935 | null                   | 200  |
       | DE94500105178833114935;DE96500105179669622432 | DE94500105178833114935 | null                   | 200  |
+
+    ################################################################################################
+    #                                                                                              #
+    # Consent Status                                                                               #
+    #                                                                                              #
+    ################################################################################################
+  Scenario Outline: Consent Status
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    When PSU requests the consent status
+    Then the appropriate status and response code <code> are received
+    Examples:
+      | accounts               | balances               | transactions           | code |
+      | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | 200  |
