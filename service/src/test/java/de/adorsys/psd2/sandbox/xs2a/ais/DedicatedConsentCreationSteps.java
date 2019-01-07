@@ -13,6 +13,14 @@ import de.adorsys.psd2.model.ConsentStatus;
 import de.adorsys.psd2.model.ConsentStatusResponse200;
 import de.adorsys.psd2.model.Consents;
 import de.adorsys.psd2.model.ConsentsResponse201;
+import de.adorsys.psd2.model.PsuData;
+import de.adorsys.psd2.model.ScaStatusResponse;
+import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
+import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
+import de.adorsys.psd2.model.StartScaprocessResponse;
+import de.adorsys.psd2.model.TransactionAuthorisation;
+import de.adorsys.psd2.model.UpdatePsuAuthentication;
+import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
@@ -23,6 +31,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -154,11 +164,77 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
-  @Then("the appropriate status and response code (.*) are received")
-  public void checkConsentStatus(String code) {
+  @Then("the appropriate status (.*) and response code (.*) are received")
+  public void checkConsentStatus(String status, String code) {
     ResponseEntity<ConsentStatusResponse200> actualResponse = context.getActualResponse();
-    assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.RECEIVED));
+    ConsentStatus expectedConsentStatus = ConsentStatus.fromValue(status);
+
+    assertThat(actualResponse.getBody().getConsentStatus(), equalTo(expectedConsentStatus));
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+  }
+
+  @Given("PSU authorised the consent with psu-id (.*), password (.*), sca-method (.*) and tan (.*)")
+  public void authoriseConsent(String psuId, String password, String selectedScaMethod,
+      String tan) {
+    HashMap<String, String> headers = new HashMap<>();
+    headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
+    headers.put("PSU-ID", psuId);
+    headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
+
+    Request startAuthorisationRequest = new Request<>();
+    startAuthorisationRequest.setHeader(headers);
+
+    ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations",
+        HttpMethod.POST,
+        startAuthorisationRequest.toHttpEntity(),
+        StartScaprocessResponse.class);
+
+    String authorisationId = extractAuthorisationId(startScaResponse);
+
+    PsuData psuData = new PsuData();
+    psuData.setPassword(password);
+
+    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
+    authenticationData.setPsuData(psuData);
+
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
+    updateCredentialRequest.setBody(authenticationData);
+    updateCredentialRequest.setHeader(headers);
+
+    template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations/" + authorisationId,
+        HttpMethod.PUT,
+        updateCredentialRequest.toHttpEntity(),
+        UpdatePsuAuthenticationResponse.class);
+
+    SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
+    scaMethod.setAuthenticationMethodId(selectedScaMethod);
+
+    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>();
+    scaSelectionRequest.setBody(scaMethod);
+    scaSelectionRequest.setHeader(headers);
+
+    template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations/" + authorisationId,
+        HttpMethod.PUT,
+        scaSelectionRequest.toHttpEntity(),
+        SelectPsuAuthenticationMethodResponse.class);
+
+    TransactionAuthorisation authorisationData = new TransactionAuthorisation();
+    authorisationData.scaAuthenticationData(tan);
+
+    Request<TransactionAuthorisation> request = new Request<>();
+    request.setBody(authorisationData);
+    request.setHeader(headers);
+
+    ResponseEntity<ScaStatusResponse> response = template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations/" + authorisationId,
+        HttpMethod.PUT,
+        request.toHttpEntity(),
+        ScaStatusResponse.class);
+
+    context.setActualResponse(response);
   }
 
   private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {
@@ -174,11 +250,22 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
     AccountReferenceIban tmpExpectedEntry;
     HashSet<String> expectedHashValues = new HashSet<>();
 
-    for (Object entry : expectedList ) {
+    for (Object entry : expectedList) {
       tmpExpectedEntry = (AccountReferenceIban) entry;
       expectedHashValues.add(tmpExpectedEntry.getIban().concat(tmpExpectedEntry.getCurrency()));
     }
 
     assertThat(actualHashValues.equals(expectedHashValues), equalTo(true));
+  }
+
+  private String extractAuthorisationId(ResponseEntity<StartScaprocessResponse> response) {
+    String regex = "\\/authorisations\\/(.*?)$";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher((CharSequence) response.getBody().getLinks().get(
+        "startAuthorisationWithPsuAuthentication"));
+    while (matcher.find()) {
+      return matcher.group(1);
+    }
+    return null;
   }
 }
