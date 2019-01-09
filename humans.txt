@@ -1,0 +1,32 @@
+/* TEAM */
+
+	Andreas Winter, Developer
+	Contact: awi [at] adorsys.de
+	Twitter: @awandi34
+
+	Annina Kiupel, Product Owner
+	Contact: ank [at] adorsys.de
+
+	Isabella Ionescu, Developer
+	Contact: iio [at] adorsys.de
+
+	Jana Tiimus, Developer
+	Contact: jti [at] adorsys.de
+
+	Nadja Krendel, Agile Coach
+	Contact: nkr [at] adorsys.de
+	Twitter: @KrendelNadja
+
+	Roman Ataman, Developer
+	Contact: rat [at] adorsys.de
+	Twitter: @atamanroman
+
+  Sebastian Wild, Developer
+	Contact: swi [at] adorsys.de
+
+  Tarkan Nein, Developer
+	Contact: tne [at] adorsys.de
+
+/* THANKS */
+
+  Thanks to everybody at adorsys.de and adorsys.com.ua for all the kind help.
