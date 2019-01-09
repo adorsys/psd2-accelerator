@@ -148,3 +148,6 @@ Don't. Fail forward, create a new release and tell everybody you messed up. Won'
 - [Maven, version 3.0](https://maven.apache.org/) - Dependency Management
 - [Spring Boot, version 1.5.17](https://projects.spring.io/spring-boot/) - Spring Boot as core Java framework
 - [Angular CLI, version 6.2.2](https://github.com/angular/angular-cli)
+
+## License
+This project is licensed under the Apache License version 2.0 - see the LICENSE.md file for details.
