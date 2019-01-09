@@ -25,6 +25,7 @@ import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
+import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
+public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
 
@@ -224,6 +225,20 @@ public class DedicatedConsentCreationSteps extends SpringCucumberTestBase {
         ScaStatusResponse.class);
 
     context.setActualResponse(response);
+  }
+
+  @Given("PSU deletes the consent")
+  public void deleteConsent() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request revokeConsentRequest = new Request<>();
+    revokeConsentRequest.setHeader(headers);
+
+    template.exchange(
+        "consents/" + context.getConsentId(),
+        HttpMethod.DELETE,
+        revokeConsentRequest.toHttpEntity(),
+        SpiResponse.VoidResponse.class);
   }
 
   private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {

@@ -37,3 +37,13 @@ Feature: AIS
     Examples:
       | accounts               | balances               | transactions           | psu-id | password | sca-method | tan   | status | code |
       | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | PSU-1  | 12345    | SMS_OTP    | 54321 | valid  | 200  |
+
+#  TODO: Revoke consent should result in a terminatedByTpp status instead of revokedByPsu (bug-ticket https://git.adorsys.de/adorsys/xs2a/aspsp-xs2a/issues/587)
+  Scenario Outline: Consent Status TerminatedByTpp
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    And PSU deletes the consent
+    When PSU requests the consent status
+    Then the appropriate status <status> and response code <code> are received
+    Examples:
+      | accounts               | balances               | transactions           | status       | code |
+      | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | revokedByPsu | 200  |
