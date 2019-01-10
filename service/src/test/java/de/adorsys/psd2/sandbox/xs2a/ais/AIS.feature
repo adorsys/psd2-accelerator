@@ -47,3 +47,17 @@ Feature: AIS
     Examples:
       | accounts               | balances               | transactions           | status       | code |
       | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | revokedByPsu | 200  |
+
+    ################################################################################################
+    #                                                                                              #
+    # Get Account List                                                                             #
+    #                                                                                              #
+    ################################################################################################
+  Scenario Outline: Get Account List
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    When PSU accesses the account list
+    Then the appropriate account data and response code <code> are received
+    Examples:
+      | accounts                                      | balances               | transactions           | psu-id | password | sca-method | tan   | code |
+      | DE94500105178833114935;DE96500105179669622432 | DE94500105178833114935 | DE94500105178833114935 | PSU-1  | 12345    | SMS_OTP    | 54321 | 200  |
