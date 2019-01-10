@@ -7,6 +7,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.model.AccountAccess;
+import de.adorsys.psd2.model.AccountList;
 import de.adorsys.psd2.model.AccountReferenceIban;
 import de.adorsys.psd2.model.ConsentInformationResponse200Json;
 import de.adorsys.psd2.model.ConsentStatus;
@@ -167,7 +168,6 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   public void authoriseConsent(String psuId, String password, String selectedScaMethod,
       String tan) {
     HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", psuId);
 
     Request startAuthorisationRequest = new Request<>();
     startAuthorisationRequest.setHeader(headers);
@@ -187,6 +187,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
     UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
     authenticationData.setPsuData(psuData);
+    headers.put("PSU-ID", psuId);
 
     Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
     updateCredentialRequest.setBody(authenticationData);
@@ -239,6 +240,33 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         HttpMethod.DELETE,
         revokeConsentRequest.toHttpEntity(),
         SpiResponse.VoidResponse.class);
+  }
+
+
+  @When("PSU accesses the account list")
+  public void getAccountList() {
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("Consent-ID", context.getConsentId());
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<AccountList> response = template.exchange(
+        "accounts/",
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        AccountList.class);
+
+    context.setActualResponse(response);
+  }
+
+  @Then("the appropriate account data and response code (.*) are received")
+  public void the_appropriate_account_data_and_response_code_are_received(String code) {
+    ResponseEntity<AccountList> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody().getAccounts().size(), equalTo(0));
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
   private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {
