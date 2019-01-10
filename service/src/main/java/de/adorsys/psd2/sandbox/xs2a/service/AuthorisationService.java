@@ -1,12 +1,10 @@
 package de.adorsys.psd2.sandbox.xs2a.service;
 
-import static de.adorsys.psd2.sandbox.portal.testdata.TestDataService.PSU_ID;
-import static de.adorsys.psd2.sandbox.portal.testdata.TestDataService.PSU_PASSWORD;
 import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.FAILURE;
 import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.SUCCESS;
 
-import com.google.common.base.Charsets;
-import de.adorsys.psd2.sandbox.xs2a.service.domain.SpiAspspAuthorisationData;
+import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.PsuData;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.sca.ChallengeData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
@@ -18,10 +16,18 @@ import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthorisationService {
+
+  private TestDataService testDataService;
+
+  public AuthorisationService(TestDataService testDataService) {
+    this.testDataService = testDataService;
+  }
 
   /**
    * Abstract Implementation of requestAvailableScaMethods.
@@ -33,21 +39,19 @@ public class AuthorisationService {
   public SpiResponse<SpiAuthorisationStatus> authorisePsu(
       SpiPsuData spiPsuData, String password, AspspConsentData aspspConsentData) {
 
-    SpiAspspAuthorisationData accessToken = new SpiAspspAuthorisationData(PSU_ID, PSU_PASSWORD);
+    Optional<PsuData> psu = testDataService.getPsu(spiPsuData.getPsuId());
 
-    byte[] payload = accessToken.toString().getBytes(Charsets.UTF_8);
-
-    if (spiPsuData.getPsuId().equals(PSU_ID) && password.equals(PSU_PASSWORD)) {
+    if (!psu.isPresent() || !password.equals(psu.get().getPassword())) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
           .aspspConsentData(aspspConsentData)
-          .payload(SUCCESS)
-          .success();
+          .payload(FAILURE)
+          .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
     }
 
     return SpiResponse.<SpiAuthorisationStatus>builder()
         .aspspConsentData(aspspConsentData)
-        .payload(FAILURE)
-        .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+        .payload(SUCCESS)
+        .success();
   }
 
   /**

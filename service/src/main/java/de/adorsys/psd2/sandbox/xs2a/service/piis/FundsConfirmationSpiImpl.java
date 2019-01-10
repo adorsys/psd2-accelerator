@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.piis;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
@@ -10,6 +11,7 @@ import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.FundsConfirmationSpi;
 import java.math.BigDecimal;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
 
-  private TestDataService testDataService = new TestDataService();
+  private TestDataService testDataService;
 
-  private boolean hasSufficientFunds(Account account, BigDecimal amount) {
-    return amount.compareTo(account.getAmount()) <= 0;
+  public FundsConfirmationSpiImpl(TestDataService testDataService) {
+    this.testDataService = testDataService;
   }
 
   @Override
@@ -28,16 +30,30 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       @NotNull SpiPsuData spiPsuData, @Nullable PiisConsent piisConsent,
       @NotNull SpiFundsConfirmationRequest spiFundsConfirmationRequest,
       @NotNull AspspConsentData aspspConsentData) {
+    SpiFundsConfirmationResponse response = new SpiFundsConfirmationResponse();
 
-    Account account = testDataService.getAccountDetails(TestDataService.ACCOUNT_ID_GIRO);
+    String iban = spiFundsConfirmationRequest.getPsuAccount().getIban();
 
-    String requestedIban = spiFundsConfirmationRequest.getPsuAccount().getIban();
+    Optional<String> psuId = testDataService.getPsuByIban(iban);
+
+    // Passed iban could not be matched to an existing PSU
+    if (!psuId.isPresent()) {
+      response.setFundsAvailable(false);
+      return new SpiResponse<>(response, aspspConsentData);
+    }
+
+    Optional<String> accountId = testDataService.getAccountIdByIban(psuId.get(), iban);
     BigDecimal requestedAmount = spiFundsConfirmationRequest.getInstructedAmount().getAmount();
 
-    SpiFundsConfirmationResponse response = new SpiFundsConfirmationResponse();
-    response.setFundsAvailable(
-        account.getIban().equals(requestedIban) && hasSufficientFunds(account, requestedAmount)
-    );
+    if (accountId.isPresent()) {
+      Optional<Account> account = testDataService.getDistinctAccount(psuId.get(), accountId.get());
+      if (account.isPresent()) {
+        Balance balance = account.get().getBalance();
+        response
+            .setFundsAvailable(
+                requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);
+      }
+    }
     return new SpiResponse<>(response, aspspConsentData);
   }
 }
