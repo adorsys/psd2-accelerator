@@ -26,7 +26,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
         "de.adorsys.psd2.xs2a",
         "de.adorsys.psd2.aspsp",
         "de.adorsys.psd2.consent",
-        "de.adorsys.psd2.sandbox.xs2a"
+        "de.adorsys.psd2.sandbox.xs2a",
+        "de.adorsys.psd2.sandbox.portal.testdata"
     },
     excludeFilters = @ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,

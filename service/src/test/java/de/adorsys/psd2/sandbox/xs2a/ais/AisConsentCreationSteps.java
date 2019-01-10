@@ -264,7 +264,8 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   public void the_appropriate_account_data_and_response_code_are_received(String code) {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
 
-    assertThat(actualResponse.getBody().getAccounts().size(), equalTo(0));
+    assertThat(actualResponse.getBody().getAccounts().size(),
+        equalTo(context.getConsentAccountAccess().getAccounts().size()));
 
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
