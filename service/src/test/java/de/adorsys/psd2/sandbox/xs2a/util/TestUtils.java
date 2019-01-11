@@ -28,37 +28,21 @@ public class TestUtils {
   }
 
   /**
-   * Extracts authorisationId from URL.
+   * Extracts id from URL.
    *
-   * @param url url to extract id from
+   * @param url                    url to extract id from
+   * @param segmentAheadExtraction url segment which is hardcoded ahead of id
    * @return authorisationId
    */
-  public static String extractAuthorisationId(String url) {
+  public static String extractId(String url, String segmentAheadExtraction) {
 
     UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(url);
     List<String> pathSegments = uriComponentsBuilder.build().getPathSegments();
 
-    int index = pathSegments.indexOf("authorisations");
+    int index = pathSegments.indexOf(segmentAheadExtraction);
     if (index == -1) {
-      throw new IllegalArgumentException("URL does not contain 'authorisations' segment'");
-    }
-    return pathSegments.get(index + 1);
-  }
-
-  /**
-   * Extracts cancellationId from URL.
-   *
-   * @param url url to extract id from
-   * @return cancellationId
-   */
-  public static String extractCancellationId(String url) {
-
-    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(url);
-    List<String> pathSegments = uriComponentsBuilder.build().getPathSegments();
-
-    int index = pathSegments.indexOf("cancellation-authorisations");
-    if (index == -1) {
-      throw new IllegalArgumentException("URL does not contain 'cancellation-authorisations' segment'");
+      throw new IllegalArgumentException(
+          "URL does not contain '" + segmentAheadExtraction + "' segment'");
     }
     return pathSegments.get(index + 1);
   }

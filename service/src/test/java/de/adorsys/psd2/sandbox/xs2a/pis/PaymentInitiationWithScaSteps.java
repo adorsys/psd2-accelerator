@@ -2,14 +2,15 @@ package de.adorsys.psd2.sandbox.xs2a.pis;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.Address;
 import de.adorsys.psd2.model.Amount;
@@ -40,13 +41,23 @@ import de.adorsys.psd2.xs2a.domain.TransactionStatusResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
 import org.junit.Ignore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 @Ignore("without this ignore intellij tries to run the step files")
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
+  @Autowired
+  public AspspProfileService aspspProfileService;
+
   private Context context = new Context();
+  private String scaApproach;
+
+  @Before
+  public void setScaApproach() {
+    scaApproach = aspspProfileService.getScaApproach().toString();
+  }
 
   @Given("^PSU initiated a (.*) payment with iban (.*) using the payment product (.*)$")
   public void initiatePayment(String paymentType, String debtorIban, String paymentProduct) {
@@ -72,7 +83,172 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         request.toHttpEntity(),
         PaymentInitationRequestResponse201.class);
 
+    if (scaApproach.equalsIgnoreCase("redirect")) {
+      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+    }
+
     context.setPaymentId(response.getBody().getPaymentId());
+  }
+
+  @When("PSU tries to initiate a payment (.*) with iban (.*) using the payment product (.*)")
+  public void tryToInitiatePayment(String paymentService, String iban, String paymentProduct) {
+    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
+    payment.setEndToEndIdentification("WBG-123456789");
+    payment.setDebtorAccount(createAccount(iban, "EUR"));
+
+    Amount instructedAmount = new Amount();
+    instructedAmount.setAmount("520");
+    instructedAmount.setCurrency("EUR");
+    payment.setInstructedAmount(instructedAmount);
+
+    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    payment.setCreditorName("WBG");
+    payment.setCreditorAddress(createCreditorAddress());
+    payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request<PaymentInitiationSctJson> request = new Request<>();
+    request.setBody(payment);
+    request.setHeader(headers);
+
+    ResponseEntity<TppMessage403PIS[]> response = template.exchange(
+        paymentService + "/" + paymentProduct,
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        TppMessage403PIS[].class);
+
+    context.setActualResponse(response);
+  }
+
+  @And("^PSU authorised the payment with psu-id (.*), password (.*), sca-method (.*) and tan (.*)$")
+  public void authorisePayment(String psuId, String password, String selectedScaMethod,
+      String tan) {
+    if (scaApproach.equalsIgnoreCase("embedded")) {
+      this.authorisePaymentWithEmbeddedApproach(psuId, password, selectedScaMethod, tan);
+    } else {
+      this.authoriseWithRedirectApproach(psuId);
+    }
+  }
+
+  @When("^PSU tries to authorise the payment with his (.*) and (.*)$")
+  public void tryToAuthoriseThePayment(String psuId, String password) {
+    if (scaApproach.equalsIgnoreCase("embedded")) {
+      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, "authorisations");
+    } else {
+      this.authoriseWithRedirectApproach(psuId);
+    }
+  }
+
+  @When("PSU tries to authorise the cancellation resource with his (.*) and (.*)")
+  public void tryToCancelPayment(String psuId, String password) {
+    if (scaApproach.equalsIgnoreCase("embedded")) {
+      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, "cancellation-authorisations");
+    } else {
+      authoriseWithRedirectApproach(psuId);
+    }
+  }
+
+  @When("^PSU requests the payment data$")
+  public void getPaymentData() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId(),
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        PaymentInitiationSctWithStatusResponse.class);
+
+    context.setActualResponse(response);
+  }
+
+  @When("^PSU requests the payment status$")
+  public void getPaymentStatus() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<TransactionStatusResponse> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/status",
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        TransactionStatusResponse.class);
+
+    context.setActualResponse(response);
+  }
+
+  @And("PSU cancels the payment")
+  public void cancelPayment() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request<>();
+    request.setHeader(headers);
+    ResponseEntity<PaymentInitiationCancelResponse204202> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId(),
+        HttpMethod.DELETE,
+        request.toHttpEntity(),
+        PaymentInitiationCancelResponse204202.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+  }
+
+  @Then("^the SCA status (.*) and response code (.*) are received$")
+  public void checkScaResponse(String scaStatus, String code) {
+    ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+    assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
+  }
+
+  @Then("^the transaction status (.*) and response code (.*) are received$")
+  public void checkTransactionResponse(String status, String code) {
+    ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
+        equalTo(status));
+  }
+
+  @Then("^the payment data and response code (.*) are received and its transaction-status is (.*)$")
+  public void receivePaymentDataAndResponseCode(String code, String transactionStatus) {
+    ResponseEntity<PaymentInitiationSctWithStatusResponse> actualResponse = context
+        .getActualResponse();
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
+        equalTo(transactionStatus));
+    assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
+    assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
+  }
+
+  @Then("an error and response code (.*) are received")
+  public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
+    ResponseEntity<TppMessage401PIS> actualResponse = context.getActualResponse();
+    assertThat(actualResponse.getBody().getCategory(), equalTo(TppMessageCategory.ERROR));
+    assertThat(actualResponse.getBody().getText(), containsString("PSU-ID cannot be matched"));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+  }
+
+  @Then("an error with http code (.*) and error-message (.*) are received")
+  public void receiveErrorMessageAndCode(Integer httpCode, String errorMessage) {
+    ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
+    // TODO did work in 1.13 but is null in 1.15 :(
+    // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
+    assertThat(actualResponse.getBody()[0].getText(),
+        containsString("channel independent blocking"));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(httpCode));
   }
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
@@ -133,309 +309,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     return request;
   }
 
-  @And("^PSU created an authorisation resource$")
-  public void createAuthorisationResource() {
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request<>();
-    request.setHeader(headers);
-
-    ResponseEntity<StartScaprocessResponse> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations",
-        HttpMethod.POST,
-        request.toHttpEntity(),
-        StartScaprocessResponse.class);
-
-    context.setAuthorisationId(TestUtils.extractAuthorisationId(
-        (String) response.getBody().getLinks().get("startAuthorisationWithPsuAuthentication")));
-  }
-
-  @And("^PSU updated the resource with his (.*) and (.*)$")
-  public void updateResourceWithPassword(String psuId, String password) {
-    context.setPsuId(psuId);
-
-    HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", context.getPsuId());
-
-    PsuData psuData = new PsuData();
-    psuData.setPassword(password);
-
-    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
-    authenticationData.setPsuData(psuData);
-
-    Request<UpdatePsuAuthentication> request = new Request<>();
-    request.setBody(authenticationData);
-    request.setHeader(headers);
-
-    ResponseEntity<UpdatePsuAuthenticationResponse> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
-            context.getAuthorisationId(),
-        HttpMethod.PUT,
-        request.toHttpEntity(),
-        UpdatePsuAuthenticationResponse.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-  }
-
-  @When("^PSU tries to update the resource with his (.*) and (.*)$")
-  public void tryToUpdateResourceWithPassword(String psuId, String password) {
-    HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", psuId);
-
-    PsuData psuData = new PsuData();
-    psuData.setPassword(password);
-
-    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
-    authenticationData.setPsuData(psuData);
-
-    Request<UpdatePsuAuthentication> request = new Request<>();
-    request.setBody(authenticationData);
-    request.setHeader(headers);
-
-    ResponseEntity<TppMessage401PIS> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
-            context.getAuthorisationId(),
-        HttpMethod.PUT,
-        request.toHttpEntity(),
-        TppMessage401PIS.class);
-
-    context.setActualResponse(response);
-  }
-
-  @And("^PSU updated the resource with a selection of authentication method (.*)$")
-  public void updateResourceWithAuthenticationMethod(String selectedScaMethod) {
-    HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", context.getPsuId());
-
-    SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
-    scaMethod.setAuthenticationMethodId(selectedScaMethod);
-
-    Request<SelectPsuAuthenticationMethod> request = new Request<>();
-    request.setBody(scaMethod);
-    request.setHeader(headers);
-
-    ResponseEntity<SelectPsuAuthenticationMethodResponse> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
-            context.getAuthorisationId(),
-        HttpMethod.PUT,
-        request.toHttpEntity(),
-        SelectPsuAuthenticationMethodResponse.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-  }
-
-  @When("^PSU updates the resource with a (.*)$")
-  public void updateResourceWithTan(String tan) {
-    HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", context.getPsuId());
-
-    TransactionAuthorisation authorisationData = new TransactionAuthorisation();
-    authorisationData.scaAuthenticationData(tan);
-
-    Request<TransactionAuthorisation> request = new Request<>();
-    request.setBody(authorisationData);
-    request.setHeader(headers);
-
-    ResponseEntity<ScaStatusResponse> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
-            context.getAuthorisationId(),
-        HttpMethod.PUT,
-        request.toHttpEntity(),
-        ScaStatusResponse.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-
-    context.setActualResponse(response);
-  }
-
-  @When("^PSU requests the payment data$")
-  public void getPaymentData() {
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request();
-    request.setHeader(headers);
-
-    ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
-        context.getPaymentService() + "/" + context.getPaymentProduct() + "/"
-            + context.getPaymentId(),
-        HttpMethod.GET,
-        request.toHttpEntity(),
-        PaymentInitiationSctWithStatusResponse.class);
-
-    context.setActualResponse(response);
-  }
-
-  @When("^PSU requests the payment status$")
-  public void getPaymentStatus() {
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request();
-    request.setHeader(headers);
-
-    ResponseEntity<TransactionStatusResponse> response = template.exchange(
-        context.getPaymentService() + "/" + context.getPaymentProduct() + "/"
-            + context.getPaymentId() + "/status",
-        HttpMethod.GET,
-        request.toHttpEntity(),
-        TransactionStatusResponse.class);
-
-    context.setActualResponse(response);
-  }
-
-  @Then("^the SCA status (.*) and response code (.*) are received$")
-  public void checkScaResponse(String scaStatus, String code) {
-    ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
-
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
-  }
-
-  @Then("^the transaction status (.*) and response code (.*) are received$")
-  public void checkTransactionResponse(String status, String code) {
-    ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();
-
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
-        equalTo(status));
-  }
-
-  @Then("an appropriate error and response code (.*) are received")
-  public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
-    ResponseEntity<TppMessage401PIS> actualResponse = context.getActualResponse();
-
-    assertThat(actualResponse.getBody().getCategory(), equalTo(TppMessageCategory.ERROR));
-    assertThat(actualResponse.getBody().getText(), containsString("PSU-ID cannot be matched"));
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-  }
-
-  @Then("^the payment data and response code (.*) are received and its transaction-status is (.*)$")
-  public void theAppropriateDataAndResponseCodeAreReceived(String code, String transactionStatus) {
-    ResponseEntity<PaymentInitiationSctWithStatusResponse> actualResponse = context
-        .getActualResponse();
-
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
-        equalTo(transactionStatus));
-    assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
-    assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
-  }
-
-  @And("PSU cancels the payment")
-  public void cancelPayment() {
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request<>();
-    request.setHeader(headers);
-    ResponseEntity<PaymentInitiationCancelResponse204202> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId(),
-        HttpMethod.DELETE,
-        request.toHttpEntity(),
-        PaymentInitiationCancelResponse204202.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-  }
-
-  @And("PSU starts the cancellation authorisation")
-  public void createCancellationAuthorisationResource() {
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request<>();
-    request.setHeader(headers);
-
-    ResponseEntity<StartScaprocessResponse> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/cancellation-authorisations",
-        HttpMethod.POST,
-        request.toHttpEntity(),
-        StartScaprocessResponse.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-
-    context.setCancellationId(TestUtils.extractCancellationId(
-        (String) response.getBody().getLinks().get("startAuthorisationWithPsuAuthentication")));
-  }
-
-  @When("PSU tries to update the cancellation resource with his (.*) and (.*)")
-  public void tryToUpdateCancellationResourceWithPassword(String psuId, String password) {
-    HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("PSU-ID", psuId);
-
-    PsuData psuData = new PsuData();
-    psuData.setPassword(password);
-
-    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
-    authenticationData.setPsuData(psuData);
-
-    Request<UpdatePsuAuthentication> request = new Request<>();
-    request.setBody(authenticationData);
-    request.setHeader(headers);
-
-    ResponseEntity<TppMessage401PIS> response = template.exchange(
-        context.getPaymentService() + "/" +
-            context.getPaymentId() + "/cancellation-authorisations/" +
-            context.getCancellationId(),
-        HttpMethod.PUT,
-        request.toHttpEntity(),
-        TppMessage401PIS.class);
-
-    context.setActualResponse(response);
-  }
-
-  @When("PSU tries to initiate a payment (.*) with iban (.*) using the payment product (.*)")
-  public void tryToInitiatePayment(String paymentService, String iban, String paymentProduct) {
-    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
-    payment.setEndToEndIdentification("WBG-123456789");
-    payment.setDebtorAccount(createAccount(iban, "EUR"));
-
-    Amount instructedAmount = new Amount();
-    instructedAmount.setAmount("520");
-    instructedAmount.setCurrency("EUR");
-    payment.setInstructedAmount(instructedAmount);
-
-    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
-    payment.setCreditorName("WBG");
-    payment.setCreditorAddress(createCreditorAddress());
-    payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
-
-    HashMap<String, String> headers = TestUtils.createSession();
-
-    Request<PaymentInitiationSctJson> request = new Request<>();
-    request.setBody(payment);
-    request.setHeader(headers);
-
-    ResponseEntity<TppMessage403PIS[]> response = template.exchange(
-        paymentService + "/" + paymentProduct,
-        HttpMethod.POST,
-        request.toHttpEntity(),
-        TppMessage403PIS[].class);
-
-    context.setActualResponse(response);
-  }
-
-  @Then("an appropriate error with http code (.*) and error-message (.*) are received")
-  public void anAppropriateErrorWithErrorCodesAndMessageAreReceived(Integer httpCode, String errorMessage) {
-    ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();
-
-    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
-    // TODO did work in 1.13 but is null in 1.15 :(
-    // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
-    assertThat(actualResponse.getBody()[0].getText(), containsString("channel independent blocking"));
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(httpCode));
-  }
-
   private AccountReference createAccount(String iban, String currency) {
     AccountReference account = new AccountReference();
     account.setCurrency(currency);
@@ -451,5 +324,145 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     creditorAddress.setPostalCode("90543");
     creditorAddress.setStreet("WBG Straße");
     return creditorAddress;
+  }
+
+  private void authoriseWithRedirectApproach(String psuId) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request<>();
+    request.setHeader(headers);
+
+    String externalId = TestUtils.extractId(context.getScaRedirect(), "pis");
+
+    template.exchange(
+        String.format("online-banking/init/pis/%s?psu-id=%s", externalId, psuId),
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        Object.class);
+
+    //TODO: add check for request status
+    // Could be successfull or failed
+  }
+
+  private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,
+      String password) {
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("PSU-ID", psuId);
+
+    PsuData psuData = new PsuData();
+    psuData.setPassword(password);
+
+    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
+    authenticationData.setPsuData(psuData);
+
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
+    updateCredentialRequest.setBody(authenticationData);
+    updateCredentialRequest.setHeader(headers);
+
+    return template.exchange(
+        url,
+        HttpMethod.PUT,
+        updateCredentialRequest.toHttpEntity(),
+        clazz);
+  }
+
+  private void authorisePaymentWithEmbeddedApproach(String psuId, String password,
+      String selectedScaMethod,
+      String tan) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request startAuthorisationRequest = new Request<>();
+    startAuthorisationRequest.setHeader(headers);
+
+    ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/authorisations",
+        HttpMethod.POST,
+        startAuthorisationRequest.toHttpEntity(),
+        StartScaprocessResponse.class);
+
+    String authorisationId = TestUtils
+        .extractId((String) startScaResponse.getBody().getLinks()
+            .get("startAuthorisationWithPsuAuthentication"), "authorisations");
+
+    String url = context.getPaymentService() + "/" +
+        context.getPaymentProduct() + "/" +
+        context.getPaymentId() + "/authorisations/" +
+        authorisationId;
+
+    handleCredentialRequest(UpdatePsuAuthenticationResponse.class, url, psuId, password);
+
+    SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
+    scaMethod.setAuthenticationMethodId(selectedScaMethod);
+
+    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>();
+    scaSelectionRequest.setBody(scaMethod);
+    scaSelectionRequest.setHeader(headers);
+
+    ResponseEntity<SelectPsuAuthenticationMethodResponse> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/authorisations/" +
+            authorisationId,
+        HttpMethod.PUT,
+        scaSelectionRequest.toHttpEntity(),
+        SelectPsuAuthenticationMethodResponse.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    TransactionAuthorisation authorisationData = new TransactionAuthorisation();
+    authorisationData.scaAuthenticationData(tan);
+
+    Request<TransactionAuthorisation> request = new Request<>();
+    request.setBody(authorisationData);
+    request.setHeader(headers);
+
+    ResponseEntity<ScaStatusResponse> sendTanResponse = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/authorisations/" +
+            authorisationId,
+        HttpMethod.PUT,
+        request.toHttpEntity(),
+        ScaStatusResponse.class);
+
+    assertTrue(sendTanResponse.getStatusCode().is2xxSuccessful());
+
+    context.setActualResponse(sendTanResponse);
+  }
+
+  private void tryToAuthoriseWithEmbeddedApproach(String psuId, String password,
+      String urlSegment) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request<>();
+    request.setHeader(headers);
+
+    ResponseEntity<StartScaprocessResponse> startCancellationResponse = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/" +
+            urlSegment,
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        StartScaprocessResponse.class);
+
+    assertTrue(startCancellationResponse.getStatusCode().is2xxSuccessful());
+
+    String resourceId = TestUtils.extractId(
+        (String) startCancellationResponse.getBody().getLinks()
+            .get("startAuthorisationWithPsuAuthentication"), urlSegment);
+
+    String url = context.getPaymentService() + "/" +
+        context.getPaymentProduct() + "/" +
+        context.getPaymentId() + "/" +
+        urlSegment + "/" +
+        resourceId;
+
+    ResponseEntity<TppMessage401PIS> response = handleCredentialRequest(
+        TppMessage401PIS.class, url, psuId, password);
+
+    context.setActualResponse(response);
   }
 }

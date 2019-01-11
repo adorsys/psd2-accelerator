@@ -19,7 +19,7 @@ import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-@Ignore
+@Ignore("Cucumber steps")
 public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();

@@ -1,0 +1,114 @@
+package de.adorsys.psd2.sandbox.xs2a.service.redirect;
+
+import de.adorsys.psd2.consent.domain.account.AisConsent;
+import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
+import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
+import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
+import de.adorsys.psd2.consent.repository.AisConsentAuthorizationRepository;
+import de.adorsys.psd2.consent.repository.AisConsentRepository;
+import de.adorsys.psd2.consent.repository.PisAuthorizationRepository;
+import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
+import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
+import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
+import java.util.List;
+import java.util.Optional;
+import javax.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
+@Service
+@Transactional
+public class RedirectService {
+
+  private PisPaymentDataRepository pisPaymentDataRepository;
+  private PisAuthorizationRepository pisAuthorizationRepository;
+  private AisConsentAuthorizationRepository aisConsentAuthorizationRepository;
+  private AisConsentRepository aisConsentRepository;
+
+  /**
+   * Create a new RedirectService instance.
+   *
+   * @param pisPaymentDataRepository          PisPaymentRepository
+   * @param pisAuthorizationRepository        PisAuthorizationRepository
+   * @param aisConsentAuthorizationRepository AisConsentAuthorizationRepository
+   * @param aisConsentRepository              AisConsentRepository
+   */
+  public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
+      PisAuthorizationRepository pisAuthorizationRepository,
+      AisConsentAuthorizationRepository aisConsentAuthorizationRepository,
+      AisConsentRepository aisConsentRepository) {
+    this.pisPaymentDataRepository = pisPaymentDataRepository;
+    this.pisAuthorizationRepository = pisAuthorizationRepository;
+    this.aisConsentAuthorizationRepository = aisConsentAuthorizationRepository;
+    this.aisConsentRepository = aisConsentRepository;
+  }
+
+  /**
+   * Sets consent status in CMS depending on PSU-ID.
+   *
+   * @param externalId Consent Id
+   * @param psuId      Psu Id
+   */
+  public void handleConsentCreationRedirectRequest(String externalId, String psuId) {
+    Optional<AisConsentAuthorization> aisConsentAuthorization = aisConsentAuthorizationRepository
+        .findByExternalId(externalId);
+
+    if (!aisConsentAuthorization.isPresent()) {
+      //TODO handle error case
+      return;
+    }
+    AisConsentAuthorization aisConsentAuth = aisConsentAuthorization.get();
+
+    AisConsent consent = aisConsentRepository.findOne(aisConsentAuth.getId());
+    // TODO: Set status of PSU from TestDataService
+    consent.setConsentStatus(ConsentStatus.VALID);
+    aisConsentAuth.setScaStatus(ScaStatus.PSUAUTHENTICATED);
+
+    aisConsentRepository.save(consent);
+    aisConsentAuthorizationRepository.save(aisConsentAuth);
+  }
+
+  /**
+   * Sets payment status in CMS depending on PSU-ID.
+   *
+   * @param externalId Payment Id
+   * @param psuId      Psu Id
+   */
+  // TODO: handle isInit for cancellation and initiation scenarios
+  public void handlePaymentRedirectRequest(String externalId, String psuId, boolean isInit) {
+    Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
+        .findByExternalId(externalId);
+
+    if (!pisAuthorization.isPresent()) {
+      //TODO handle error case
+      return;
+    }
+
+    PisAuthorization payment = pisAuthorization.get();
+
+    Optional<List<PisPaymentData>> pisPaymentDataList = pisPaymentDataRepository
+        .findByPaymentId(payment.getPaymentData().getPaymentId());
+
+    if (!pisPaymentDataList.isPresent() && pisPaymentDataList.get().isEmpty()) {
+      //TODO handle error case
+      return;
+    }
+    PisPaymentData pisPaymentData = pisPaymentDataList.get().get(0);
+
+    pisPaymentData.setTransactionStatus(getTransactionStatus(psuId));
+
+    // TODO: Set status of PSU from TestDataService
+    payment.setScaStatus(ScaStatus.FINALISED);
+    payment.getPaymentData().setTransactionStatus(getTransactionStatus(psuId));
+    pisPaymentDataRepository.save(pisPaymentData);
+  }
+
+  private TransactionStatus getTransactionStatus(String psuId) {
+    if (psuId.equalsIgnoreCase("psu-unknown")
+        || psuId.equalsIgnoreCase("psu-rejected")) {
+      return TransactionStatus.RCVD;
+    } else {
+      return TransactionStatus.ACCP;
+    }
+  }
+}
