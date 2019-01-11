@@ -34,7 +34,7 @@ arc42/psd2-accelerator-arc42.html arc42/psd2-accelerator-deployment.html: arc42/
 
 arc42/images/generated: $(PLANTUML_SRC) ## Generate images from .puml files
 # Note: Because plantuml doesnt update the images/generated timestamp we need to touch it afterwards
-	cd arc42 images/* && plantuml -o "../images/generated" diagrams/*.puml && touch images/generated
+	cd arc42 && mkdir -p images/generated && plantuml -o "../images/generated" diagrams/*.puml && touch images/generated
 
 test: test-ui test-service ## Run all tests
 

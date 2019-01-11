@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -15,12 +15,7 @@ function setAppVersion {
   (cd ui && npm version $1)
 }
 
-# match input vs semver regex
-function checkSemver {
-  echo "DEBUG check if $1 follows the semver format" 1>&2
-  [[ $1 =~ ^([[:digit:]])+\.([[:digit:]])+.([[:digit:]])(-([^+[:space:]]+))?(\+([^[:space:]]+))?$ ]]
-  return $?
-}
+
 
 if [ $# -ne 2 ]; then
   echo 'Usage: release.sh <release-version> <next-snapshot-version>' 1>&2

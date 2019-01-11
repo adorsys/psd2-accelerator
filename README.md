@@ -1,5 +1,8 @@
 # <img src="arc42/images/logo/psd2-accelerator.svg" height="24px"> PSD2 Accelerator
 
+[![Build Status](https://travis-ci.com/adorsys/psd2-accelerator.svg?branch=master)](https://travis-ci.com/adorsys/psd2-accelerator)
+
+
 <img src="arc42/images/accelerator.png" width="50%" align="center">
 
 _Figure 1.1:_ Components of the PSD2 Accelerator
@@ -16,7 +19,7 @@ The *PSD2 Accelerator* project bundles the described PSD2 components created at 
 
 For more details about the PSD2 Accelerator and PSD2 see:
 
-- [our architecture documentation](arc42/src/01_introduction_and_goals.adoc)
+- [our architecture documentation](https://adorsys.github.io/psd2-accelerator)
 - [our PSD2 landing page](https://adorsys.de/psd2.html)
 - [the PSD2 directive](https://ec.europa.eu/info/law/payment-services-psd-2-directive-eu-2015-2366_en)
 - [the XS2A spec](https://www.berlin-group.org/psd2-access-to-bank-accounts)

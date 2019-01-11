@@ -1,0 +1,72 @@
+language: generic
+
+jdk:
+  - openjdk8
+
+services: docker
+
+env:
+  global:
+    - PSD2_SANDBOX_IMAGE="psd2-sandbox"
+    - SSL_PROXY_IMAGE="psd2-sandbox-ssl-proxy"
+    - NPM_CONFIG_CACHE="$HOME/.npm"
+    - OPENSHIFT_REGISTRY="openshift-registry.adorsys.de"
+    - OPENSHIFT_NAMESPACE="psd2-sandbox-dev"
+
+cache:
+  directories:
+    - "$HOME/.npm"
+    - "$HOME/.m2"
+
+before_install:
+  - nvm install --lts
+  - nvm use --lts
+
+script:
+  # build_ui
+  - cd ui || travis_terminate 1
+  - npm ci || travis_terminate 1
+  - npm run tslint || travis_terminate 1
+  - npm run prettier-check || travis_terminate 1
+  - npm run test-ci || travis_terminate 1
+  - npm run build -- --prod || travis_terminate 1
+  - cd .. || travis_terminate 1
+  # build service
+  - mvn -f service/pom.xml -B clean package || travis_terminate 1
+  # build docker
+  - docker build --pull -t "adorsys/$PSD2_SANDBOX_IMAGE:latest" service || travis_terminate 1
+  - docker build --pull -t "adorsys/$SSL_PROXY_IMAGE:latest" ssl-proxy || travis_terminate 1
+  - docker run -it --rm -v $PWD:/src -w /src -u $(id -u ${USER}):$(id -g ${USER})
+    adorsys/arc42-tools sh -c "make arc42/psd2-accelerator-arc42.html" || travis_terminate 1
+  # assemble arc42 and license in pages
+  - mkdir pages || travis_terminate 1
+  - cp -r arc42/images pages || travis_terminate 1
+  - cp arc42/psd2-accelerator-arc42.html pages/index.html || travis_terminate 1
+  - cp arc42/psd2-accelerator-deployment.html pages/deployment.html || travis_terminate 1
+  - mkdir pages/licenses || travis_terminate 1
+  - cp -r service/target/site/css pages/licenses || travis_terminate 1
+  - cp -r service/target/site/images pages/licenses || travis_terminate 1
+  - cp service/target/site/dependencies.html pages/licenses/index.html || travis_terminate 1
+
+deploy:
+  # master
+  - provider: script
+    skip_cleanup: true
+    script: bash infrastructure/build/deploy.sh latest
+    on:
+      branch: master
+  # release
+  - provider: script
+    skip_cleanup: true
+    script: bash infrastructure/build/deploy.sh $TRAVIS_TAG
+    on:
+      tags: true
+      condition: '$TRAVIS_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.*)?$'
+  # deploy www content to github pages
+  - provider: pages
+    skip-cleanup: true
+    github-token: $GITHUB_PAGES_TOKEN
+    keep-history: false
+    local-dir: pages
+    on:
+      branch: master
