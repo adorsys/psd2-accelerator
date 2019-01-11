@@ -15,6 +15,7 @@ public class Context {
   private String paymentId;
   private String authorisationId;
   private String cancellationId;
+  private String scaRedirect;
   private String consentId;
   private AccountAccess consentAccountAccess;
   private ResponseEntity actualResponse;

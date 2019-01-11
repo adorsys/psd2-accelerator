@@ -23,7 +23,6 @@ public abstract class SpringCucumberTestBase {
 
   @LocalServerPort
   protected int localPort;
-
   protected RestTemplate template;
 
   // RequestFactory and ErrorHandler are needed due to a Bug in Response of RestTemplate: see https://github.com/spring-projects/spring-framework/issues/14004
