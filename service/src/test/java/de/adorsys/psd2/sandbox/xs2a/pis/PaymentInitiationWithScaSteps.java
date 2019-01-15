@@ -11,6 +11,7 @@ import de.adorsys.psd2.model.Address;
 import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
+import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
 import de.adorsys.psd2.model.PsuData;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
@@ -23,7 +24,7 @@ import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
-import java.time.LocalDate;
+import de.adorsys.psd2.xs2a.domain.TransactionStatusResponse;
 import java.util.HashMap;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -174,11 +175,65 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
+  @When("^PSU requests the payment data$")
+  public void getPaymentData() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
+        context.getPaymentService() + "/" + context.getPaymentId(),
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        PaymentInitiationSctWithStatusResponse.class);
+
+    context.setActualResponse(response);
+  }
+
+  @When("^PSU requests the payment status$")
+  public void getPaymentStatus() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request();
+    request.setHeader(headers);
+
+    ResponseEntity<TransactionStatusResponse> response = template.exchange(
+        context.getPaymentService() + "/" + context.getPaymentId() + "/status",
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        TransactionStatusResponse.class);
+
+    context.setActualResponse(response);
+  }
+
+
   @Then("^the SCA status (.*) and response code (.*) are received$")
-  public void checkResponse(String scaStatus, String code) {
+  public void checkScaResponse(String scaStatus, String code) {
     ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
+  }
+
+  @Then("^the transaction status (.*) and response code (.*) are received$")
+  public void checkTransactionResponse(String status, String code) {
+    ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
+        equalTo(status));
+  }
+
+  @Then("^the payment data and response code (.*) are received and its transaction-status is (.*)$")
+  public void theAppropriateDataAndResponseCodeAreReceived(String code, String transactionStatus) {
+    ResponseEntity<PaymentInitiationSctWithStatusResponse> actualResponse = context
+        .getActualResponse();
+
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
+    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
+        equalTo(transactionStatus));
+    assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
+    assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
   }
 }
