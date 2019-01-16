@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "psd2-certificate-ui": {
+    "psd2-accelerator": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -19,7 +19,7 @@
           "options": {
             "baseHref": "/app/",
             "deployUrl": "/app/",
-            "outputPath": "dist/psd2-certificate-ui",
+            "outputPath": "dist/psd2-accelerator",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -51,19 +51,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "psd2-certificate-ui:build",
+            "browserTarget": "psd2-accelerator:build",
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "psd2-certificate-ui:build:production"
+              "browserTarget": "psd2-accelerator:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "psd2-certificate-ui:build"
+            "browserTarget": "psd2-accelerator:build"
           }
         },
         "test": {
@@ -87,7 +87,7 @@
         }
       }
     },
-    "psd2-certificate-ui-e2e": {
+    "psd2-accelerator-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "architect": {
@@ -95,11 +95,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "psd2-certificate-ui:serve"
+            "devServerTarget": "psd2-accelerator:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "psd2-certificate-ui:serve:production"
+              "devServerTarget": "psd2-accelerator:serve:production"
             }
           }
         },
@@ -113,5 +113,5 @@
       }
     }
   },
-  "defaultProject": "psd2-certificate-ui"
+  "defaultProject": "psd2-accelerator"
 }
