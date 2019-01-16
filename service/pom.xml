@@ -171,7 +171,7 @@
               <outputDirectory>${basedir}/target/classes/app</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../ui/dist/psd2-certificate-ui</directory>
+                  <directory>../ui/dist/psd2-accelerator</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>
