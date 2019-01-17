@@ -54,6 +54,7 @@ public class TestUtils {
     HashMap<String, String> headers = new HashMap<>();
     headers.put("x-request-id", UUID.randomUUID().toString());
     headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
+    headers.put("psu-ip-address", "192.168.0.26");
 
     return headers;
   }

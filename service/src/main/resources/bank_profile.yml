@@ -3,7 +3,7 @@ setting:
   frequencyPerDay: 5
   combinedServiceIndicator: false
   availablePaymentProducts: sepa-credit-transfers
-  availablePaymentTypes: single
+  availablePaymentTypes: single, periodic
   scaApproach: EMBEDDED
   tppSignatureRequired: false
   bankOfferedConsentSupport: false
@@ -17,7 +17,7 @@ setting:
   allPsd2Support: false
   transactionsWithoutBalancesSupported: false
   signingBasketSupported: false
-  paymentCancellationAuthorizationMandated: false
+  paymentCancellationAuthorizationMandated: true
   piisConsentSupported: false
   deltaReportSupported: false
   redirectUrlExpirationTimeMs: 600000
