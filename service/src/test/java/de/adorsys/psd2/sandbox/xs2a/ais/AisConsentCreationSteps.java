@@ -48,7 +48,6 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     String[] ibansForTransactions = transactions.split(";");
 
     HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("psu-ip-address", "192.168.0.26");
 
     Consents consent = new Consents();
 

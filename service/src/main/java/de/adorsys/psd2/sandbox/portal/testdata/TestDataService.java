@@ -23,6 +23,8 @@ public class TestDataService {
   private static final Currency EUR = Currency.getInstance("EUR");
 
   private Map<String, PsuData> psuMap;
+  public static final String TAN = "54321";
+
 
   // Checkstyle forces constructor to have java docs comments. TODO Fix checkstyle, use constructor
   {
@@ -322,7 +324,7 @@ public class TestDataService {
     return new PsuData(
         "PSU-1",
         "12345",
-        "54321",
+        TAN,
         accounts
     );
   }

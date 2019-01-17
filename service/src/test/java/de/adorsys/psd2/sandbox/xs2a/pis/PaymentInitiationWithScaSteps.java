@@ -9,9 +9,13 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.model.Address;
 import de.adorsys.psd2.model.Amount;
+import de.adorsys.psd2.model.DayOfExecution;
+import de.adorsys.psd2.model.ExecutionRule;
+import de.adorsys.psd2.model.FrequencyCode;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
+import de.adorsys.psd2.model.PeriodicPaymentInitiationSctJson;
 import de.adorsys.psd2.model.PsuData;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
@@ -25,6 +29,7 @@ import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import de.adorsys.psd2.xs2a.domain.TransactionStatusResponse;
+import java.time.LocalDate;
 import java.util.HashMap;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -33,48 +38,22 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
 
-  @Given("^PSU initiated a single payment using the payment product (.*)$")
-  public void initiatePayment(String paymentProduct) {
-    context.setPaymentService("payments");
+  @Given("^PSU initiated a (.*) payment using the payment product (.*)$")
+  public void initiatePayment(String paymentType, String paymentProduct) {
     context.setPaymentProduct(paymentProduct);
 
+    Request request = null;
     HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("psu-ip-address", "192.168.0.26");
 
-    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
-    payment.setEndToEndIdentification("WBG-123456789");
-
-    HashMap<String, String> debtorAccount = new HashMap<>();
-    debtorAccount.put("currency", "EUR");
-    debtorAccount.put("iban", "DE51250400903312345678");
-    payment.setDebtorAccount(debtorAccount);
-
-    Amount instructedAmount = new Amount();
-    instructedAmount.setAmount("520");
-    instructedAmount.setCurrency("EUR");
-    payment.setInstructedAmount(instructedAmount);
-
-    HashMap<String, String> creditorAccount = new HashMap<>();
-    creditorAccount.put("currency", "EUR");
-    creditorAccount.put("iban", "DE15500105172295759744");
-    payment.setCreditorAccount(creditorAccount);
-
-    payment.setCreditorAgent("AAAADEBBXXX");
-    payment.setCreditorName("WBG");
-
-    Address creditorAddress = new Address();
-    creditorAddress.setBuildingNumber("56");
-    creditorAddress.setCity("Nürnberg");
-    creditorAddress.setCountry("DE");
-    creditorAddress.setPostalCode("90543");
-    creditorAddress.setStreet("WBG Straße");
-    payment.setCreditorAddress(creditorAddress);
-
-    payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
-
-    Request<PaymentInitiationSctJson> request = new Request<>();
-    request.setBody(payment);
-    request.setHeader(headers);
+    if(paymentType.equals("single")){
+      request = getSinglePayment(headers, false);
+    }
+    if(paymentType.equals("future-dated")){
+      request = getSinglePayment(headers, true);
+    }
+    if(paymentType.equals("periodic")){
+      request = getPeriodicPayment(headers);
+    }
 
     ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
         context.getPaymentService() + "/" +
@@ -85,11 +64,66 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     context.setPaymentId(response.getBody().getPaymentId());
   }
+  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers, boolean isFutureDated) {
+    context.setPaymentService("payments");
 
-  @And("^PSU created an authorisation resource$")
+    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
+    payment.setEndToEndIdentification("WBG-123456789");
+    payment.setDebtorAccount(createAccount("DE51250400903312345678", "EUR"));
+
+    Amount instructedAmount = new Amount();
+    instructedAmount.setAmount("520");
+    instructedAmount.setCurrency("EUR");
+    payment.setInstructedAmount(instructedAmount);
+
+    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    payment.setCreditorName("WBG");
+    payment.setCreditorAddress(createCreditorAddress());
+    payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+    if(isFutureDated){
+      payment.setRequestedExecutionDate(LocalDate.now().plusDays(7));
+    }
+
+    Request<PaymentInitiationSctJson> request = new Request<>();
+    request.setBody(payment);
+    request.setHeader(headers);
+
+    return request;
+  }
+
+  private Request getPeriodicPayment(HashMap<String, String> headers) {
+    context.setPaymentService("periodic-payments");
+
+    PeriodicPaymentInitiationSctJson periodicPayment = new PeriodicPaymentInitiationSctJson();
+    periodicPayment.setEndToEndIdentification("WBG-123456789");
+
+    periodicPayment.setDebtorAccount(createAccount("DE51250400903312345678", "EUR"));
+
+    Amount instructedAmount = new Amount();
+    instructedAmount.setAmount("520");
+    instructedAmount.setCurrency("EUR");
+    periodicPayment.setInstructedAmount(instructedAmount);
+
+    periodicPayment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    periodicPayment.setCreditorName("WBG");
+    periodicPayment.setFrequency(FrequencyCode.MONTHLY);
+    periodicPayment.setDayOfExecution(DayOfExecution._01);
+    periodicPayment.setExecutionRule(ExecutionRule.PRECEEDING);
+    periodicPayment.setStartDate(LocalDate.now().plusDays(7));
+    periodicPayment.setEndDate(LocalDate.now().plusMonths(1));
+
+    periodicPayment.setCreditorAddress(createCreditorAddress());
+    periodicPayment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+
+    Request<PeriodicPaymentInitiationSctJson> request = new Request<>();
+    request.setBody(periodicPayment);
+    request.setHeader(headers);
+    return request;
+  }
+
+   @And("^PSU created an authorisation resource$")
   public void createAuthorisationResource() {
     HashMap<String, String> headers = TestUtils.createSession();
-    headers.put("psu-ip-address", "192.168.0.26");
 
     Request request = new Request<>();
     request.setHeader(headers);
@@ -207,7 +241,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
-
   @Then("^the SCA status (.*) and response code (.*) are received$")
   public void checkScaResponse(String scaStatus, String code) {
     ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
@@ -235,5 +268,22 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         equalTo(transactionStatus));
     assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
+  }
+
+  private HashMap<String, String> createAccount(String iban, String currency) {
+    HashMap<String, String> creditorAccount = new HashMap<>();
+    creditorAccount.put("currency", currency);
+    creditorAccount.put("iban", iban);
+    return creditorAccount;
+  }
+
+  private Address createCreditorAddress() {
+    Address creditorAddress = new Address();
+    creditorAddress.setBuildingNumber("56");
+    creditorAddress.setCity("Nürnberg");
+    creditorAddress.setCountry("DE");
+    creditorAddress.setPostalCode("90543");
+    creditorAddress.setStreet("WBG Straße");
+    return creditorAddress;
   }
 }
