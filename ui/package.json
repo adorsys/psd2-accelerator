@@ -12,8 +12,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "e2e-running": "ng e2e --devServerTarget=",
-    "tslint": "tslint -p tslint.json",
-    "tslint-fix": "tslint --fix -p tslint.json",
+    "tslint": "tslint -p src/tsconfig.app.json",
+    "tslint-fix": "tslint --fix -p src/tsconfig.app.json",
     "prettier": "find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v \"assets/lib\" | grep -v node_modules | grep -v dist | xargs prettier --write",
     "prettier-check": "find . -name '*.js' -or -name '*.ts' -or -name '*.html' -or -name '*.css' -or -name '*.scss'| grep -v build | grep -v \"assets/lib\" | grep -v node_modules | grep -v dist | xargs prettier-check"
   },
