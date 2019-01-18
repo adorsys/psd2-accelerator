@@ -4,6 +4,7 @@ import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountDetails;
@@ -34,7 +35,9 @@ public class AccountSpiImpl implements AccountSpi {
   }
 
   @Override
-  public SpiResponse<List<SpiAccountDetails>> requestAccountList(boolean b,
+  public SpiResponse<List<SpiAccountDetails>> requestAccountList(
+      @NotNull SpiContextData ctx,
+      boolean b,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
@@ -75,6 +78,7 @@ public class AccountSpiImpl implements AccountSpi {
   private SpiAccountDetails mapAccountToSpiAccount(Account account) {
     return new SpiAccountDetails(
         account.getAccountId(),
+        "",
         account.getIban(),
         "",
         "",
@@ -104,7 +108,9 @@ public class AccountSpiImpl implements AccountSpi {
   }
 
   @Override
-  public SpiResponse<SpiAccountDetails> requestAccountDetailForAccount(boolean b,
+  public SpiResponse<SpiAccountDetails> requestAccountDetailForAccount(
+      @NotNull SpiContextData ctx,
+      boolean b,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
@@ -115,7 +121,9 @@ public class AccountSpiImpl implements AccountSpi {
   }
 
   @Override
-  public SpiResponse<SpiTransactionReport> requestTransactionsForAccount(String s, boolean b,
+  public SpiResponse<SpiTransactionReport> requestTransactionsForAccount(
+      @NotNull SpiContextData ctx,
+      String s, boolean b,
       @NotNull LocalDate localDate, @NotNull LocalDate localDate1,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent, @NotNull AspspConsentData aspspConsentData) {
@@ -127,6 +135,7 @@ public class AccountSpiImpl implements AccountSpi {
 
   @Override
   public SpiResponse<SpiTransaction> requestTransactionForAccountByTransactionId(
+      @NotNull SpiContextData ctx,
       @NotNull String s, @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
@@ -138,6 +147,7 @@ public class AccountSpiImpl implements AccountSpi {
 
   @Override
   public SpiResponse<List<SpiAccountBalance>> requestBalancesForAccount(
+      @NotNull SpiContextData ctx,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {

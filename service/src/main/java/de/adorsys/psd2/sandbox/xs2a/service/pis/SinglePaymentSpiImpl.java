@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
@@ -16,7 +17,7 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiSinglePaymentInitiationResponse> initiatePayment(
-      @NotNull SpiPsuData psuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData initialAspspConsentData) {
     SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
@@ -26,7 +27,7 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentWithoutSca(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiSinglePayment spiSinglePayment,
       @NotNull AspspConsentData aspspConsentData) {
     return SpiResponse.<SpiResponse.VoidResponse>builder().success();
@@ -34,7 +35,7 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndExecutePayment(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiSinglePayment spiSinglePayment,
       @NotNull AspspConsentData aspspConsentData) {
@@ -48,11 +49,11 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiSinglePayment> getPaymentById(
-      @NotNull SpiPsuData psuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData aspspConsentData) {
 
-    return super.getPaymentById(psuData, payment, aspspConsentData);
+    return super.getPaymentById(ctx.getPsuData(), payment, aspspConsentData);
   }
 
   @Override

@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
@@ -28,10 +29,11 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
 
   @Override
   public SpiResponse<SpiAuthorisationStatus> authorisePsu(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
+      @NotNull SpiPsuData psuData,
       String password,
       SpiPayment spiPayment,
-      AspspConsentData aspspConsentData) {
+      @NotNull AspspConsentData aspspConsentData) {
 
     String iban = null;
 
@@ -42,21 +44,21 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
       iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
     }
 
-    return authorisationService.authorisePsu(spiPsuData, password, iban, aspspConsentData);
+    return authorisationService.authorisePsu(ctx.getPsuData(), password, iban, aspspConsentData);
   }
 
   @Override
   public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       SpiPayment spiPayment,
-      AspspConsentData aspspConsentData) {
+      @NotNull AspspConsentData aspspConsentData) {
 
     return authorisationService.requestAvailableScaMethods(aspspConsentData);
   }
 
   @Override
   public @NotNull SpiResponse<SpiAuthorizationCodeResult> requestAuthorisationCode(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull String selectedScaMethod,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
