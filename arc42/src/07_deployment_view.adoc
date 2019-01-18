@@ -155,7 +155,10 @@ See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
 ==== Technical Requirements / Sizing
 
 - the _sandbox_ needs a recent JDK 8 (if you aren't using the Docker Image)
-- HA setup is possible, all state is shared in the DB
+- HA setup is possible
+  - all state is shared in the DB
+  - zero downtime deployments are **not** guaranteed (see the note about <<downtime_db_migration, DB migrations>>)
+  - DB availability depends on your setup
 - supported databases (see <<Use Your Own Database>>):
   ** PostgreSQL 9+
   ** Oracle 11g+
@@ -200,7 +203,12 @@ WARNING: Please make sure to set the right `SPRING_JPA_PROPERTIES_HIBERNATE_DEFA
 
 There are three options to do database migration.
 
-NOTE: Every approach needs at least read access to the DB.
+[[downtime_db_migration]]
+[WARNING]
+====
+- every approach needs at least read access to the DB
+- you should scale down the deployment while migrating or requests may fail
+====
 
 ===== Automatically with Liquibase
 
