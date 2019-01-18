@@ -5,6 +5,7 @@ import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
@@ -27,7 +28,8 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
 
   @Override
   public @NotNull SpiResponse<SpiFundsConfirmationResponse> performFundsSufficientCheck(
-      @NotNull SpiPsuData spiPsuData, @Nullable PiisConsent piisConsent,
+      @NotNull SpiContextData ctx,
+      @Nullable PiisConsent piisConsent,
       @NotNull SpiFundsConfirmationRequest spiFundsConfirmationRequest,
       @NotNull AspspConsentData aspspConsentData) {
     SpiFundsConfirmationResponse response = new SpiFundsConfirmationResponse();

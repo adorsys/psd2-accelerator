@@ -6,6 +6,7 @@ import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
@@ -37,10 +38,9 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
     this.authorisationService = authorisationService;
   }
 
-
   @Override
   public @NotNull SpiResponse<SpiPaymentCancellationResponse> initiatePaymentCancellation(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
     SpiPaymentCancellationResponse cancellationResponse = new SpiPaymentCancellationResponse();
@@ -53,7 +53,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> cancelPaymentWithoutSca(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
     return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
@@ -61,10 +61,11 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndCancelPayment(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
+
     if (spiScaConfirmation.getTanNumber().equals(TestDataService.TAN)) {
       Optional<List<PisPaymentData>> paymentDataList = paymentDataRepository
           .findByPaymentId(spiPayment.getPaymentId());
@@ -89,8 +90,11 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
   }
 
   @Override
-  public SpiResponse<SpiAuthorisationStatus> authorisePsu(@NotNull SpiPsuData spiPsuData,
-      String password, SpiPayment spiPayment, AspspConsentData aspspConsentData) {
+  public SpiResponse<SpiAuthorisationStatus> authorisePsu(@NotNull SpiContextData ctx,
+      @NotNull SpiPsuData psuData,
+      String password,
+      SpiPayment spiPayment,
+      @NotNull AspspConsentData aspspConsentData) {
     String iban = null;
 
     if (spiPayment instanceof SpiSinglePayment) {
@@ -100,19 +104,21 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
     }
 
-    return authorisationService.authorisePsu(spiPsuData, password, iban, aspspConsentData);
+    return authorisationService.authorisePsu(psuData, password, iban, aspspConsentData);
   }
 
   @Override
   public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
-      @NotNull SpiPsuData spiPsuData, SpiPayment spiPayment,
-      AspspConsentData aspspConsentData) {
+      @NotNull SpiContextData ctx,
+      SpiPayment spiPayment,
+      @NotNull AspspConsentData aspspConsentData) {
     return authorisationService.requestAvailableScaMethods(aspspConsentData);
   }
 
   @Override
   public @NotNull SpiResponse<SpiAuthorizationCodeResult> requestAuthorisationCode(
-      @NotNull SpiPsuData spiPsuData, @NotNull String s,
+      @NotNull SpiContextData ctx,
+      @NotNull String s,
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
     return authorisationService.requestAuthorisationCode(s, aspspConsentData);

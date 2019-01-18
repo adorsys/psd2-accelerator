@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
@@ -16,7 +17,7 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentWithoutSca(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiPeriodicPayment spiPeriodicPayment,
       @NotNull AspspConsentData aspspConsentData) {
     return SpiResponse.<SpiResponse.VoidResponse>builder().success();
@@ -24,7 +25,7 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndExecutePayment(
-      @NotNull SpiPsuData spiPsuData,
+      @NotNull SpiContextData ctx,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiPeriodicPayment spiPeriodicPayment,
       @NotNull AspspConsentData aspspConsentData) {

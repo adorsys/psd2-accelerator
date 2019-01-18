@@ -2,13 +2,14 @@ package de.adorsys.psd2.sandbox.xs2a.ais;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.model.AccountAccess;
 import de.adorsys.psd2.model.AccountList;
-import de.adorsys.psd2.model.AccountReferenceIban;
+import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.ConsentInformationResponse200Json;
 import de.adorsys.psd2.model.ConsentStatus;
 import de.adorsys.psd2.model.ConsentStatusResponse200;
@@ -19,8 +20,8 @@ import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
+import de.adorsys.psd2.model.TppMessage401AIS;
 import de.adorsys.psd2.model.TppMessageCategory;
-import de.adorsys.psd2.model.TppMessageGeneric;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
@@ -33,9 +34,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import org.junit.experimental.categories.Categories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -56,9 +55,9 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
     AccountAccess accountAccess = new AccountAccess();
 
-    List<Object> accountList = fillAccountReferences(ibansForAccountAccess);
-    List<Object> balanceList = fillAccountReferences(ibansForBalances);
-    List<Object> transactionList = fillAccountReferences(ibansForTransactions);
+    List<AccountReference> accountList = fillAccountReferences(ibansForAccountAccess);
+    List<AccountReference> balanceList = fillAccountReferences(ibansForBalances);
+    List<AccountReference> transactionList = fillAccountReferences(ibansForTransactions);
 
     accountAccess.setAccounts(accountList);
     accountAccess.setBalances(balanceList);
@@ -84,15 +83,15 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     context.setConsentId(response.getBody().getConsentId());
   }
 
-  private List<Object> fillAccountReferences(String[] ibans) {
-    ArrayList<Object> result = new ArrayList<>();
+  private List<AccountReference> fillAccountReferences(String[] ibans) {
+    ArrayList<AccountReference> result = new ArrayList<>();
 
     if (ibans[0].equals("null")) {
       return null;
     }
 
     for (String iban : ibans) {
-      AccountReferenceIban referenceIban = new AccountReferenceIban();
+      AccountReference referenceIban = new AccountReference();
       referenceIban.setCurrency("EUR");
       referenceIban.setIban(iban);
 
@@ -126,13 +125,16 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     AccountAccess expectedAccess = context.getConsentAccountAccess();
 
     if (expectedAccess.getAccounts() != null) {
-      assertAccountReferenceIbans(actualAccess.getAccounts(), expectedAccess.getAccounts());
+      assertEquals(new HashSet<>(expectedAccess.getAccounts()),
+          new HashSet<>(actualAccess.getAccounts()));
     }
     if (expectedAccess.getBalances() != null) {
-      assertAccountReferenceIbans(actualAccess.getBalances(), expectedAccess.getBalances());
+      assertEquals(new HashSet<>(expectedAccess.getBalances()),
+          new HashSet<>(actualAccess.getBalances()));
     }
     if (expectedAccess.getTransactions() != null) {
-      assertAccountReferenceIbans(actualAccess.getTransactions(), expectedAccess.getTransactions());
+      assertEquals(new HashSet<>(expectedAccess.getTransactions()),
+          new HashSet<>(actualAccess.getTransactions()));
     }
 
     assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.RECEIVED));
@@ -272,26 +274,6 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
-  private void assertAccountReferenceIbans(List<Object> actualList, List<Object> expectedList) {
-    LinkedHashMap<String, String> tmpActualEntry;
-    HashSet<String> actualHashValues = new HashSet<>();
-
-    for (Object entry : actualList) {
-      tmpActualEntry = (LinkedHashMap<String, String>) entry;
-      actualHashValues.add(tmpActualEntry.get("iban").concat(tmpActualEntry.get("currency")));
-    }
-
-    AccountReferenceIban tmpExpectedEntry;
-    HashSet<String> expectedHashValues = new HashSet<>();
-
-    for (Object entry : expectedList) {
-      tmpExpectedEntry = (AccountReferenceIban) entry;
-      expectedHashValues.add(tmpExpectedEntry.getIban().concat(tmpExpectedEntry.getCurrency()));
-    }
-
-    assertThat(actualHashValues.equals(expectedHashValues), equalTo(true));
-  }
-
   @When("Another PSU tries to authorise the consent with psu-id (.*), password (.*)")
   public void psuTriesToAuthoriseConsent(String psuId, String password) {
     HashMap<String, String> headers = TestUtils.createSession();
@@ -320,18 +302,18 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     updateCredentialRequest.setBody(authenticationData);
     updateCredentialRequest.setHeader(headers);
 
-    ResponseEntity<TppMessageGeneric[]> response = template.exchange(
+    ResponseEntity<TppMessage401AIS[]> response = template.exchange(
         "consents/" + context.getConsentId() + "/authorisations/" + authorisationId,
         HttpMethod.PUT,
         updateCredentialRequest.toHttpEntity(),
-        TppMessageGeneric[].class);
+        TppMessage401AIS[].class);
 
     context.setActualResponse(response);
   }
 
   @Then("an appropriate error and response code (.*) are received")
   public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
-    ResponseEntity<TppMessageGeneric[]> actualResponse = context.getActualResponse();
+    ResponseEntity<TppMessage401AIS[]> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
     assertThat(actualResponse.getBody()[0].getCode(), equalTo("UNAUTHORIZED"));

@@ -7,6 +7,7 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.Address;
 import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.DayOfExecution;
@@ -21,8 +22,8 @@ import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
+import de.adorsys.psd2.model.TppMessage401PIS;
 import de.adorsys.psd2.model.TppMessageCategory;
-import de.adorsys.psd2.model.TppMessageGeneric;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
@@ -47,13 +48,13 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     Request request = null;
     HashMap<String, String> headers = TestUtils.createSession();
 
-    if(paymentType.equals("single")){
+    if (paymentType.equals("single")) {
       request = getSinglePayment(headers, false);
     }
-    if(paymentType.equals("future-dated")){
+    if (paymentType.equals("future-dated")) {
       request = getSinglePayment(headers, true);
     }
-    if(paymentType.equals("periodic")){
+    if (paymentType.equals("periodic")) {
       request = getPeriodicPayment(headers);
     }
 
@@ -66,23 +67,30 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     context.setPaymentId(response.getBody().getPaymentId());
   }
-  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers, boolean isFutureDated) {
+
+  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
+      boolean isFutureDated) {
     context.setPaymentService("payments");
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
-    payment.setDebtorAccount(createAccount("DE94500105178833114935", "EUR"));
+
+    AccountReference debtorAccount = createAccount("EUR", "DE51250400903312345678");
+    payment.setDebtorAccount(debtorAccount);
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
     instructedAmount.setCurrency("EUR");
     payment.setInstructedAmount(instructedAmount);
 
-    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    AccountReference creditorAccount = createAccount("EUR", "DE15500105172295759744");
+    payment.setCreditorAccount(creditorAccount);
+
+    payment.setCreditorAgent("AAAADEBBXXX");
     payment.setCreditorName("WBG");
     payment.setCreditorAddress(createCreditorAddress());
     payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
-    if(isFutureDated){
+    if (isFutureDated) {
       payment.setRequestedExecutionDate(LocalDate.now().plusDays(7));
     }
 
@@ -109,7 +117,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     periodicPayment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
     periodicPayment.setCreditorName("WBG");
     periodicPayment.setFrequency(FrequencyCode.MONTHLY);
-    periodicPayment.setDayOfExecution(DayOfExecution._01);
+    periodicPayment.setDayOfExecution(DayOfExecution._1);
     periodicPayment.setExecutionRule(ExecutionRule.PRECEEDING);
     periodicPayment.setStartDate(LocalDate.now().plusDays(7));
     periodicPayment.setEndDate(LocalDate.now().plusMonths(1));
@@ -182,13 +190,13 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(authenticationData);
     request.setHeader(headers);
 
-    ResponseEntity<TppMessageGeneric[]> response = template.exchange(
+    ResponseEntity<TppMessage401PIS[]> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentId() + "/authorisations/" +
             context.getAuthorisationId(),
         HttpMethod.PUT,
         request.toHttpEntity(),
-        TppMessageGeneric[].class);
+        TppMessage401PIS[].class);
 
     context.setActualResponse(response);
   }
@@ -288,7 +296,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @Then("an appropriate error and response code (.*) are received")
   public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
-    ResponseEntity<TppMessageGeneric[]> actualResponse = context.getActualResponse();
+    ResponseEntity<TppMessage401PIS[]> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
     assertThat(actualResponse.getBody()[0].getCode(), equalTo("UNAUTHORIZED"));
@@ -307,11 +315,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
   }
 
-  private HashMap<String, String> createAccount(String iban, String currency) {
-    HashMap<String, String> creditorAccount = new HashMap<>();
-    creditorAccount.put("currency", currency);
-    creditorAccount.put("iban", iban);
-    return creditorAccount;
+  private AccountReference createAccount(String iban, String currency) {
+    AccountReference account = new AccountReference();
+    account.setCurrency(currency);
+    account.setIban(iban);
+    return account;
   }
 
   private Address createCreditorAddress() {
