@@ -5,6 +5,8 @@ import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
+import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.PaymentAuthorisationSpi;
@@ -31,7 +33,16 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
       SpiPayment spiPayment,
       AspspConsentData aspspConsentData) {
 
-    return authorisationService.authorisePsu(spiPsuData, password, aspspConsentData);
+    String iban = null;
+
+    if (spiPayment instanceof SpiSinglePayment) {
+      iban = ((SpiSinglePayment) spiPayment).getDebtorAccount().getIban();
+    }
+    if (spiPayment instanceof SpiPeriodicPayment) {
+      iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
+    }
+
+    return authorisationService.authorisePsu(spiPsuData, password, iban, aspspConsentData);
   }
 
   @Override

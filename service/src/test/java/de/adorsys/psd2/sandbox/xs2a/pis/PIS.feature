@@ -32,6 +32,15 @@ Feature: Payment Initiation Service
       | payment-type | payment-product       | psu-id | password | sca-method | tan   | sca-status | code |
       | single       | sepa-credit-transfers | PSU-1  | 12345    | SMS_OTP    | 54321 | finalised  | 200  |
 
+  Scenario Outline: PSU Validation PIS
+    Given PSU initiated a single payment using the payment product <payment-product>
+    And PSU created an authorisation resource
+    When Another PSU tries to update the resource with his <psu-id> and <password>
+    Then an appropriate error and response code <code> are received
+    Examples:
+      | payment-product       | psu-id | password | code |
+      | sepa-credit-transfers | PSU-2  | 12345    | 401  |
+
     ################################################################################################
     #                                                                                              #
     # Payment Status                                                                               #

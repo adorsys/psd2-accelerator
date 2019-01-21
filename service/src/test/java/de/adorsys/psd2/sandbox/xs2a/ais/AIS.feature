@@ -16,6 +16,14 @@ Feature: AIS
       | null                                          | DE94500105178833114935 | null                   | 200  |
       | DE94500105178833114935;DE96500105179669622432 | DE94500105178833114935 | null                   | 200  |
 
+  Scenario Outline: PSU Validation AIS
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    When Another PSU tries to authorise the consent with psu-id <psu-id>, password <password>
+    Then an appropriate error and response code <code> are received
+    Examples:
+      | accounts               | balances               | transactions | psu-id | password | code |
+      | DE94500105178833114935 | DE94500105178833114935 | null         | PSU-2  | 12345    | 401  |
+
     ################################################################################################
     #                                                                                              #
     # Consent Status                                                                               #

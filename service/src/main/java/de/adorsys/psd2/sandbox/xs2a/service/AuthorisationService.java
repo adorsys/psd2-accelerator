@@ -15,6 +15,7 @@ import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +38,16 @@ public class AuthorisationService {
    * @param aspspConsentData aspspConsentData
    */
   public SpiResponse<SpiAuthorisationStatus> authorisePsu(
-      SpiPsuData spiPsuData, String password, AspspConsentData aspspConsentData) {
+      SpiPsuData spiPsuData, String password, String iban, AspspConsentData aspspConsentData) {
 
-    Optional<PsuData> psu = testDataService.getPsu(spiPsuData.getPsuId());
+    Optional<PsuData> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
+    Optional<String> accountOwner = testDataService.getPsuByIban(iban);
 
-    if (!psu.isPresent() || !password.equals(psu.get().getPassword())) {
+    if (!inquiringPsu.isPresent() || !password.equals(inquiringPsu.get().getPassword())
+        || !accountOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accountOwner.get())) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
           .aspspConsentData(aspspConsentData)
-          .payload(FAILURE)
+          .message(Collections.singletonList("Authorization failed"))
           .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
     }
 
