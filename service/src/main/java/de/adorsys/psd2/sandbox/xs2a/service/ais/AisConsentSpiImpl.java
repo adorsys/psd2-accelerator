@@ -56,7 +56,9 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       SpiAccountConsent spiAccountConsent,
       AspspConsentData aspspConsentData) {
 
-    return authorisationService.authorisePsu(spiPsuData, password, aspspConsentData);
+    String iban = spiAccountConsent.getAccess().getAccounts().get(0).getIban();
+
+    return authorisationService.authorisePsu(spiPsuData, password, iban, aspspConsentData);
   }
 
   @Override

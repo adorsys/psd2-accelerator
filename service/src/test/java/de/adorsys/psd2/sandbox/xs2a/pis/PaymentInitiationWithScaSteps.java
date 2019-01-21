@@ -21,6 +21,8 @@ import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
+import de.adorsys.psd2.model.TppMessageCategory;
+import de.adorsys.psd2.model.TppMessageGeneric;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
@@ -69,7 +71,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
-    payment.setDebtorAccount(createAccount("DE51250400903312345678", "EUR"));
+    payment.setDebtorAccount(createAccount("DE94500105178833114935", "EUR"));
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
@@ -97,7 +99,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     PeriodicPaymentInitiationSctJson periodicPayment = new PeriodicPaymentInitiationSctJson();
     periodicPayment.setEndToEndIdentification("WBG-123456789");
 
-    periodicPayment.setDebtorAccount(createAccount("DE51250400903312345678", "EUR"));
+    periodicPayment.setDebtorAccount(createAccount("DE94500105178833114935", "EUR"));
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
@@ -121,7 +123,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     return request;
   }
 
-   @And("^PSU created an authorisation resource$")
+  @And("^PSU created an authorisation resource$")
   public void createAuthorisationResource() {
     HashMap<String, String> headers = TestUtils.createSession();
 
@@ -163,6 +165,32 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         HttpMethod.PUT,
         request.toHttpEntity(),
         UpdatePsuAuthenticationResponse.class);
+  }
+
+  @When("^Another PSU tries to update the resource with his (.*) and (.*)$")
+  public void tryToUpdateResourceWithPassword(String psuId, String password) {
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("PSU-ID", psuId);
+
+    PsuData psuData = new PsuData();
+    psuData.setPassword(password);
+
+    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
+    authenticationData.setPsuData(psuData);
+
+    Request<UpdatePsuAuthentication> request = new Request<>();
+    request.setBody(authenticationData);
+    request.setHeader(headers);
+
+    ResponseEntity<TppMessageGeneric[]> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentId() + "/authorisations/" +
+            context.getAuthorisationId(),
+        HttpMethod.PUT,
+        request.toHttpEntity(),
+        TppMessageGeneric[].class);
+
+    context.setActualResponse(response);
   }
 
   @And("^PSU updated the resource with a selection of authentication method (.*)$")
@@ -256,6 +284,15 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getTransactionStatus().toString(),
         equalTo(status));
+  }
+
+  @Then("an appropriate error and response code (.*) are received")
+  public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
+    ResponseEntity<TppMessageGeneric[]> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
+    assertThat(actualResponse.getBody()[0].getCode(), equalTo("UNAUTHORIZED"));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
   @Then("^the payment data and response code (.*) are received and its transaction-status is (.*)$")

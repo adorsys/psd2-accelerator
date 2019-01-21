@@ -19,6 +19,8 @@ import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
+import de.adorsys.psd2.model.TppMessageCategory;
+import de.adorsys.psd2.model.TppMessageGeneric;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
@@ -33,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import org.junit.experimental.categories.Categories;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -287,5 +290,51 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     }
 
     assertThat(actualHashValues.equals(expectedHashValues), equalTo(true));
+  }
+
+  @When("Another PSU tries to authorise the consent with psu-id (.*), password (.*)")
+  public void psuTriesToAuthoriseConsent(String psuId, String password) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request startAuthorisationRequest = new Request<>();
+    startAuthorisationRequest.setHeader(headers);
+
+    ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations",
+        HttpMethod.POST,
+        startAuthorisationRequest.toHttpEntity(),
+        StartScaprocessResponse.class);
+
+    String authorisationId = TestUtils
+        .extractAuthorisationId((String) startScaResponse.getBody().getLinks()
+            .get("startAuthorisationWithPsuAuthentication"));
+
+    PsuData psuData = new PsuData();
+    psuData.setPassword(password);
+
+    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
+    authenticationData.setPsuData(psuData);
+    headers.put("PSU-ID", psuId);
+
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
+    updateCredentialRequest.setBody(authenticationData);
+    updateCredentialRequest.setHeader(headers);
+
+    ResponseEntity<TppMessageGeneric[]> response = template.exchange(
+        "consents/" + context.getConsentId() + "/authorisations/" + authorisationId,
+        HttpMethod.PUT,
+        updateCredentialRequest.toHttpEntity(),
+        TppMessageGeneric[].class);
+
+    context.setActualResponse(response);
+  }
+
+  @Then("an appropriate error and response code (.*) are received")
+  public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
+    ResponseEntity<TppMessageGeneric[]> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
+    assertThat(actualResponse.getBody()[0].getCode(), equalTo("UNAUTHORIZED"));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 }
