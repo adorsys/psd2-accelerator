@@ -1,11 +1,16 @@
 package de.adorsys.psd2.sandbox.xs2a;
 
+import de.adorsys.psd2.consent.domain.PsuData;
+import de.adorsys.psd2.consent.domain.TppStopListEntity;
+import de.adorsys.psd2.consent.repository.PsuDataRepository;
+import de.adorsys.psd2.consent.repository.TppStopListRepository;
 import de.adorsys.psd2.sandbox.ContextHolder;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.MockCertificateFilter;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.TabDelimitedCertificateFilter;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -23,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Configuration
+@EnableTransactionManagement
+@EnableJpaRepositories(basePackageClasses = PsuDataRepository.class)
+@EntityScan(basePackageClasses = PsuData.class)
 @EnableAutoConfiguration
 @ComponentScan(
     basePackages = {
@@ -37,9 +45,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
         classes = QwacCertificateFilter.class
     )
 )
-@EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"de.adorsys.psd2.consent.repository"})
-@EntityScan("de.adorsys.psd2.consent.domain")
 @PropertySource(
     value = {
         "classpath:xs2a-application.properties",
