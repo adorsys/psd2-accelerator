@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import de.adorsys.psd2.consent.domain.InstanceDependableEntity;
 import de.adorsys.psd2.consent.domain.PsuData;
 import de.adorsys.psd2.consent.repository.PsuDataRepository;
 import de.adorsys.psd2.sandbox.ContextHolder;
@@ -12,6 +13,14 @@ import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import java.util.Set;
+import javax.persistence.EntityManagerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.event.spi.PreInsertEvent;
+import org.hibernate.event.spi.PreInsertEventListener;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +38,7 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -139,5 +149,47 @@ public class Xs2aConfig {
       return super.objectMapper();
     }
   }
+
+  @Slf4j
+  @Component
+  public static class HardcodedInstanceIdSetter implements PreInsertEventListener {
+
+    private static final String PROPERTY_NAME = "instanceId";
+    private static final String SANDBOX_INSTANCE = "sandbox";
+
+    HardcodedInstanceIdSetter(EntityManagerFactory emf) {
+      SessionFactoryImpl sessionFactory = emf.unwrap(SessionFactoryImpl.class);
+      EventListenerRegistry registry = sessionFactory.getServiceRegistry()
+          .getService(EventListenerRegistry.class);
+      registry.getEventListenerGroup(EventType.PRE_INSERT).appendListener(this);
+    }
+
+    @Override
+    public boolean onPreInsert(PreInsertEvent event) {
+      Object object = event.getEntity();
+
+      if (object instanceof InstanceDependableEntity) {
+        InstanceDependableEntity entity = (InstanceDependableEntity) object;
+        String[] propertyNames = event.getPersister()
+            .getEntityMetamodel()
+            .getPropertyNames();
+
+        int instanceProperty = ArrayUtils.indexOf(propertyNames, PROPERTY_NAME);
+        if (instanceProperty >= 0) {
+          event.getState()[instanceProperty] = SANDBOX_INSTANCE;
+        } else {
+          String errorMessage = String.format(
+              "Field '%s' not found on entity '%s'.",
+              PROPERTY_NAME,
+              entity.getClass().getName()
+          );
+          // InstanceDependableEntity provides this property so it must exist
+          throw new IllegalStateException(errorMessage);
+        }
+      }
+      return false;
+    }
+  }
+
 
 }
