@@ -1,6 +1,9 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
+import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
+import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
@@ -8,6 +11,7 @@ import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiSinglePaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
+import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -15,11 +19,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements SinglePaymentSpi {
 
+  private TestDataService testDataService;
+
+  public SinglePaymentSpiImpl(TestDataService testDataService) {
+    this.testDataService = testDataService;
+  }
+
   @Override
   public @NotNull SpiResponse<SpiSinglePaymentInitiationResponse> initiatePayment(
       @NotNull SpiContextData ctx,
       @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData initialAspspConsentData) {
+
+    Optional<String> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
+    if (!psuId.isPresent()) {
+      throw new RestException(MessageErrorCode.UNAUTHORIZED);
+    }
+    boolean isBlocked = testDataService.isBlockedPsu(psuId.get());
+
+    if (isBlocked) {
+      throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
+    }
     SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
     response.setTransactionStatus(SpiTransactionStatus.RCVD);
 

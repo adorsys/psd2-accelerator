@@ -8,7 +8,8 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
     features = "src/test/java/de/adorsys/psd2/sandbox/xs2a/piis",
     glue = "de.adorsys.psd2.sandbox.xs2a.piis",
-    plugin = {"pretty", "html:target/report"})
+    plugin = {"pretty", "html:target/report"},
+    tags = {"not @ignore"})
 public class CucumberPiisTest {
 
 }

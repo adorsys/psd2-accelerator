@@ -66,7 +66,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       @NotNull SpiPayment spiPayment,
       @NotNull AspspConsentData aspspConsentData) {
 
-    if (spiScaConfirmation.getTanNumber().equals(TestDataService.TAN)) {
+    if (spiScaConfirmation.getTanNumber().equals(TestDataService.GLOBAL_TAN)) {
       Optional<List<PisPaymentData>> paymentDataList = paymentDataRepository
           .findByPaymentId(spiPayment.getPaymentId());
 
@@ -104,7 +104,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
     }
 
-    return authorisationService.authorisePsu(psuData, password, iban, aspspConsentData);
+    return authorisationService.authorisePsu(psuData, password, iban, aspspConsentData, true);
   }
 
   @Override

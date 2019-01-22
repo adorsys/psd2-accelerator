@@ -21,20 +21,32 @@ import org.springframework.stereotype.Service;
 public class TestDataService {
 
   private static final Currency EUR = Currency.getInstance("EUR");
+  public static final String GLOBAL_PASSWORD = "12345";
+  public static final String GLOBAL_TAN = "54321";
 
   private Map<String, PsuData> psuMap;
-  public static final String TAN = "54321";
-
 
   // Checkstyle forces constructor to have java docs comments. TODO Fix checkstyle, use constructor
   {
     HashMap<String, PsuData> map = new HashMap<>();
 
     PsuData psuSuccessful = initPsuSuccessfull();
+    PsuData psuRejected = initPsuRejected();
+    PsuData psuCancellationRejected = initPsuCancellationRejected();
+    PsuData psuBlocked = initPsuBlocked();
+    PsuData psuIntern = initPsuInternalLimit();
+    PsuData psuPending = initPsuPending();
+
     map.put(psuSuccessful.getPsuId(), psuSuccessful);
+    map.put(psuRejected.getPsuId(), psuRejected);
+    map.put(psuCancellationRejected.getPsuId(), psuCancellationRejected);
+    map.put(psuBlocked.getPsuId(), psuBlocked);
+    map.put(psuIntern.getPsuId(), psuIntern);
+    map.put(psuPending.getPsuId(), psuPending);
 
     this.psuMap = Collections.unmodifiableMap(map);
   }
+
 
   public Optional<PsuData> getPsu(String psuId) {
     return Optional.ofNullable(psuMap.get(psuId));
@@ -47,18 +59,18 @@ public class TestDataService {
    * @return Psu-Id
    */
   public Optional<String> getPsuByIban(String iban) {
-    for (Map.Entry<String, PsuData> currentPsu : psuMap.entrySet()) {
-      String currentPsuId = currentPsu.getValue().getPsuId();
-
-      List<Account> result = currentPsu.getValue().getAccounts().values().stream()
-          .filter(account -> account.getIban().equals(iban))
-          .collect(Collectors.toList());
-
-      if (result.size() > 0) {
-        return Optional.of(currentPsuId);
+    for (PsuData psu : psuMap.values()) {
+      boolean hasAccountWithIban = psu.getAccounts().values().stream()
+          .anyMatch(account -> account.getIban().equals(iban));
+      if (hasAccountWithIban) {
+        return Optional.of(psu.getPsuId());
       }
     }
     return Optional.empty();
+  }
+
+  public boolean isBlockedPsu(String psuId) {
+    return psuId.equals("PSU-Blocked");
   }
 
   /**
@@ -322,10 +334,154 @@ public class TestDataService {
     accounts.put(savingsAccount.getAccountId(), savingsAccount);
 
     return new PsuData(
-        "PSU-1",
-        "12345",
-        TAN,
+        "PSU-Successful",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
         accounts
     );
+  }
+
+  private PsuData initPsuRejected() {
+    String iban = "DE03760300809827461249";
+    String accountOwner = "Klaus Bauer";
+    String accountId = "2b163b22-8b7a-46cc-9ba4-7c8730ed3edd";
+
+    Transaction transaction = new Transaction(
+        "2b968e08-c3d4-4270-9acc-eb8ef92a79d1",
+        BigDecimal.valueOf(38.82),
+        EUR,
+        LocalDate.parse("2018-11-01"),
+        accountOwner,
+        iban,
+        "REWE",
+        "",
+        "Ihr Einkauf bei REWE"
+    );
+
+    return new PsuData(
+        "PSU-Rejected",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction)
+    );
+  }
+
+  private PsuData initPsuCancellationRejected() {
+    String iban = "DE54500105177914626923";
+    String accountOwner = "Sebastian Sommer";
+    String accountId = "a9231724-1bd5-4070-99bb-8c97e11982ad";
+
+    Transaction transaction = new Transaction(
+        "ed821677-edc8-4263-a3c9-e154a8ae9749",
+        BigDecimal.valueOf(50.82),
+        EUR,
+        LocalDate.parse("2018-11-01"),
+        accountOwner,
+        iban,
+        "Lidl",
+        "",
+        "Ihr Einkauf bei Lidl"
+    );
+
+    return new PsuData(
+        "PSU-Cancellation-Rejected",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction)
+    );
+  }
+
+  private PsuData initPsuBlocked() {
+    String iban = "DE10760300801209386222";
+    String accountOwner = "Martina Sandfeuer";
+    String accountId = "3ce6eee1-56c2-49cd-9314-36a2a8bb892b";
+
+    Transaction transaction = new Transaction(
+        "5c58560a-0ee8-4c2d-8e39-0aa967ae7784",
+        BigDecimal.valueOf(12.09),
+        EUR,
+        LocalDate.parse("2019-01-17"),
+        accountOwner,
+        iban,
+        "Amazon",
+        "",
+        "Amazon.de: Ihre Bestellung #81023412"
+    );
+
+    return new PsuData(
+        "PSU-Blocked",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), transaction)
+    );
+  }
+
+  private PsuData initPsuInternalLimit() {
+    String iban = "DE88760300803491763002";
+    String accountOwner = "Laura Holzer";
+    String accountId = "4ed8f9bb-f239-463f-a3ae-2b90b7924ffa";
+
+    Transaction transaction = new Transaction(
+        "a4f08d5b-fcc6-445d-b422-0971b4c3b0e2",
+        BigDecimal.valueOf(89.99),
+        EUR,
+        LocalDate.parse("2019-01-10"),
+        accountOwner,
+        iban,
+        "Amazon",
+        "",
+        "Amazon.de: Ihre Bestellung #27189921"
+    );
+
+    return new PsuData(
+        "PSU-InternalLimit",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), transaction)
+    );
+  }
+
+  private PsuData initPsuPending() {
+    String iban = "DE86760300801729983660";
+    String accountOwner = "Andreas Watzke";
+    String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
+
+    Transaction transaction = new Transaction(
+        "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
+        BigDecimal.valueOf(199.99),
+        EUR,
+        LocalDate.parse("2018-09-20"),
+        accountOwner,
+        iban,
+        "Amazon",
+        "",
+        "Amazon.de: Ihre Bestellung #4528499"
+    );
+
+    return new PsuData(
+        "PSU-Pending",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction)
+    );
+  }
+
+  private HashMap<String, Account> initSingleAccount(String accountId, String iban,
+      BigDecimal amount, Transaction transaction) {
+    HashMap<String, Account> accounts = new HashMap<>();
+
+    HashMap<String, Transaction> transactions = new HashMap<>();
+    transactions.put(transaction.getTransactionId(), transaction);
+
+    Account account = new Account(
+        accountId,
+        iban,
+        EUR,
+        new Balance(new Amount(EUR, amount)),
+        transactions
+    );
+
+    accounts.put(account.getAccountId(), account);
+    return accounts;
   }
 }

@@ -39,7 +39,7 @@ import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-@Ignore
+@Ignore("without this ignore intellij tries to run the step files")
 public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
@@ -276,7 +276,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
-  @When("Another PSU tries to authorise the consent with psu-id (.*), password (.*)")
+  @When("PSU tries to authorise the consent with psu-id (.*), password (.*)")
   public void psuTriesToAuthoriseConsent(String psuId, String password) {
     HashMap<String, String> headers = TestUtils.createSession();
 
