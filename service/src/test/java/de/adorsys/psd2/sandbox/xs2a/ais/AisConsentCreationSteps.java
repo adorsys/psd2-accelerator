@@ -35,9 +35,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+@Ignore
 public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();

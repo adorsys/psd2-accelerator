@@ -6,9 +6,9 @@ import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiSinglePaymentInitiationResponse;
-import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +22,11 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
       @NotNull AspspConsentData initialAspspConsentData) {
     SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
     response.setTransactionStatus(SpiTransactionStatus.RCVD);
+
+    String paymentId = UUID.randomUUID().toString();
+    payment.setPaymentId(paymentId);
+    response.setPaymentId(paymentId);
+
     return new SpiResponse<>(response, initialAspspConsentData);
   }
 
@@ -58,10 +63,8 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiTransactionStatus> getPaymentStatusById(
-      @NotNull SpiPsuData psuData,
-      @NotNull SpiSinglePayment payment,
+      @NotNull SpiContextData contextData, @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData aspspConsentData) {
-
-    return super.getPaymentStatusById(psuData, payment, aspspConsentData);
+    return super.getPaymentStatusById(payment, aspspConsentData);
   }
 }

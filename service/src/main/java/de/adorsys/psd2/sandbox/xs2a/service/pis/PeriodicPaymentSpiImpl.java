@@ -6,9 +6,9 @@ import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPeriodicPaymentInitiationResponse;
-import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.PeriodicPaymentSpi;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -38,28 +38,33 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
   }
 
   @Override
+  public @NotNull SpiResponse<SpiPeriodicPayment> getPaymentById(
+      @NotNull SpiContextData contextData,
+      @NotNull SpiPeriodicPayment payment,
+      @NotNull AspspConsentData aspspConsentData) {
+    return super.getPaymentById(contextData.getPsuData(), payment, aspspConsentData);
+  }
+
+  @Override
   public @NotNull SpiResponse<SpiPeriodicPaymentInitiationResponse> initiatePayment(
-      @NotNull SpiPsuData psuData,
+      @NotNull SpiContextData contextData,
       @NotNull SpiPeriodicPayment payment,
       @NotNull AspspConsentData initialAspspConsentData) {
+
     SpiPeriodicPaymentInitiationResponse response = new SpiPeriodicPaymentInitiationResponse();
     response.setTransactionStatus(SpiTransactionStatus.RCVD);
+    String paymentId = UUID.randomUUID().toString();
+    payment.setPaymentId(paymentId);
+    response.setPaymentId(paymentId);
+
     return new SpiResponse<>(response, initialAspspConsentData);
   }
 
   @Override
-  public @NotNull SpiResponse<SpiPeriodicPayment> getPaymentById(
-      @NotNull SpiPsuData psuData,
-      @NotNull SpiPeriodicPayment payment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return super.getPaymentById(psuData, payment, aspspConsentData);
-  }
-
-  @Override
   public @NotNull SpiResponse<SpiTransactionStatus> getPaymentStatusById(
-      @NotNull SpiPsuData psuData,
+      @NotNull SpiContextData contextData,
       @NotNull SpiPeriodicPayment payment,
       @NotNull AspspConsentData aspspConsentData) {
-    return super.getPaymentStatusById(psuData, payment, aspspConsentData);
+    return super.getPaymentStatusById(payment, aspspConsentData);
   }
 }

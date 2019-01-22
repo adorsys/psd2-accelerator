@@ -41,7 +41,6 @@ class AbstractPaymentSpiImpl {
   PisPaymentDataRepository paymentDataRepository;
 
   SpiResponse<SpiTransactionStatus> getPaymentStatusById(
-      SpiPsuData psuData,
       SpiSinglePayment payment,
       AspspConsentData aspspConsentData) {
 

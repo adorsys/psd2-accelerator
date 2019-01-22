@@ -21,25 +21,26 @@ Feature: Payment Initiation Service
     #                                                                                              #
     ################################################################################################
 
-  Scenario Outline: Initiation of a Single Payment with multiple SCA Methods
-    Given PSU initiated a <payment-type> payment using the payment product <payment-product>
-    And PSU created an authorisation resource
-    And PSU updated the resource with his <psu-id> and <password>
-    And PSU updated the resource with a selection of authentication method <sca-method>
-    When PSU updates the resource with a <tan>
-    Then the SCA status <sca-status> and response code <code> are received
-    Examples:
-      | payment-type | payment-product       | psu-id | password | sca-method | tan   | sca-status | code |
-      | single       | sepa-credit-transfers | PSU-1  | 12345    | SMS_OTP    | 54321 | finalised  | 200  |
+  #TODO waiting for XS2A-Core patch
+#  Scenario Outline: Initiation of a Single Payment with multiple SCA Methods
+#    Given PSU initiated a <payment-type> payment using the payment product <payment-product>
+#    And PSU created an authorisation resource
+#    And PSU updated the resource with his <psu-id> and <password>
+#    And PSU updated the resource with a selection of authentication method <sca-method>
+#    When PSU updates the resource with a <tan>
+#    Then the SCA status <sca-status> and response code <code> are received
+#    Examples:
+#      | payment-type | payment-product       | psu-id | password | sca-method | tan   | sca-status | code |
+#      | single       | sepa-credit-transfers | PSU-1  | 12345    | SMS_OTP    | 54321 | finalised  | 200  |
 
   Scenario Outline: PSU Validation PIS
-    Given PSU initiated a single payment using the payment product <payment-product>
+    Given PSU initiated a <payment-type> payment using the payment product <payment-product>
     And PSU created an authorisation resource
     When Another PSU tries to update the resource with his <psu-id> and <password>
     Then an appropriate error and response code <code> are received
     Examples:
-      | payment-product       | psu-id | password | code |
-      | sepa-credit-transfers | PSU-2  | 12345    | 401  |
+      | payment-type | payment-product       | psu-id | password | code |
+      | single       | sepa-credit-transfers | PSU-2  | 12345    | 401  |
 
     ################################################################################################
     #                                                                                              #
@@ -55,16 +56,16 @@ Feature: Payment Initiation Service
       | payment-type | payment-product       | status | code |
       | single       | sepa-credit-transfers | RCVD   | 200  |
 
-
-  Scenario Outline: Payment Status Accepted
-    Given PSU initiated a <payment-type> payment using the payment product <payment-product>
-    And PSU created an authorisation resource
-    And PSU updated the resource with his <psu-id> and <password>
-    And PSU updated the resource with a selection of authentication method <sca-method>
-    When PSU updates the resource with a <tan>
-    When PSU requests the payment status
-    Then the transaction status <status> and response code <code> are received
-    Examples:
-      | payment-type | payment-product       | psu-id | password | sca-method | tan   | status | code |
-      | single       | sepa-credit-transfers | PSU-1  | 12345    | SMS_OTP    | 54321 | ACCP   | 200  |
+  #TODO waiting for XS2A-Core patch
+#  Scenario Outline: Payment Status Accepted
+#    Given PSU initiated a <payment-type> payment using the payment product <payment-product>
+#    And PSU created an authorisation resource
+#    And PSU updated the resource with his <psu-id> and <password>
+#    And PSU updated the resource with a selection of authentication method <sca-method>
+#    When PSU updates the resource with a <tan>
+#    When PSU requests the payment status
+#    Then the transaction status <status> and response code <code> are received
+#    Examples:
+#      | payment-type | payment-product       | psu-id | password | sca-method | tan   | status | code |
+#      | single       | sepa-credit-transfers | PSU-1  | 12345    | SMS_OTP    | 54321 | ACCP   | 200  |
 
