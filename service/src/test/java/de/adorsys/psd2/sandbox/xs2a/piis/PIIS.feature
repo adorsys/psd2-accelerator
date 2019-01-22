@@ -13,5 +13,5 @@ Feature: Payment Instrument Issuer Service
       | amount | iban                   | availability-status | code |
       | 500    | DE94500105178833114935 | true                | 200  |
       | 2500   | DE94500105178833114935 | false               | 200  |
-      | 500    | WRONG_IBAN             | false               | 200  |
-      | 2500   | WRONG_IBAN             | false               | 200  |
+      | 500    | AT022050302101023600   | false               | 200  |
+      | 2500   | AT022050302101023600   | false               | 200  |

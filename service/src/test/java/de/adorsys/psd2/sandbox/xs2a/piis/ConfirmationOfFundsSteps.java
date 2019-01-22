@@ -15,9 +15,11 @@ import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import java.util.HashMap;
+import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
+@Ignore
 public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
