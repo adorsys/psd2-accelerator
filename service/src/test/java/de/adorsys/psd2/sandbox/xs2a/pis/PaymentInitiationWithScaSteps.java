@@ -2,7 +2,9 @@ package de.adorsys.psd2.sandbox.xs2a.pis;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -15,6 +17,7 @@ import de.adorsys.psd2.model.DayOfExecution;
 import de.adorsys.psd2.model.ExecutionRule;
 import de.adorsys.psd2.model.FrequencyCode;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
+import de.adorsys.psd2.model.PaymentInitiationCancelResponse204202;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
 import de.adorsys.psd2.model.PeriodicPaymentInitiationSctJson;
@@ -24,6 +27,7 @@ import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
 import de.adorsys.psd2.model.TppMessage401PIS;
+import de.adorsys.psd2.model.TppMessage403PIS;
 import de.adorsys.psd2.model.TppMessageCategory;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
@@ -39,26 +43,26 @@ import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-@Ignore
+@Ignore("without this ignore intellij tries to run the step files")
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
 
-  @Given("^PSU initiated a (.*) payment using the payment product (.*)$")
-  public void initiatePayment(String paymentType, String paymentProduct) {
+  @Given("^PSU initiated a (.*) payment with iban (.*) using the payment product (.*)$")
+  public void initiatePayment(String paymentType, String debtorIban, String paymentProduct) {
     context.setPaymentProduct(paymentProduct);
 
     Request request = null;
     HashMap<String, String> headers = TestUtils.createSession();
 
     if (paymentType.equals("single")) {
-      request = getSinglePayment(headers, false);
+      request = getSinglePayment(headers, false, debtorIban);
     }
     if (paymentType.equals("future-dated")) {
-      request = getSinglePayment(headers, true);
+      request = getSinglePayment(headers, true, debtorIban);
     }
     if (paymentType.equals("periodic")) {
-      request = getPeriodicPayment(headers);
+      request = getPeriodicPayment(headers, debtorIban);
     }
 
     ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
@@ -72,24 +76,19 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   }
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
-      boolean isFutureDated) {
+      boolean isFutureDated, String debtorIban) {
     context.setPaymentService("payments");
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
-
-    AccountReference debtorAccount = createAccount("DE51250400903312345678", "EUR");
-    payment.setDebtorAccount(debtorAccount);
+    payment.setDebtorAccount(createAccount(debtorIban, "EUR"));
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
     instructedAmount.setCurrency("EUR");
     payment.setInstructedAmount(instructedAmount);
 
-    AccountReference creditorAccount = createAccount("DE15500105172295759744", "EUR");
-    payment.setCreditorAccount(creditorAccount);
-
-    payment.setCreditorAgent("AAAADEBBXXX");
+    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
     payment.setCreditorName("WBG");
     payment.setCreditorAddress(createCreditorAddress());
     payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
@@ -104,13 +103,13 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     return request;
   }
 
-  private Request getPeriodicPayment(HashMap<String, String> headers) {
+  private Request getPeriodicPayment(HashMap<String, String> headers, String debtorIban) {
     context.setPaymentService("periodic-payments");
 
     PeriodicPaymentInitiationSctJson periodicPayment = new PeriodicPaymentInitiationSctJson();
     periodicPayment.setEndToEndIdentification("WBG-123456789");
 
-    periodicPayment.setDebtorAccount(createAccount("DE94500105178833114935", "EUR"));
+    periodicPayment.setDebtorAccount(createAccount(debtorIban, "EUR"));
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
@@ -170,7 +169,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(authenticationData);
     request.setHeader(headers);
 
-    template.exchange(
+    ResponseEntity<UpdatePsuAuthenticationResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
             context.getPaymentId() + "/authorisations/" +
@@ -178,9 +177,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         HttpMethod.PUT,
         request.toHttpEntity(),
         UpdatePsuAuthenticationResponse.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
-  @When("^Another PSU tries to update the resource with his (.*) and (.*)$")
+  @When("^PSU tries to update the resource with his (.*) and (.*)$")
   public void tryToUpdateResourceWithPassword(String psuId, String password) {
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", psuId);
@@ -219,7 +220,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setBody(scaMethod);
     request.setHeader(headers);
 
-    template.exchange(
+    ResponseEntity<SelectPsuAuthenticationMethodResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
             context.getPaymentId() + "/authorisations/" +
@@ -227,6 +228,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         HttpMethod.PUT,
         request.toHttpEntity(),
         SelectPsuAuthenticationMethodResponse.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
   @When("^PSU updates the resource with a (.*)$")
@@ -250,6 +253,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         request.toHttpEntity(),
         ScaStatusResponse.class);
 
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
     context.setActualResponse(response);
   }
 
@@ -261,8 +266,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setHeader(headers);
 
     ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
-        context.getPaymentService() + "/" + context.getPaymentProduct() + "/" + context
-            .getPaymentId(),
+        context.getPaymentService() + "/" + context.getPaymentProduct() + "/"
+            + context.getPaymentId(),
         HttpMethod.GET,
         request.toHttpEntity(),
         PaymentInitiationSctWithStatusResponse.class);
@@ -278,8 +283,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     request.setHeader(headers);
 
     ResponseEntity<TransactionStatusResponse> response = template.exchange(
-        context.getPaymentService() + "/" + context.getPaymentProduct() + "/" + context
-            .getPaymentId() + "/status",
+        context.getPaymentService() + "/" + context.getPaymentProduct() + "/"
+            + context.getPaymentId() + "/status",
         HttpMethod.GET,
         request.toHttpEntity(),
         TransactionStatusResponse.class);
@@ -323,6 +328,112 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         equalTo(transactionStatus));
     assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
+  }
+
+  @And("PSU cancels the payment")
+  public void cancelPayment() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request<>();
+    request.setHeader(headers);
+    ResponseEntity<PaymentInitiationCancelResponse204202> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId(),
+        HttpMethod.DELETE,
+        request.toHttpEntity(),
+        PaymentInitiationCancelResponse204202.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+  }
+
+  @And("PSU starts the cancellation authorisation")
+  public void createCancellationAuthorisationResource() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request request = new Request<>();
+    request.setHeader(headers);
+
+    ResponseEntity<StartScaprocessResponse> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/cancellation-authorisations",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        StartScaprocessResponse.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    context.setCancellationId(TestUtils.extractCancellationId(
+        (String) response.getBody().getLinks().get("startAuthorisationWithPsuAuthentication")));
+  }
+
+  @When("PSU tries to update the cancellation resource with his (.*) and (.*)")
+  public void tryToUpdateCancellationResourceWithPassword(String psuId, String password) {
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("PSU-ID", psuId);
+
+    PsuData psuData = new PsuData();
+    psuData.setPassword(password);
+
+    UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
+    authenticationData.setPsuData(psuData);
+
+    Request<UpdatePsuAuthentication> request = new Request<>();
+    request.setBody(authenticationData);
+    request.setHeader(headers);
+
+    ResponseEntity<TppMessage401PIS> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentId() + "/cancellation-authorisations/" +
+            context.getCancellationId(),
+        HttpMethod.PUT,
+        request.toHttpEntity(),
+        TppMessage401PIS.class);
+
+    context.setActualResponse(response);
+  }
+
+  @When("PSU tries to initiate a payment (.*) with iban (.*) using the payment product (.*)")
+  public void tryToInitiatePayment(String paymentService, String iban, String paymentProduct) {
+    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
+    payment.setEndToEndIdentification("WBG-123456789");
+    payment.setDebtorAccount(createAccount(iban, "EUR"));
+
+    Amount instructedAmount = new Amount();
+    instructedAmount.setAmount("520");
+    instructedAmount.setCurrency("EUR");
+    payment.setInstructedAmount(instructedAmount);
+
+    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    payment.setCreditorName("WBG");
+    payment.setCreditorAddress(createCreditorAddress());
+    payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Request<PaymentInitiationSctJson> request = new Request<>();
+    request.setBody(payment);
+    request.setHeader(headers);
+
+    ResponseEntity<TppMessage403PIS[]> response = template.exchange(
+        paymentService + "/" + paymentProduct,
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        TppMessage403PIS[].class);
+
+    context.setActualResponse(response);
+  }
+
+  @Then("an appropriate error with http code (.*) and error-message (.*) are received")
+  public void anAppropriateErrorWithErrorCodesAndMessageAreReceived(Integer httpCode, String errorMessage) {
+    ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
+    // TODO did work in 1.13 but is null in 1.15 :(
+    // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
+    assertThat(actualResponse.getBody()[0].getText(), containsString("channel independent blocking"));
+    assertThat(actualResponse.getStatusCodeValue(), equalTo(httpCode));
   }
 
   private AccountReference createAccount(String iban, String currency) {

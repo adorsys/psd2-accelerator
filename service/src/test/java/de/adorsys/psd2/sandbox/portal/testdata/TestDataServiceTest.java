@@ -30,7 +30,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getPsuTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     Optional<PsuData> optionalPsu = testDataService.getPsu(psuId);
 
     assertEquals(optionalPsu.get().getPsuId(), psuId);
@@ -46,7 +46,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getPsuIdByIbanTestSuccessful() {
-    final String expectedPsuId = "PSU-1";
+    final String expectedPsuId = "PSU-Successful";
     Optional<String> returnedPsuId1 = testDataService.getPsuByIban("DE94500105178833114935");
     Optional<String> returnedPsuId2 = testDataService.getPsuByIban("DE96500105179669622432");
 
@@ -63,7 +63,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getRequestedAccountsTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String iban1 = "DE94500105178833114935";
     final String iban2 = "DE96500105179669622432";
     final List<String> ibans = Arrays.asList(iban1, iban2);
@@ -89,7 +89,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getSingleRequestedAccountsTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String iban = "DE96500105179669622432";
     final List<String> ibans = Arrays.asList(iban);
 
@@ -119,7 +119,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getDistinctAccountTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String accountIdGrio = "9b86539d-589b-4082-90c2-d725c019777f";
 
     Optional<Account> account = testDataService.getDistinctAccount(psuId, accountIdGrio);
@@ -143,7 +143,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getAccountsTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
 
     Optional<List<Account>> accounts = testDataService.getAccounts(psuId);
 
@@ -168,7 +168,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getTransactionsTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String accountIdGrio = "9b86539d-589b-4082-90c2-d725c019777f";
     final String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
@@ -203,7 +203,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getDistinctTransactionTestSuccessful() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
     final String transactionId = "8508921e-2cd4-43e8-ba1e-26b143307927";
 
@@ -230,7 +230,7 @@ public class TestDataServiceTest {
 
   @Test
   public void getDistinctTransactionTestWithUnkonwnAccount() {
-    final String psuId = "PSU-1";
+    final String psuId = "PSU-Successful";
     final String accountId = "ACCOUNT_UNKOWN";
     final String transactionId = "8508921e-2cd4-43e8-ba1e-26b143307927";
 

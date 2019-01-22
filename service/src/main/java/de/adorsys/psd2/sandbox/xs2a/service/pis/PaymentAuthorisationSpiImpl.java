@@ -44,7 +44,9 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
       iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
     }
 
-    return authorisationService.authorisePsu(ctx.getPsuData(), password, iban, aspspConsentData);
+    return authorisationService.authorisePsu(
+        ctx.getPsuData(), password, iban, aspspConsentData, false
+    );
   }
 
   @Override

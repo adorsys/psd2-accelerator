@@ -76,7 +76,7 @@ class AbstractPaymentSpiImpl {
       SpiPayment spiPayment,
       SpiScaConfirmation spiScaConfirmation,
       AspspConsentData aspspConsentData) {
-    if (spiScaConfirmation.getTanNumber().equals(TestDataService.TAN)) {
+    if (spiScaConfirmation.getTanNumber().equals(TestDataService.GLOBAL_TAN)) {
       Optional<List<PisPaymentData>> paymentDataList = paymentDataRepository
           .findByPaymentId(spiPayment.getPaymentId());
 

@@ -46,6 +46,24 @@ public class TestUtils {
   }
 
   /**
+   * Extracts cancellationId from URL.
+   *
+   * @param url url to extract id from
+   * @return cancellationId
+   */
+  public static String extractCancellationId(String url) {
+
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString(url);
+    List<String> pathSegments = uriComponentsBuilder.build().getPathSegments();
+
+    int index = pathSegments.indexOf("cancellation-authorisations");
+    if (index == -1) {
+      throw new IllegalArgumentException("URL does not contain 'cancellation-authorisations' segment'");
+    }
+    return pathSegments.get(index + 1);
+  }
+
+  /**
    * Initiates HttpSession by adding mandatory Headers.
    *
    * @return HashMap of Header

@@ -1,6 +1,5 @@
 package de.adorsys.psd2.sandbox.xs2a.service;
 
-import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.FAILURE;
 import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.SUCCESS;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
@@ -37,13 +36,23 @@ public class AuthorisationService {
    * @param aspspConsentData aspspConsentData
    */
   public SpiResponse<SpiAuthorisationStatus> authorisePsu(
-      SpiPsuData spiPsuData, String password, String iban, AspspConsentData aspspConsentData) {
+      SpiPsuData spiPsuData, String password, String iban, AspspConsentData aspspConsentData,
+      boolean forceFailure) {
 
     Optional<PsuData> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
     Optional<String> accountOwner = testDataService.getPsuByIban(iban);
 
     if (!inquiringPsu.isPresent() || !password.equals(inquiringPsu.get().getPassword())
-        || !accountOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accountOwner.get())) {
+        || !accountOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accountOwner.get())
+        || inquiringPsu.get().getPsuId().equals("PSU-Rejected")) {
+      return SpiResponse.<SpiAuthorisationStatus>builder()
+          .aspspConsentData(aspspConsentData)
+          .message(Collections.singletonList("Authorization failed"))
+          .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+    }
+
+    if (inquiringPsu.get().getPsuId().equals("PSU-Cancellation-Rejected")
+        && forceFailure) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
           .aspspConsentData(aspspConsentData)
           .message(Collections.singletonList("Authorization failed"))
