@@ -33,22 +33,25 @@ before_install:
   - nvm use --lts
 
 script:
-  # build_ui
+  # build ui
   - cd ui || travis_terminate 1
   - npm ci || travis_terminate 1
   - npm run tslint || travis_terminate 1
   - npm run prettier-check || travis_terminate 1
   - npm run test-ci || travis_terminate 1
   - npm run build -- --prod || travis_terminate 1
-  - cd .. || travis_terminate 1
+  - cd -
   # build service
   - mvn -f service/pom.xml -B clean package || travis_terminate 1
+  - cd service/target || travis_terminate 1
+  - sha1sum *.jar | tee $(ls *.jar).sha1 || travis_terminate 1
+  - cd -
   # build docker
   - docker build --pull -t "adorsys/$PSD2_SANDBOX_IMAGE:latest" service || travis_terminate 1
   - docker build --pull -t "adorsys/$SSL_PROXY_IMAGE:latest" ssl-proxy || travis_terminate 1
   - docker run -it --rm -v $PWD:/src -w /src -u $(id -u ${USER}):$(id -g ${USER})
     adorsys/arc42-tools sh -c "make arc42/psd2-accelerator-arc42.html" || travis_terminate 1
-  # assemble arc42 and license in pages
+  # assemble arc42 and license for pages
   - mkdir pages || travis_terminate 1
   - cp -r arc42/images pages || travis_terminate 1
   - cp arc42/psd2-accelerator-arc42.html pages/index.html || travis_terminate 1
