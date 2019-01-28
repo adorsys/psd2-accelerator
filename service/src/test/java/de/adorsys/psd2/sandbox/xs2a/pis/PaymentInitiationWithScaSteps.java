@@ -23,6 +23,7 @@ import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
 import de.adorsys.psd2.model.PeriodicPaymentInitiationSctJson;
 import de.adorsys.psd2.model.PsuData;
+import de.adorsys.psd2.model.ScaStatus;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
@@ -202,14 +203,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
-  @Then("^the SCA status (.*) and response code (.*) are received$")
-  public void checkScaResponse(String scaStatus, String code) {
-    ResponseEntity<ScaStatusResponse> actualResponse = context.getActualResponse();
-
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().getScaStatus().toString(), equalTo(scaStatus));
-  }
-
   @Then("^the transaction status (.*) and response code (.*) are received$")
   public void checkTransactionResponse(String status, String code) {
     ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();
@@ -338,7 +331,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         String.format("online-banking/init/pis/%s?psu-id=%s", externalId, psuId),
         HttpMethod.GET,
         request.toHttpEntity(),
-        Object.class);
+        String.class);
 
     //TODO: add check for request status
     // Could be successfull or failed
@@ -428,6 +421,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         ScaStatusResponse.class);
 
     assertTrue(sendTanResponse.getStatusCode().is2xxSuccessful());
+    assertThat(sendTanResponse.getBody().getScaStatus(), equalTo(ScaStatus.FINALISED));
 
     context.setActualResponse(sendTanResponse);
   }

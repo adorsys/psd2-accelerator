@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Online Banking</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+      align-items: center;
+    }
+
+    .starter-template {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <div class="starter-template">
+    <h2>
+      <span th:text="'The ' + ${resourceType} + ' status has changed to: ' + ${status}"></span>
+    </h2>
+    <p>You will be automatically redirected back to the TPP within 3 seconds. Otherwise, click
+      <a th:href="${redirectUri}">here</a>.</p>
+  </div>
+
+</div>
+<!-- /.container -->
+
+<script th:inline="javascript">
+  const redirectUri = /*[[${redirectUri}]]*/ '';
+  window.setTimeout(redirectToTpp, 3000);
+
+  function redirectToTpp() {
+    window.location.replace(redirectUri);
+  }
+</script>
+</body>
+
+</html>

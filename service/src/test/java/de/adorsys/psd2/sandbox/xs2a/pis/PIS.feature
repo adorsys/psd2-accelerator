@@ -21,14 +21,14 @@ Feature: Payment Initiation Service
     #                                                                                              #
     ################################################################################################
 
-  @ignore
   Scenario Outline: Initiation of a Single Payment with multiple SCA Methods
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     When PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
-    Then the SCA status <sca-status> and response code <code> are received
+    When PSU requests the payment status
+    Then the transaction status <status> and response code <code> are received
     Examples:
-      | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | sca-status | code |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | finalised  | 200  |
+      | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status | code |
+      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   | 200  |
 
   Scenario Outline: Initiation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -39,6 +39,7 @@ Feature: Payment Initiation Service
       | payment-type | iban                   | payment-product       | psu-id       | password | status | code |
       | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RCVD   | 200  |
       | single       | DE03760300809827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RCVD   | 200  |
+
     ################################################################################################
     #                                                                                              #
     # Payment Status                                                                               #
