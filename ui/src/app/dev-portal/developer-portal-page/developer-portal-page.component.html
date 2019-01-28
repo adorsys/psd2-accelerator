@@ -120,8 +120,8 @@
         <a href="../swagger-ui.html">XS2A Swagger UI</a>.
       </p>
       <p>
-        The following code snippet is an example cURL command which is
-        initiating a single payment:
+        The following code snippet is an example cURL command which initiates a
+        single payment from PSU "PSU-Successful":
       </p>
       <pre class="code-sample"><code>
 curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
@@ -136,7 +136,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     "endToEndIdentification": "WBG-123456789",
     "debtorAccount": {{ '{' }}
       "currency": "EUR",
-      "iban": "DE52500105173911841934"
+      "iban": "DE94500105178833114935"
     {{ '}' }},
     "instructedAmount": {{ '{' }}
       "currency": "EUR",

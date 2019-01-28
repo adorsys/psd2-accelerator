@@ -39,7 +39,7 @@ public class RedirectController {
     redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.INIT);
 
     model.addAttribute("resourceType", "payment");
-    model.addAttribute("status", "ACCP");
+    model.addAttribute("status", redirectService.getPaymentStatusFromRepo(externalId));
     model.addAttribute("redirectUri",
         redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
 
@@ -63,7 +63,7 @@ public class RedirectController {
     redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
 
     model.addAttribute("resourceType", "consent");
-    model.addAttribute("status", "VALID");
+    model.addAttribute("status", redirectService.getConsentStatusFromRepo(externalId));
     model.addAttribute("redirectUri",
         redirectService.getRedirectToTppUriFromAccountRepo(externalId));
 
@@ -87,7 +87,7 @@ public class RedirectController {
     redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.CANCEL);
 
     model.addAttribute("resourceType", "payment");
-    model.addAttribute("status", "CANC");
+    model.addAttribute("status", redirectService.getPaymentStatusFromRepo(externalId));
     model.addAttribute("redirectUri",
         redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
 

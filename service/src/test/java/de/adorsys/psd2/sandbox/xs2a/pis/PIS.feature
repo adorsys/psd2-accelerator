@@ -5,6 +5,7 @@ Feature: Payment Initiation Service
     # Payment Initiation                                                                           #
     #                                                                                              #
     ################################################################################################
+
   Scenario Outline: Initiation of a payment
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     When PSU requests the payment data
@@ -29,6 +30,15 @@ Feature: Payment Initiation Service
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
       | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
+
+  Scenario Outline: Initiation of a Single Payment Internal Limit
+    Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
+    When PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    When PSU requests the payment status
+    Then the transaction status <status> and response code <code> are received
+    Examples:
+      | payment-type | iban                   | payment-product       | psu-id            | password | sca-method | tan   | status | code |
+      | single       | DE88760300803491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   | 200  |
 
   Scenario Outline: Initiation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
