@@ -6,11 +6,16 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class PsuData {
+public class TestPsu {
 
   private String psuId;
   private String password;
   private String tan;
   private HashMap<String, Account> accounts;
-
+  private String transactionStatusAfterSca;
+  private String consentStatusAfterSca;
+  private String initiationScaStatus;
+  private String transactionStatusAfterCancellation;
+  private String consentStatusAfterDeletion;
+  private String cancellationScaStatus;
 }

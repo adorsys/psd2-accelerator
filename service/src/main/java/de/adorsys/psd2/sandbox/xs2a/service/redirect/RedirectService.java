@@ -13,6 +13,7 @@ import de.adorsys.psd2.consent.repository.PisAuthorizationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
@@ -25,12 +26,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RedirectService {
 
-  private TestDataService testDataService;
   private PisPaymentDataRepository pisPaymentDataRepository;
   private PisAuthorizationRepository pisAuthorizationRepository;
   private AisConsentAuthorizationRepository aisConsentAuthorizationRepository;
   private AisConsentRepository aisConsentRepository;
-  private PisCommonPaymentDataRepository commonPaymentDataRepository;
+  private PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
+  private TestDataService testDataService;
 
   /**
    * Create a new RedirectService instance.
@@ -39,19 +40,20 @@ public class RedirectService {
    * @param pisAuthorizationRepository        PisAuthorizationRepository
    * @param aisConsentAuthorizationRepository AisConsentAuthorizationRepository
    * @param aisConsentRepository              AisConsentRepository
+   * @param testDataService                   TestDataService
    */
-  public RedirectService(TestDataService testDataService,
-      PisPaymentDataRepository pisPaymentDataRepository,
+  public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
       PisAuthorizationRepository pisAuthorizationRepository,
       AisConsentAuthorizationRepository aisConsentAuthorizationRepository,
       AisConsentRepository aisConsentRepository,
-      PisCommonPaymentDataRepository commonPaymentDataRepository) {
-    this.testDataService = testDataService;
+      PisCommonPaymentDataRepository pisCommonPaymentDataRepository,
+      TestDataService testDataService) {
     this.pisPaymentDataRepository = pisPaymentDataRepository;
     this.pisAuthorizationRepository = pisAuthorizationRepository;
     this.aisConsentAuthorizationRepository = aisConsentAuthorizationRepository;
     this.aisConsentRepository = aisConsentRepository;
-    this.commonPaymentDataRepository = commonPaymentDataRepository;
+    this.testDataService = testDataService;
+    this.pisCommonPaymentDataRepository = pisCommonPaymentDataRepository;
   }
 
   /**
@@ -71,10 +73,17 @@ public class RedirectService {
     AisConsentAuthorization aisConsentAuth = aisConsentAuthorization.get();
 
     AisConsent consent = aisConsentRepository.findOne(aisConsentAuth.getId());
-    // TODO: Set status of PSU from TestDataService
-    consent.setConsentStatus(ConsentStatus.VALID);
-    aisConsentAuth.setScaStatus(ScaStatus.PSUAUTHENTICATED);
 
+    Optional<TestPsu> psu = testDataService.getPsu(psuId);
+    if (psu.isPresent()) {
+      Optional<ConsentStatus> consentStatus = ConsentStatus.fromValue(psu.get()
+          .getConsentStatusAfterSca());
+      if (consentStatus.isPresent()) {
+        consent.setConsentStatus(consentStatus.get());
+      }
+      aisConsentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getInitiationScaStatus()));
+
+    }
     aisConsentRepository.save(consent);
     aisConsentAuthorizationRepository.save(aisConsentAuth);
   }
@@ -82,10 +91,10 @@ public class RedirectService {
   /**
    * Sets payment status in CMS depending on PSU-ID.
    *
-   * @param externalId Payment Id
-   * @param psuId      Psu Id
+   * @param externalId   Payment Id
+   * @param psuId        Psu Id
+   * @param scaOperation Executed for Initiation or Cancellation
    */
-  // TODO: handle isInit for cancellation and initiation scenarios
   public void handlePaymentRedirectRequest(String externalId, String psuId,
       ScaOperation scaOperation) {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
@@ -96,40 +105,47 @@ public class RedirectService {
       return;
     }
 
-    PisAuthorization payment = pisAuthorization.get();
+    PisAuthorization paymentAuth = pisAuthorization.get();
 
     Optional<List<PisPaymentData>> pisPaymentDataList = pisPaymentDataRepository
-        .findByPaymentId(payment.getPaymentData().getPaymentId());
+        .findByPaymentId(paymentAuth.getPaymentData().getPaymentId());
 
-    if (!pisPaymentDataList.isPresent() && pisPaymentDataList.get().isEmpty()) {
+    if (!pisPaymentDataList.isPresent() || pisPaymentDataList.get().isEmpty()) {
       //TODO handle error case
       return;
     }
     PisPaymentData pisPaymentData = pisPaymentDataList.get().get(0);
 
-    TransactionStatus txStatus;
-    if (scaOperation == ScaOperation.INIT) {
-      if (psuId.equalsIgnoreCase("psu-unknown")
-          || psuId.equalsIgnoreCase("psu-rejected")) {
-        txStatus = TransactionStatus.RCVD;
+    Optional<TestPsu> psu = testDataService.getPsu(psuId);
+
+    if (psu.isPresent()) {
+      if (scaOperation == ScaOperation.CANCEL) {
+        TransactionStatus newTxStatus = TransactionStatus
+            .getByValue(psu.get().getTransactionStatusAfterCancellation());
+        pisPaymentData.setTransactionStatus(newTxStatus);
+        paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
+        paymentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getCancellationScaStatus()));
       } else {
-        txStatus = TransactionStatus.ACCP;
+        TransactionStatus newTxStatus = TransactionStatus
+            .getByValue(psu.get().getTransactionStatusAfterSca());
+        pisPaymentData.setTransactionStatus(newTxStatus);
+        paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
+
+        ScaStatus newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus());
+        if (newScaStatus.isFinalisedStatus()) {
+          // We need to update the payment with the PSU so that cancellation works. This happens
+          // automatically in the embedded approach (rat).
+          PsuData psuData = new PsuData();
+          psuData.setPsuId(psuId);
+          pisPaymentData.getPaymentData().getPsuData().add(psuData);
+        }
+
+        paymentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getInitiationScaStatus()));
       }
-    } else {
-      txStatus = TransactionStatus.CANC;
+      pisAuthorizationRepository.save(paymentAuth);
+      pisPaymentDataRepository.save(pisPaymentData);
+      pisCommonPaymentDataRepository.save(pisPaymentData.getPaymentData());
     }
-
-    pisPaymentData.setTransactionStatus(txStatus);
-
-    // TODO: Set status of PSU from TestDataService
-    payment.setScaStatus(ScaStatus.FINALISED);
-    payment.getPaymentData().setTransactionStatus(txStatus);
-    // We need to update the payment with the PSU so that cancellation works. This happens
-    // automatically in the embedded approach (rat).
-    PsuData psuData = new PsuData();
-    psuData.setPsuId(psuId);
-    pisPaymentData.getPaymentData().getPsuData().add(psuData);
-    pisPaymentDataRepository.save(pisPaymentData);
   }
 
   /**
@@ -146,7 +162,7 @@ public class RedirectService {
       return null;
     }
 
-    Optional<PisCommonPaymentData> commonPaymentData = commonPaymentDataRepository
+    Optional<PisCommonPaymentData> commonPaymentData = pisCommonPaymentDataRepository
         .findByPaymentId(pisAuthorization.get().getPaymentData().getPaymentId());
 
     if (!commonPaymentData.isPresent()) {
@@ -162,7 +178,7 @@ public class RedirectService {
   /**
    * Returns the tppRedirectUri for a specific consent.
    *
-   * @param externalId External payment Id
+   * @param externalId External consent Id
    * @return tppRedirectUri
    */
   public String getRedirectToTppUriFromAccountRepo(String externalId) {
@@ -176,5 +192,45 @@ public class RedirectService {
     TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
 
     return tppInfo.getRedirectUri();
+  }
+
+  /**
+   * Returns the payment status to a specific payment.
+   *
+   * @param externalId External payment Id
+   * @return payment status
+   */
+  public String getPaymentStatusFromRepo(String externalId) {
+    Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
+        .findByExternalId(externalId);
+    if (!pisAuthorization.isPresent()) {
+      //TODO handle error case
+      return null;
+    }
+
+    TransactionStatus transactionStatus = pisAuthorizationRepository.findByExternalId(externalId)
+        .get().getPaymentData().getTransactionStatus();
+
+
+    return transactionStatus.getTransactionStatus();
+  }
+
+  /**
+   * Returns the consent status after SCA to a specific consent.
+   *
+   * @param externalId External consent Id
+   * @return consent status
+   */
+  public String getConsentStatusFromRepo(String externalId) {
+    Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
+        .findByExternalId(externalId);
+    if (!aisAuthorisation.isPresent()) {
+      //TODO handle error case
+      return null;
+    }
+
+    ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
+
+    return consentStatus.getValue();
   }
 }

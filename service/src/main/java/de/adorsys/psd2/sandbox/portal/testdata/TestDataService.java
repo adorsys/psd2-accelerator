@@ -3,7 +3,7 @@ package de.adorsys.psd2.sandbox.portal.testdata;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Amount;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.PsuData;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,18 +24,20 @@ public class TestDataService {
   public static final String GLOBAL_PASSWORD = "12345";
   public static final String GLOBAL_TAN = "54321";
 
-  private Map<String, PsuData> psuMap;
+  private Map<String, TestPsu> psuMap;
 
   // Checkstyle forces constructor to have java docs comments. TODO Fix checkstyle, use constructor
   {
-    HashMap<String, PsuData> map = new HashMap<>();
+    HashMap<String, TestPsu> map = new HashMap<>();
 
-    PsuData psuSuccessful = initPsuSuccessfull();
-    PsuData psuRejected = initPsuRejected();
-    PsuData psuCancellationRejected = initPsuCancellationRejected();
-    PsuData psuBlocked = initPsuBlocked();
-    PsuData psuIntern = initPsuInternalLimit();
-    PsuData psuPending = initPsuPending();
+    TestPsu psuSuccessful = initPsuSuccessfull();
+    TestPsu psuRejected = initPsuRejected();
+    TestPsu psuCancellationRejected = initPsuCancellationRejected();
+    TestPsu psuBlocked = initPsuBlocked();
+    TestPsu psuIntern = initPsuInternalLimit();
+    TestPsu psuPending = initPsuPending();
+    TestPsu psuConsentExpired = initPsuConsentExpired();
+    TestPsu psuConsentRevokedByPsu = initPsuConsentRevokedByPsu();
 
     map.put(psuSuccessful.getPsuId(), psuSuccessful);
     map.put(psuRejected.getPsuId(), psuRejected);
@@ -43,12 +45,15 @@ public class TestDataService {
     map.put(psuBlocked.getPsuId(), psuBlocked);
     map.put(psuIntern.getPsuId(), psuIntern);
     map.put(psuPending.getPsuId(), psuPending);
+    map.put(psuConsentExpired.getPsuId(), psuConsentExpired);
+    map.put(psuConsentRevokedByPsu.getPsuId(), psuConsentRevokedByPsu);
+
 
     this.psuMap = Collections.unmodifiableMap(map);
   }
 
 
-  public Optional<PsuData> getPsu(String psuId) {
+  public Optional<TestPsu> getPsu(String psuId) {
     return Optional.ofNullable(psuMap.get(psuId));
   }
 
@@ -59,7 +64,7 @@ public class TestDataService {
    * @return Psu-Id
    */
   public Optional<String> getPsuByIban(String iban) {
-    for (PsuData psu : psuMap.values()) {
+    for (TestPsu psu : psuMap.values()) {
       boolean hasAccountWithIban = psu.getAccounts().values().stream()
           .anyMatch(account -> account.getIban().equals(iban));
       if (hasAccountWithIban) {
@@ -170,7 +175,7 @@ public class TestDataService {
     );
   }
 
-  private PsuData initPsuSuccessfull() {
+  private TestPsu initPsuSuccessfull() {
     String ibanGiro = "DE94500105178833114935";
     String accountOwner = "Melanie Klein";
     String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
@@ -333,15 +338,21 @@ public class TestDataService {
 
     accounts.put(savingsAccount.getAccountId(), savingsAccount);
 
-    return new PsuData(
+    return new TestPsu(
         "PSU-Successful",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        accounts
+        accounts,
+        "AcceptedCustomerProfile",
+        "valid",
+        "finalised",
+        "Canceled",
+        "terminatedByTpp",
+        "finalised"
     );
   }
 
-  private PsuData initPsuRejected() {
+  private TestPsu initPsuRejected() {
     String iban = "DE03760300809827461249";
     String accountOwner = "Klaus Bauer";
     String accountId = "2b163b22-8b7a-46cc-9ba4-7c8730ed3edd";
@@ -358,15 +369,21 @@ public class TestDataService {
         "Ihr Einkauf bei REWE"
     );
 
-    return new PsuData(
+    return new TestPsu(
         "PSU-Rejected",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction)
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
+        "Received",
+        "received",
+        "failed",
+        null,
+        null,
+        null
     );
   }
 
-  private PsuData initPsuCancellationRejected() {
+  private TestPsu initPsuCancellationRejected() {
     String iban = "DE54500105177914626923";
     String accountOwner = "Sebastian Sommer";
     String accountId = "a9231724-1bd5-4070-99bb-8c97e11982ad";
@@ -383,15 +400,21 @@ public class TestDataService {
         "Ihr Einkauf bei Lidl"
     );
 
-    return new PsuData(
+    return new TestPsu(
         "PSU-Cancellation-Rejected",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction)
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
+        "AcceptedCustomerProfile",
+        "valid",
+        "finalised",
+        "AcceptedCustomerProfile",
+        "terminatedByTpp",
+        "failed"
     );
   }
 
-  private PsuData initPsuBlocked() {
+  private TestPsu initPsuBlocked() {
     String iban = "DE10760300801209386222";
     String accountOwner = "Martina Sandfeuer";
     String accountId = "3ce6eee1-56c2-49cd-9314-36a2a8bb892b";
@@ -408,15 +431,21 @@ public class TestDataService {
         "Amazon.de: Ihre Bestellung #81023412"
     );
 
-    return new PsuData(
+    return new TestPsu(
         "PSU-Blocked",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), transaction)
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), transaction),
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
     );
   }
 
-  private PsuData initPsuInternalLimit() {
+  private TestPsu initPsuInternalLimit() {
     String iban = "DE88760300803491763002";
     String accountOwner = "Laura Holzer";
     String accountId = "4ed8f9bb-f239-463f-a3ae-2b90b7924ffa";
@@ -433,15 +462,22 @@ public class TestDataService {
         "Amazon.de: Ihre Bestellung #27189921"
     );
 
-    return new PsuData(
+    // TODO clarify which transaction status should be returned after SCA
+    return new TestPsu(
         "PSU-InternalLimit",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), transaction)
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), transaction),
+        "Rejected",
+        "valid",
+        "finalised",
+        null,
+        "terminatedByTpp",
+        "finalised"
     );
   }
 
-  private PsuData initPsuPending() {
+  private TestPsu initPsuPending() {
     String iban = "DE86760300801729983660";
     String accountOwner = "Andreas Watzke";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
@@ -458,11 +494,79 @@ public class TestDataService {
         "Amazon.de: Ihre Bestellung #4528499"
     );
 
-    return new PsuData(
+    return new TestPsu(
         "PSU-Pending",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction)
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        "Pending",
+        "valid",
+        "finalised",
+        null,
+        null,
+        "finalised"
+    );
+  }
+
+  private TestPsu initPsuConsentExpired() {
+    String iban = "DE86760300801729983660";
+    String accountOwner = "Meryl Streep";
+    String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
+
+    Transaction transaction = new Transaction(
+        "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
+        BigDecimal.valueOf(199.99),
+        EUR,
+        LocalDate.parse("2018-09-20"),
+        accountOwner,
+        iban,
+        "Amazon",
+        "",
+        "Amazon.de: Ihre Bestellung #4528499"
+    );
+
+    return new TestPsu(
+        "PSU-Pending",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        "AcceptedCustomerProfile",
+        "expired",
+        "finalised",
+        "Canceled",
+        null,
+        "finalised"
+    );
+  }
+
+  private TestPsu initPsuConsentRevokedByPsu() {
+    String iban = "DE86760300801729983660";
+    String accountOwner = "Tom Cruise";
+    String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
+
+    Transaction transaction = new Transaction(
+        "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
+        BigDecimal.valueOf(199.99),
+        EUR,
+        LocalDate.parse("2018-09-20"),
+        accountOwner,
+        iban,
+        "Amazon",
+        "",
+        "Amazon.de: Ihre Bestellung #4528499"
+    );
+
+    return new TestPsu(
+        "PSU-Pending",
+        GLOBAL_PASSWORD,
+        GLOBAL_TAN,
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        "AcceptedCustomerProfile",
+        "revokedByPsu",
+        "finalised",
+        "Canceled",
+        null,
+        "finalised"
     );
   }
 

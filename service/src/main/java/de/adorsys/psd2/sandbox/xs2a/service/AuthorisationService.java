@@ -3,7 +3,7 @@ package de.adorsys.psd2.sandbox.xs2a.service;
 import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.SUCCESS;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.PsuData;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.sca.ChallengeData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
@@ -39,7 +39,7 @@ public class AuthorisationService {
       SpiPsuData spiPsuData, String password, String iban, AspspConsentData aspspConsentData,
       boolean forceFailure) {
 
-    Optional<PsuData> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
+    Optional<TestPsu> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
     Optional<String> accountOwner = testDataService.getPsuByIban(iban);
 
     if (!inquiringPsu.isPresent() || !password.equals(inquiringPsu.get().getPassword())

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.PsuData;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ public class TestDataServiceTest {
   @Test
   public void getPsuTestSuccessful() {
     final String psuId = "PSU-Successful";
-    Optional<PsuData> optionalPsu = testDataService.getPsu(psuId);
+    Optional<TestPsu> optionalPsu = testDataService.getPsu(psuId);
 
     assertEquals(optionalPsu.get().getPsuId(), psuId);
   }
@@ -39,7 +39,7 @@ public class TestDataServiceTest {
   @Test
   public void getPsuTestWithErrors() {
     final String psuId = "PSU-UNKNOWN";
-    Optional<PsuData> optionalPsu = testDataService.getPsu(psuId);
+    Optional<TestPsu> optionalPsu = testDataService.getPsu(psuId);
 
     assertEquals(optionalPsu, Optional.empty());
   }
