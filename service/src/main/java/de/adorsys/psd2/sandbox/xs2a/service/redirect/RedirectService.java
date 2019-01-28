@@ -1,12 +1,15 @@
 package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
+import de.adorsys.psd2.consent.domain.TppInfoEntity;
 import de.adorsys.psd2.consent.domain.account.AisConsent;
 import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
+import de.adorsys.psd2.consent.domain.payment.PisCommonPaymentData;
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.AisConsentAuthorizationRepository;
 import de.adorsys.psd2.consent.repository.AisConsentRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorizationRepository;
+import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
@@ -24,6 +27,7 @@ public class RedirectService {
   private PisAuthorizationRepository pisAuthorizationRepository;
   private AisConsentAuthorizationRepository aisConsentAuthorizationRepository;
   private AisConsentRepository aisConsentRepository;
+  private PisCommonPaymentDataRepository commonPaymentDataRepository;
 
   /**
    * Create a new RedirectService instance.
@@ -36,11 +40,13 @@ public class RedirectService {
   public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
       PisAuthorizationRepository pisAuthorizationRepository,
       AisConsentAuthorizationRepository aisConsentAuthorizationRepository,
-      AisConsentRepository aisConsentRepository) {
+      AisConsentRepository aisConsentRepository,
+      PisCommonPaymentDataRepository commonPaymentDataRepository) {
     this.pisPaymentDataRepository = pisPaymentDataRepository;
     this.pisAuthorizationRepository = pisAuthorizationRepository;
     this.aisConsentAuthorizationRepository = aisConsentAuthorizationRepository;
     this.aisConsentRepository = aisConsentRepository;
+    this.commonPaymentDataRepository = commonPaymentDataRepository;
   }
 
   /**
@@ -110,5 +116,32 @@ public class RedirectService {
     } else {
       return TransactionStatus.ACCP;
     }
+  }
+
+  /**
+   * Returns the tppRedirectUri for a specific payment.
+   *
+   * @param externalId External payment Id
+   * @return tppRedirectUri
+   */
+  public String getRedirectToTppUri(String externalId) {
+    Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
+        .findByExternalId(externalId);
+    if (!pisAuthorization.isPresent()) {
+      //TODO handle error case
+      return null;
+    }
+
+    Optional<PisCommonPaymentData> commonPaymentData = commonPaymentDataRepository
+        .findByPaymentId(pisAuthorization.get().getPaymentData().getPaymentId());
+
+    if (!commonPaymentData.isPresent()) {
+      return null;
+    }
+
+    TppInfoEntity tppInfo = commonPaymentData.get().getAuthorizations().get(0).getPaymentData()
+        .getTppInfo();
+
+    return tppInfo.getRedirectUri();
   }
 }
