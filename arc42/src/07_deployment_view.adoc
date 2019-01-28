@@ -25,7 +25,9 @@ NOTE: In reality all (SSL) traffic get passed through the Load Balancer to the _
 
 === Release Artifacts
 
-Images are released to https://hub.docker.com/u/adorsys[adorsys DockerHub account].
+We use https://github.com/adorsys/psd2-accelerator/releases[GitHub Releases] to publish our release notes and the Sandbox JAR and its SHA1 checksum.
+
+Docker Images are released to https://hub.docker.com/u/adorsys[adorsys DockerHub account].
 
 [options="header"]
 |=======
@@ -33,8 +35,6 @@ Images are released to https://hub.docker.com/u/adorsys[adorsys DockerHub accoun
 | sandbox   | adorsys/psd2-sandbox:{acc-version}
 | ssl-proxy | adorsys/psd2-sandbox-ssl-proxy:{acc-version}
 |=======
-
-If you want to deploy the JAR without Docker please extract it from the Docker image. Use this command to copy the JAR to your current directory.
 
 [subs=attributes+]
 [source,shell]
