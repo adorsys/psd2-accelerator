@@ -39,7 +39,8 @@ public class RedirectController {
 
     model.addAttribute("resourceType", "payment");
     model.addAttribute("status", "ACCP");
-    model.addAttribute("redirectUri", redirectService.getRedirectToTppUri(externalId));
+    model.addAttribute("redirectUri",
+        redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
 
     return targetHtmlFile;
   }
@@ -62,7 +63,8 @@ public class RedirectController {
 
     model.addAttribute("resourceType", "consent");
     model.addAttribute("status", "VALID");
-    model.addAttribute("redirectUri", redirectService.getRedirectToTppUri(externalId));
+    model.addAttribute("redirectUri",
+        redirectService.getRedirectToTppUriFromAccountRepo(externalId));
 
     return targetHtmlFile;
   }
@@ -85,7 +87,8 @@ public class RedirectController {
 
     model.addAttribute("resourceType", "payment");
     model.addAttribute("status", "CANC");
-    model.addAttribute("redirectUri", redirectService.getRedirectToTppUri(externalId));
+    model.addAttribute("redirectUri",
+        redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
 
     return targetHtmlFile;
   }
