@@ -11,6 +11,7 @@ import de.adorsys.psd2.consent.repository.AisConsentRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorizationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
+import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RedirectService {
 
+  private TestDataService testDataService;
   private PisPaymentDataRepository pisPaymentDataRepository;
   private PisAuthorizationRepository pisAuthorizationRepository;
   private AisConsentAuthorizationRepository aisConsentAuthorizationRepository;
@@ -37,11 +39,13 @@ public class RedirectService {
    * @param aisConsentAuthorizationRepository AisConsentAuthorizationRepository
    * @param aisConsentRepository              AisConsentRepository
    */
-  public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
+  public RedirectService(TestDataService testDataService,
+      PisPaymentDataRepository pisPaymentDataRepository,
       PisAuthorizationRepository pisAuthorizationRepository,
       AisConsentAuthorizationRepository aisConsentAuthorizationRepository,
       AisConsentRepository aisConsentRepository,
       PisCommonPaymentDataRepository commonPaymentDataRepository) {
+    this.testDataService = testDataService;
     this.pisPaymentDataRepository = pisPaymentDataRepository;
     this.pisAuthorizationRepository = pisAuthorizationRepository;
     this.aisConsentAuthorizationRepository = aisConsentAuthorizationRepository;
@@ -59,7 +63,7 @@ public class RedirectService {
     Optional<AisConsentAuthorization> aisConsentAuthorization = aisConsentAuthorizationRepository
         .findByExternalId(externalId);
 
-    if (!aisConsentAuthorization.isPresent()) {
+    if (!aisConsentAuthorization.isPresent() || !testDataService.getPsu(psuId).isPresent()) {
       //TODO handle error case
       return;
     }
@@ -85,7 +89,7 @@ public class RedirectService {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
 
-    if (!pisAuthorization.isPresent()) {
+    if (!pisAuthorization.isPresent() || !testDataService.getPsu(psuId).isPresent()) {
       //TODO handle error case
       return;
     }
@@ -124,7 +128,7 @@ public class RedirectService {
    * @param externalId External payment Id
    * @return tppRedirectUri
    */
-  public String getRedirectToTppUri(String externalId) {
+  public String getRedirectToTppUriFromPaymentRepo(String externalId) {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
     if (!pisAuthorization.isPresent()) {
@@ -141,6 +145,25 @@ public class RedirectService {
 
     TppInfoEntity tppInfo = commonPaymentData.get().getAuthorizations().get(0).getPaymentData()
         .getTppInfo();
+
+    return tppInfo.getRedirectUri();
+  }
+
+  /**
+   * Returns the tppRedirectUri for a specific consent.
+   *
+   * @param externalId External payment Id
+   * @return tppRedirectUri
+   */
+  public String getRedirectToTppUriFromAccountRepo(String externalId) {
+    Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
+        .findByExternalId(externalId);
+    if (!aisAuthorisation.isPresent()) {
+      //TODO handle error case
+      return null;
+    }
+
+    TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
 
     return tppInfo.getRedirectUri();
   }
