@@ -18,7 +18,6 @@ import de.adorsys.psd2.model.DayOfExecution;
 import de.adorsys.psd2.model.ExecutionRule;
 import de.adorsys.psd2.model.FrequencyCode;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
-import de.adorsys.psd2.model.PaymentInitiationCancelResponse204202;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
 import de.adorsys.psd2.model.PeriodicPaymentInitiationSctJson;
@@ -45,6 +44,7 @@ import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 @Ignore("without this ignore intellij tries to run the step files")
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
@@ -67,17 +67,21 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   public void initiatePayment(String paymentType, String debtorIban, String paymentProduct) {
     context.setPaymentProduct(paymentProduct);
 
-    Request request = null;
     HashMap<String, String> headers = TestUtils.createSession();
+    Request<?> request;
 
-    if (paymentType.equals("single")) {
-      request = getSinglePayment(headers, false, debtorIban);
-    }
-    if (paymentType.equals("future-dated")) {
-      request = getSinglePayment(headers, true, debtorIban);
-    }
-    if (paymentType.equals("periodic")) {
-      request = getPeriodicPayment(headers, debtorIban);
+    switch (paymentType) {
+      case "single":
+        request = getSinglePayment(headers, false, debtorIban);
+        break;
+      case "future-dated":
+        request = getSinglePayment(headers, true, debtorIban);
+        break;
+      case "periodic":
+        request = getPeriodicPayment(headers, debtorIban);
+        break;
+      default:
+        throw new IllegalStateException("Unknown payment product=" + paymentType);
     }
 
     ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
@@ -114,9 +118,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request<PaymentInitiationSctJson> request = new Request<>();
-    request.setBody(payment);
-    request.setHeader(headers);
+    Request<PaymentInitiationSctJson> request = new Request<>(payment, headers);
 
     ResponseEntity<TppMessage403PIS[]> response = template.exchange(
         paymentService + "/" + paymentProduct,
@@ -172,8 +174,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   public void getPaymentData() {
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request request = new Request();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
@@ -192,8 +193,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   public void getPaymentStatus() {
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request request = new Request();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<TransactionStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
@@ -211,9 +211,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   @And("PSU cancels the payment")
   public void cancelPayment() {
     HashMap<String, String> headers = TestUtils.createSession();
+    Request<?> request = Request.emptyRequest(headers);
 
-    Request request = new Request<>();
-    request.setHeader(headers);
     ResponseEntity<TransactionStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
@@ -283,11 +282,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
       payment.setRequestedExecutionDate(LocalDate.now().plusDays(7));
     }
 
-    Request<PaymentInitiationSctJson> request = new Request<>();
-    request.setBody(payment);
-    request.setHeader(headers);
-
-    return request;
+    return new Request<>(payment, headers);
   }
 
   private Request getPeriodicPayment(HashMap<String, String> headers, String debtorIban) {
@@ -314,10 +309,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     periodicPayment.setCreditorAddress(createCreditorAddress());
     periodicPayment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
 
-    Request<PeriodicPaymentInitiationSctJson> request = new Request<>();
-    request.setBody(periodicPayment);
-    request.setHeader(headers);
-    return request;
+    return new Request<>(periodicPayment, headers);
   }
 
   private AccountReference createAccount(String iban, String currency) {
@@ -339,9 +331,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   private void authoriseWithRedirectApproach(String psuId, boolean isInit) {
     HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request<>();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     String externalId = TestUtils.extractId(context.getScaRedirect(), "pis");
 
@@ -370,9 +360,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
     authenticationData.setPsuData(psuData);
 
-    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
-    updateCredentialRequest.setBody(authenticationData);
-    updateCredentialRequest.setHeader(headers);
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>(authenticationData, headers);
 
     return template.exchange(
         url,
@@ -385,8 +373,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
       String selectedScaMethod, String tan, String urlSegment) {
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request startAuthorisationRequest = new Request<>();
-    startAuthorisationRequest.setHeader(headers);
+    Request<?> startAuthorisationRequest = Request.emptyRequest(headers);
 
     ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
         context.getPaymentService() + "/" +
@@ -417,9 +404,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
     scaMethod.setAuthenticationMethodId(selectedScaMethod);
 
-    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>();
-    scaSelectionRequest.setBody(scaMethod);
-    scaSelectionRequest.setHeader(headers);
+    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>(scaMethod, headers);
 
     ResponseEntity<SelectPsuAuthenticationMethodResponse> response = template.exchange(
         context.getPaymentService() + "/" +
@@ -436,9 +421,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     TransactionAuthorisation authorisationData = new TransactionAuthorisation();
     authorisationData.scaAuthenticationData(tan);
 
-    Request<TransactionAuthorisation> request = new Request<>();
-    request.setBody(authorisationData);
-    request.setHeader(headers);
+    Request<TransactionAuthorisation> request = new Request<>(authorisationData, headers);
 
     ResponseEntity<ScaStatusResponse> sendTanResponse = template.exchange(
         context.getPaymentService() + "/" +
@@ -460,8 +443,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
       String urlSegment) {
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request request = new Request<>();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<StartScaprocessResponse> startCancellationResponse = template.exchange(
         context.getPaymentService() + "/" +

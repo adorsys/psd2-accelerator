@@ -18,6 +18,7 @@ import java.util.HashMap;
 import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 @Ignore("Cucumber steps")
 public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
@@ -35,9 +36,6 @@ public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
     headers.put("x-request-id", "2f77a125-aa7a-45c0-b414-cea25a116035");
     headers.put("tpp-qwac-certificate", TestUtils.getTppQwacCertificate());
 
-    Request<ConfirmationOfFunds> request = new Request<>();
-    request.setHeader(headers);
-
     ConfirmationOfFunds confirmation = new ConfirmationOfFunds();
 
     AccountReference account = new AccountReference();
@@ -51,7 +49,7 @@ public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
     amount.setCurrency("EUR");
     confirmation.setInstructedAmount(amount);
 
-    request.setBody(confirmation);
+    Request<ConfirmationOfFunds> request = new Request<>(confirmation, headers);
 
     ResponseEntity response = template.exchange(
         "funds-confirmations",

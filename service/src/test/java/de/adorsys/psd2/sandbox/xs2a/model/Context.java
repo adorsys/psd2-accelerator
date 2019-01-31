@@ -19,4 +19,9 @@ public class Context {
   private String consentId;
   private AccountAccess consentAccountAccess;
   private ResponseEntity actualResponse;
+
+  @SuppressWarnings("unchecked") // "just" test code
+  public <T> ResponseEntity<T> getActualResponse() {
+    return (ResponseEntity<T>) actualResponse;
+  }
 }
