@@ -49,10 +49,9 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.TBSCertificateStructure;
-import org.bouncycastle.asn1.x509.X509Extension;
-import org.bouncycastle.asn1.x509.X509Extensions;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -114,6 +113,11 @@ public class CertificateService {
   static PrivateKey getKeyFromClassPath(String filename) {
     ClassLoader loader = Thread.currentThread().getContextClassLoader();
     InputStream stream = loader.getResourceAsStream("certificates/" + filename);
+    if (stream == null) {
+      throw new CertificateException(
+          "Could not read private key from classpath:" + "certificates/" + filename
+      );
+    }
 
     BufferedReader br = new BufferedReader(new InputStreamReader(stream));
 
@@ -172,13 +176,13 @@ public class CertificateService {
     }
   }
 
-  static DERSequence createQcInfo(RolesOfPsp rolesOfPsp, NcaName ncaName, NcaId ncaId) {
+  private static DERSequence createQcInfo(RolesOfPsp rolesOfPsp, NcaName ncaName, NcaId ncaId) {
     return new DERSequence(new ASN1Encodable[]{rolesOfPsp, ncaName, ncaId});
   }
 
   private final IssuerData issuerData;
 
-  public CertificateService() {
+  CertificateService() {
     issuerData = generateIssuerData();
   }
 
@@ -209,7 +213,7 @@ public class CertificateService {
   }
 
   static String format(X509Certificate cert) throws Exception {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     String nl = System.getProperty("line.separator");
 
     buf.append("  [0]         Version: ").append(cert.getVersion()).append(nl);
@@ -233,9 +237,9 @@ public class CertificateService {
       }
     }
 
-    TBSCertificateStructure tbs = TBSCertificateStructure
+    TBSCertificate tbs = TBSCertificate
         .getInstance(ASN1Sequence.fromByteArray(cert.getTBSCertificate()));
-    X509Extensions extensions = tbs.getExtensions();
+    Extensions extensions = tbs.getExtensions();
 
     if (extensions != null) {
       Enumeration oids = extensions.oids();
@@ -246,10 +250,10 @@ public class CertificateService {
 
       while (oids.hasMoreElements()) {
         ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) oids.nextElement();
-        X509Extension ext = extensions.getExtension(oid);
+        Extension ext = extensions.getExtension(oid);
 
-        if (ext.getValue() != null) {
-          byte[] octs = ext.getValue().getOctets();
+        if (ext.getExtnValue() != null) {
+          byte[] octs = ext.getExtnValue().getOctets();
           ASN1InputStream asn1InputStream = new ASN1InputStream(octs);
           buf.append("                       critical(").append(ext.isCritical()).append(") ");
           try {
@@ -379,7 +383,7 @@ public class CertificateService {
 
   private static class RolesOfPsp extends DERSequence {
 
-    public static RolesOfPsp fromCertificateRequest(CertificateRequest certificateRequest) {
+    static RolesOfPsp fromCertificateRequest(CertificateRequest certificateRequest) {
       List<RoleOfPsp> roles = new ArrayList<>();
 
       if (certificateRequest.getRoles().contains(PspRole.AISP)) {
@@ -397,18 +401,18 @@ public class CertificateService {
       return new RolesOfPsp(roles.toArray(new RoleOfPsp[]{}));
     }
 
-    public RolesOfPsp(RoleOfPsp[] array) {
+    RolesOfPsp(RoleOfPsp[] array) {
       super(array);
     }
   }
 
   private static class RoleOfPsp extends DERSequence {
 
-    public static final RoleOfPsp PSP_PI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_PI,
+    static final RoleOfPsp PSP_PI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_PI,
         RoleOfPspName.PSP_PI);
-    public static final RoleOfPsp PSP_AI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_AI,
+    static final RoleOfPsp PSP_AI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_AI,
         RoleOfPspName.PSP_AI);
-    public static final RoleOfPsp PSP_IC = new RoleOfPsp(RoleOfPspOid.ROLE_OF_PSP_OID,
+    static final RoleOfPsp PSP_IC = new RoleOfPsp(RoleOfPspOid.ROLE_OF_PSP_OID,
         RoleOfPspName.PSP_IC);
 
     private RoleOfPsp(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
@@ -418,10 +422,10 @@ public class CertificateService {
 
   private static class RoleOfPspName extends DERUTF8String {
 
-    public static final RoleOfPspName PSP_AS = new RoleOfPspName("PSP_AS");
-    public static final RoleOfPspName PSP_PI = new RoleOfPspName("PSP_PI");
-    public static final RoleOfPspName PSP_AI = new RoleOfPspName("PSP_AI");
-    public static final RoleOfPspName PSP_IC = new RoleOfPspName("PSP_IC");
+    // TODO we do not support the ASPSP role (PSP_AS) right now
+    static final RoleOfPspName PSP_PI = new RoleOfPspName("PSP_PI");
+    static final RoleOfPspName PSP_AI = new RoleOfPspName("PSP_AI");
+    static final RoleOfPspName PSP_IC = new RoleOfPspName("PSP_IC");
 
     private RoleOfPspName(String string) {
       super(string);
@@ -430,18 +434,16 @@ public class CertificateService {
 
   private static class RoleOfPspOid extends ASN1ObjectIdentifier {
 
-    public static final ASN1ObjectIdentifier ETSI_PSD_2_ROLES = new ASN1ObjectIdentifier(
+    static final ASN1ObjectIdentifier ETSI_PSD_2_ROLES = new ASN1ObjectIdentifier(
         "0.4.0.19495.1");
-    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_AS = new RoleOfPspOid(
-        ETSI_PSD_2_ROLES.branch("1"));
-    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_PI = new RoleOfPspOid(
+    static final RoleOfPspOid ID_PSD_2_ROLE_PSP_PI = new RoleOfPspOid(
         ETSI_PSD_2_ROLES.branch("2"));
-    public static final RoleOfPspOid ID_PSD_2_ROLE_PSP_AI = new RoleOfPspOid(
+    static final RoleOfPspOid ID_PSD_2_ROLE_PSP_AI = new RoleOfPspOid(
         ETSI_PSD_2_ROLES.branch("3"));
-    public static final RoleOfPspOid ROLE_OF_PSP_OID = new RoleOfPspOid(
+    static final RoleOfPspOid ROLE_OF_PSP_OID = new RoleOfPspOid(
         ETSI_PSD_2_ROLES.branch("4"));
 
-    public RoleOfPspOid(ASN1ObjectIdentifier identifier) {
+    RoleOfPspOid(ASN1ObjectIdentifier identifier) {
       super(identifier.getId());
     }
   }
