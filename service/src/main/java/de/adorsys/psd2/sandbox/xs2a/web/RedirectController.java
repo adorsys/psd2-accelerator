@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.web;
 
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.RedirectService;
+import de.adorsys.psd2.sandbox.xs2a.service.redirect.ScaOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +36,7 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    redirectService.handlePaymentRedirectRequest(externalId, psuId, true);
+    redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.INIT);
 
     model.addAttribute("resourceType", "payment");
     model.addAttribute("status", "ACCP");
@@ -83,7 +84,7 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    redirectService.handlePaymentRedirectRequest(externalId, psuId, false);
+    redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.CANCEL);
 
     model.addAttribute("resourceType", "payment");
     model.addAttribute("status", "CANC");

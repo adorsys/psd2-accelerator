@@ -214,15 +214,16 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     Request request = new Request<>();
     request.setHeader(headers);
-    ResponseEntity<PaymentInitiationCancelResponse204202> response = template.exchange(
+    ResponseEntity<TransactionStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
             context.getPaymentId(),
         HttpMethod.DELETE,
         request.toHttpEntity(),
-        PaymentInitiationCancelResponse204202.class);
+        TransactionStatusResponse.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
+    context.setActualResponse(response);
   }
 
   @Then("^the transaction status (.*) is received$")
@@ -344,19 +345,18 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     String externalId = TestUtils.extractId(context.getScaRedirect(), "pis");
 
-    String pathSegment = "canc";
+    String pathSegment = "cancel";
     if (isInit) {
       pathSegment = "init";
     }
 
-    template.exchange(
+    ResponseEntity<String> response = template.exchange(
         String.format("online-banking/" + pathSegment + "/pis/%s?psu-id=%s", externalId, psuId),
         HttpMethod.GET,
         request.toHttpEntity(),
         String.class);
 
-    //TODO: add check for request status
-    // Could be successful or failed
+    assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
   private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,

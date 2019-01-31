@@ -1,5 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
+import de.adorsys.psd2.consent.domain.PsuData;
 import de.adorsys.psd2.consent.domain.TppInfoEntity;
 import de.adorsys.psd2.consent.domain.account.AisConsent;
 import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
@@ -85,7 +86,8 @@ public class RedirectService {
    * @param psuId      Psu Id
    */
   // TODO: handle isInit for cancellation and initiation scenarios
-  public void handlePaymentRedirectRequest(String externalId, String psuId, boolean isInit) {
+  public void handlePaymentRedirectRequest(String externalId, String psuId,
+      ScaOperation scaOperation) {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
 
@@ -105,21 +107,29 @@ public class RedirectService {
     }
     PisPaymentData pisPaymentData = pisPaymentDataList.get().get(0);
 
-    pisPaymentData.setTransactionStatus(getTransactionStatus(psuId));
+    TransactionStatus txStatus;
+    if (scaOperation == ScaOperation.INIT) {
+      if (psuId.equalsIgnoreCase("psu-unknown")
+          || psuId.equalsIgnoreCase("psu-rejected")) {
+        txStatus = TransactionStatus.RCVD;
+      } else {
+        txStatus = TransactionStatus.ACCP;
+      }
+    } else {
+      txStatus = TransactionStatus.CANC;
+    }
+
+    pisPaymentData.setTransactionStatus(txStatus);
 
     // TODO: Set status of PSU from TestDataService
     payment.setScaStatus(ScaStatus.FINALISED);
-    payment.getPaymentData().setTransactionStatus(getTransactionStatus(psuId));
+    payment.getPaymentData().setTransactionStatus(txStatus);
+    // We need to update the payment with the PSU so that cancellation works. This happens
+    // automatically in the embedded approach (rat).
+    PsuData psuData = new PsuData();
+    psuData.setPsuId(psuId);
+    pisPaymentData.getPaymentData().getPsuData().add(psuData);
     pisPaymentDataRepository.save(pisPaymentData);
-  }
-
-  private TransactionStatus getTransactionStatus(String psuId) {
-    if (psuId.equalsIgnoreCase("psu-unknown")
-        || psuId.equalsIgnoreCase("psu-rejected")) {
-      return TransactionStatus.RCVD;
-    } else {
-      return TransactionStatus.ACCP;
-    }
   }
 
   /**
