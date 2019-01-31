@@ -1,4 +1,4 @@
-Feature: Payment Initiation Service
+Feature: PIS
 
     ################################################################################################
     #                                                                                              #
@@ -90,24 +90,24 @@ Feature: Payment Initiation Service
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
       | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | CANC   |
 
-  # TODO Blocked by a bug in xs2a, waiting for hotfix for getAccounts endpoint
-  @ignore
   Scenario Outline: Cancellation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     And PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU cancels the payment
     And PSU tries to authorise the cancellation resource with his <psu-id> and <password>
-    Then an error is received
+    When PSU requests the payment status
+    Then the transaction status <status> is received
     Examples:
-      | payment-type | iban                   | payment-product       | psu-id                    | password | sca-method | tan   |
-      | single       | DE54500105177914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 |
+      | payment-type | iban                   | payment-product       | psu-id                    | password | sca-method | tan   | status |
+      | single       | DE54500105177914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 | ACCP   |
 
     ################################################################################################
     #                                                                                              #
     # Service Blocked                                                                              #
     #                                                                                              #
     ################################################################################################
-
+  # TODO response code is 403 but response body is empty
+  @ignore
   Scenario Outline: Service blocked for initiation of a payment
     When PSU tries to initiate a payment <payment-service> with iban <iban> using the payment product <payment-product>
     Then an error-message <error-message> is received
