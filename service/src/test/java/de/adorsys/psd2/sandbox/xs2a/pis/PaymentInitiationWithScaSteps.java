@@ -49,6 +49,9 @@ import org.springframework.http.ResponseEntity;
 @Ignore("without this ignore intellij tries to run the step files")
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
+  private static final String CANCELLATION_AUTHORISATIONS = "cancellation-authorisations";
+  private static final String AUTHORISATIONS = "authorisations";
+
   @Autowired
   public AspspProfileService aspspProfileService;
 
@@ -83,6 +86,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         HttpMethod.POST,
         request.toHttpEntity(),
         PaymentInitationRequestResponse201.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
       context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
@@ -119,6 +124,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         request.toHttpEntity(),
         TppMessage403PIS[].class);
 
+    assertTrue(response.getStatusCode().is4xxClientError());
+
     context.setActualResponse(response);
   }
 
@@ -126,27 +133,38 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
   public void authorisePayment(String psuId, String password, String selectedScaMethod,
       String tan) {
     if (scaApproach.equalsIgnoreCase("embedded")) {
-      this.authorisePaymentWithEmbeddedApproach(psuId, password, selectedScaMethod, tan);
+      this.authoriseWithEmbeddedApproach(psuId, password, selectedScaMethod, tan, AUTHORISATIONS);
     } else {
-      this.authoriseWithRedirectApproach(psuId);
+      this.authoriseWithRedirectApproach(psuId, true);
+    }
+  }
+
+  @When("^PSU authorised the cancellation with psu-id (.*), password (.*), sca-method (.*) and tan (.*)$")
+  public void authorisePaymentCancellation(String psuId, String password, String selectedScaMethod,
+      String tan) {
+    if (scaApproach.equalsIgnoreCase("embedded")) {
+      this.authoriseWithEmbeddedApproach(psuId, password, selectedScaMethod, tan,
+          CANCELLATION_AUTHORISATIONS);
+    } else {
+      this.authoriseWithRedirectApproach(psuId, false);
     }
   }
 
   @When("^PSU tries to authorise the payment with his (.*) and (.*)$")
   public void tryToAuthoriseThePayment(String psuId, String password) {
     if (scaApproach.equalsIgnoreCase("embedded")) {
-      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, "authorisations");
+      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, AUTHORISATIONS);
     } else {
-      this.authoriseWithRedirectApproach(psuId);
+      this.authoriseWithRedirectApproach(psuId, true);
     }
   }
 
   @When("PSU tries to authorise the cancellation resource with his (.*) and (.*)")
   public void tryToCancelPayment(String psuId, String password) {
     if (scaApproach.equalsIgnoreCase("embedded")) {
-      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, "cancellation-authorisations");
+      this.tryToAuthoriseWithEmbeddedApproach(psuId, password, CANCELLATION_AUTHORISATIONS);
     } else {
-      authoriseWithRedirectApproach(psuId);
+      authoriseWithRedirectApproach(psuId, false);
     }
   }
 
@@ -165,6 +183,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         request.toHttpEntity(),
         PaymentInitiationSctWithStatusResponse.class);
 
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
     context.setActualResponse(response);
   }
 
@@ -182,6 +202,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         HttpMethod.GET,
         request.toHttpEntity(),
         TransactionStatusResponse.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
 
     context.setActualResponse(response);
   }
@@ -203,37 +225,33 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
-  @Then("^the transaction status (.*) and response code (.*) are received$")
-  public void checkTransactionResponse(String status, String code) {
+  @Then("^the transaction status (.*) is received$")
+  public void checkTransactionResponse(String status) {
     ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();
 
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().getTransactionStatus().toString(),
-        equalTo(status));
+    assertThat(actualResponse.getBody().getTransactionStatus().toString(), equalTo(status));
   }
 
-  @Then("^the payment data and response code (.*) are received and its transaction-status is (.*)$")
-  public void receivePaymentDataAndResponseCode(String code, String transactionStatus) {
+  @Then("^the payment data and its transaction-status is (.*) are received$")
+  public void receivePaymentDataAndResponseCode(String transactionStatus) {
     ResponseEntity<PaymentInitiationSctWithStatusResponse> actualResponse = context
         .getActualResponse();
 
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
     assertThat(actualResponse.getBody().getTransactionStatus().toString(),
         equalTo(transactionStatus));
     assertThat(actualResponse.getBody().getCreditorName(), equalTo("WBG"));
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
   }
 
-  @Then("an error and response code (.*) are received")
-  public void anAppropriateErrorAndResponseCodeAreReceived(String code) {
+  @Then("an error is received")
+  public void anAppropriateErrorAndResponseCodeAreReceived() {
     ResponseEntity<TppMessage401PIS> actualResponse = context.getActualResponse();
     assertThat(actualResponse.getBody().getCategory(), equalTo(TppMessageCategory.ERROR));
     assertThat(actualResponse.getBody().getText(), containsString("PSU-ID cannot be matched"));
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
   }
 
-  @Then("an error with http code (.*) and error-message (.*) are received")
-  public void receiveErrorMessageAndCode(Integer httpCode, String errorMessage) {
+  @Then("an error-message (.*) is received")
+  public void receiveErrorMessageAndCode(String errorMessage) {
     ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
@@ -241,7 +259,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
     assertThat(actualResponse.getBody()[0].getText(),
         containsString("channel independent blocking"));
-    assertThat(actualResponse.getStatusCodeValue(), equalTo(httpCode));
   }
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
@@ -319,7 +336,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     return creditorAddress;
   }
 
-  private void authoriseWithRedirectApproach(String psuId) {
+  private void authoriseWithRedirectApproach(String psuId, boolean isInit) {
     HashMap<String, String> headers = TestUtils.createSession();
 
     Request request = new Request<>();
@@ -327,14 +344,19 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     String externalId = TestUtils.extractId(context.getScaRedirect(), "pis");
 
+    String pathSegment = "canc";
+    if (isInit) {
+      pathSegment = "init";
+    }
+
     template.exchange(
-        String.format("online-banking/init/pis/%s?psu-id=%s", externalId, psuId),
+        String.format("online-banking/" + pathSegment + "/pis/%s?psu-id=%s", externalId, psuId),
         HttpMethod.GET,
         request.toHttpEntity(),
         String.class);
 
     //TODO: add check for request status
-    // Could be successfull or failed
+    // Could be successful or failed
   }
 
   private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,
@@ -359,9 +381,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         clazz);
   }
 
-  private void authorisePaymentWithEmbeddedApproach(String psuId, String password,
-      String selectedScaMethod,
-      String tan) {
+  private void authoriseWithEmbeddedApproach(String psuId, String password,
+      String selectedScaMethod, String tan, String urlSegment) {
     HashMap<String, String> headers = TestUtils.createSession();
 
     Request startAuthorisationRequest = new Request<>();
@@ -370,21 +391,28 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations",
+            context.getPaymentId() + "/" +
+            urlSegment,
         HttpMethod.POST,
         startAuthorisationRequest.toHttpEntity(),
         StartScaprocessResponse.class);
 
+    assertTrue(startScaResponse.getStatusCode().is2xxSuccessful());
+
     String authorisationId = TestUtils
         .extractId((String) startScaResponse.getBody().getLinks()
-            .get("startAuthorisationWithPsuAuthentication"), "authorisations");
+            .get("startAuthorisationWithPsuAuthentication"), urlSegment);
 
     String url = context.getPaymentService() + "/" +
         context.getPaymentProduct() + "/" +
-        context.getPaymentId() + "/authorisations/" +
+        context.getPaymentId() + "/" +
+        urlSegment + "/" +
         authorisationId;
 
-    handleCredentialRequest(UpdatePsuAuthenticationResponse.class, url, psuId, password);
+    ResponseEntity<UpdatePsuAuthenticationResponse> credentialResponse = handleCredentialRequest(
+        UpdatePsuAuthenticationResponse.class, url, psuId, password);
+
+    assertTrue(credentialResponse.getStatusCode().is2xxSuccessful());
 
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
     scaMethod.setAuthenticationMethodId(selectedScaMethod);
@@ -396,7 +424,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     ResponseEntity<SelectPsuAuthenticationMethodResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
+            context.getPaymentId() + "/" +
+            urlSegment + "/" +
             authorisationId,
         HttpMethod.PUT,
         scaSelectionRequest.toHttpEntity(),
@@ -414,7 +443,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     ResponseEntity<ScaStatusResponse> sendTanResponse = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
-            context.getPaymentId() + "/authorisations/" +
+            context.getPaymentId() + "/" +
+            urlSegment + "/" +
             authorisationId,
         HttpMethod.PUT,
         request.toHttpEntity(),
@@ -456,6 +486,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     ResponseEntity<TppMessage401PIS> response = handleCredentialRequest(
         TppMessage401PIS.class, url, psuId, password);
+
+    assertTrue(response.getStatusCode().is4xxClientError());
 
     context.setActualResponse(response);
   }
