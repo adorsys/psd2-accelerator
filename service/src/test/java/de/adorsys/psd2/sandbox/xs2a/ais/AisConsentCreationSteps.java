@@ -41,6 +41,7 @@ import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 @Ignore("without this ignore intellij tries to run the step files")
 public class AisConsentCreationSteps extends SpringCucumberTestBase {
@@ -83,9 +84,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     consent.setValidUntil(LocalDate.now().plusDays(30));
     consent.setFrequencyPerDay(5);
 
-    Request<Consents> request = new Request<>();
-    request.setBody(consent);
-    request.setHeader(headers);
+    Request<Consents> request = new Request<>(consent, headers);
 
     ResponseEntity<ConsentsResponse201> response = template.exchange(
         "consents",
@@ -105,8 +104,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("PSU-ID", context.getPsuId());
 
-    Request request = new Request();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<ConsentInformationResponse200Json> response = template.exchange(
         "consents/" + context.getConsentId(),
@@ -120,9 +118,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   @When("PSU requests the consent status")
   public void getConsentStatus() {
     HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<ConsentStatusResponse200> response = template.exchange(
         "consents/" + context.getConsentId() + "/status",
@@ -182,9 +178,8 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   @Given("PSU deletes the consent")
   public void deleteConsent() {
     HashMap<String, String> headers = TestUtils.createSession();
+    Request<?> revokeConsentRequest = Request.emptyRequest(headers);
 
-    Request revokeConsentRequest = new Request<>();
-    revokeConsentRequest.setHeader(headers);
 
     template.exchange(
         "consents/" + context.getConsentId(),
@@ -197,9 +192,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   public void getAccountList() {
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
-
-    Request request = new Request();
-    request.setHeader(headers);
+    Request<?> request = Request.emptyRequest(headers);
 
     ResponseEntity<AccountList> response = template.exchange(
         "accounts/",
@@ -249,9 +242,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     authenticationData.setPsuData(psuData);
     headers.put("PSU-ID", psuId);
 
-    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>();
-    updateCredentialRequest.setBody(authenticationData);
-    updateCredentialRequest.setHeader(headers);
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>(authenticationData, headers);
 
     return template.exchange(
         url,
@@ -279,9 +270,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   private void authoriseWithRedirectApproach(String psuId) {
     HashMap<String, String> headers = TestUtils.createSession();
-
-    Request request = new Request<>();
-    request.setHeader(headers);
+    Request request = Request.emptyRequest(headers);
 
     String externalId = TestUtils.extractId(context.getScaRedirect(), "ais");
 
@@ -295,9 +284,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   private void authoriseWithEmbeddedApproach(String psuId, String password,
       String selectedScaMethod, String tan) {
     HashMap<String, String> headers = TestUtils.createSession();
-
-    Request startAuthorisationRequest = new Request<>();
-    startAuthorisationRequest.setHeader(headers);
+    Request startAuthorisationRequest = Request.emptyRequest(headers);
 
     ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
         String
@@ -318,9 +305,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     SelectPsuAuthenticationMethod scaMethod = new SelectPsuAuthenticationMethod();
     scaMethod.setAuthenticationMethodId(selectedScaMethod);
 
-    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>();
-    scaSelectionRequest.setBody(scaMethod);
-    scaSelectionRequest.setHeader(headers);
+    Request<SelectPsuAuthenticationMethod> scaSelectionRequest = new Request<>(scaMethod, headers);
 
     template.exchange(
         url,
@@ -331,9 +316,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     TransactionAuthorisation authorisationData = new TransactionAuthorisation();
     authorisationData.scaAuthenticationData(tan);
 
-    Request<TransactionAuthorisation> request = new Request<>();
-    request.setBody(authorisationData);
-    request.setHeader(headers);
+    Request<TransactionAuthorisation> request = new Request<>(authorisationData, headers);
 
     ResponseEntity<ScaStatusResponse> response = template.exchange(
         url,
@@ -347,8 +330,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   private void tryToAuthoriseWithEmbeddedApproach(String psuId, String password) {
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request startAuthorisationRequest = new Request<>();
-    startAuthorisationRequest.setHeader(headers);
+    Request<?> startAuthorisationRequest = Request.emptyRequest(headers);
 
     ResponseEntity<StartScaprocessResponse> startScaResponse = template.exchange(
         String.format("consents/%s/authorisations/", context.getConsentId()),
