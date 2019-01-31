@@ -2,18 +2,20 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
-import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiSinglePaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
+import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,12 +35,13 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
     Optional<String> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
     if (!psuId.isPresent()) {
-      throw new RestException(MessageErrorCode.UNAUTHORIZED);
+      throw new RestException(HttpStatus.UNAUTHORIZED, "PSU not found");
     }
     boolean isBlocked = testDataService.isBlockedPsu(psuId.get());
 
     if (isBlocked) {
-      throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
+      return SpiResponse.<SpiSinglePaymentInitiationResponse>builder()
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
     }
     SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
     response.setTransactionStatus(SpiTransactionStatus.RCVD);
@@ -48,28 +51,6 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
     response.setPaymentId(paymentId);
 
     return new SpiResponse<>(response, initialAspspConsentData);
-  }
-
-  @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentWithoutSca(
-      @NotNull SpiContextData ctx,
-      @NotNull SpiSinglePayment spiSinglePayment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return SpiResponse.<SpiResponse.VoidResponse>builder().success();
-  }
-
-  @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndExecutePayment(
-      @NotNull SpiContextData ctx,
-      @NotNull SpiScaConfirmation spiScaConfirmation,
-      @NotNull SpiSinglePayment spiSinglePayment,
-      @NotNull AspspConsentData aspspConsentData) {
-
-    return super.checkTanAndSetStatusOfPayment(
-        spiSinglePayment,
-        spiScaConfirmation,
-        aspspConsentData
-    );
   }
 
   @Override
@@ -83,8 +64,34 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
   @Override
   public @NotNull SpiResponse<SpiTransactionStatus> getPaymentStatusById(
-      @NotNull SpiContextData contextData, @NotNull SpiSinglePayment payment,
+      @NotNull SpiContextData contextData,
+      @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData aspspConsentData) {
     return super.getPaymentStatusById(payment, aspspConsentData);
+  }
+
+  @Override
+  public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
+      @NotNull SpiContextData spiContextData,
+      @NotNull SpiSinglePayment spiSinglePayment,
+      @NotNull AspspConsentData aspspConsentData) {
+
+    return SpiResponse.<SpiPaymentExecutionResponse>builder()
+        .aspspConsentData(aspspConsentData)
+        .payload(new SpiPaymentExecutionResponse(SpiTransactionStatus.ACTC))
+        .success();
+  }
+
+  @Override
+  public @NotNull SpiResponse<SpiPaymentExecutionResponse> verifyScaAuthorisationAndExecutePayment(
+      @NotNull SpiContextData spiContextData,
+      @NotNull SpiScaConfirmation spiScaConfirmation,
+      @NotNull SpiSinglePayment spiSinglePayment,
+      @NotNull AspspConsentData aspspConsentData) {
+    return super.checkTanAndSetStatusOfPayment(
+        spiSinglePayment,
+        spiScaConfirmation,
+        aspspConsentData
+    );
   }
 }

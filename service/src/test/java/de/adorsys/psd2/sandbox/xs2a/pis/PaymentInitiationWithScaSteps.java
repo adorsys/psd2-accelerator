@@ -247,13 +247,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
   }
 
-  @Then("an error is received")
-  public void anAppropriateErrorAndResponseCodeAreReceived() {
-    ResponseEntity<TppMessage401PIS> actualResponse = context.getActualResponse();
-    assertThat(actualResponse.getBody().getCategory(), equalTo(TppMessageCategory.ERROR));
-    assertThat(actualResponse.getBody().getText(), containsString("PSU-ID cannot be matched"));
-  }
-
   @Then("an error-message (.*) is received")
   public void receiveErrorMessageAndCode(String errorMessage) {
     ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();

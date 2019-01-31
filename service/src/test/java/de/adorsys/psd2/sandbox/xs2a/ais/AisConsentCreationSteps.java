@@ -273,8 +273,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     ResponseEntity<TppMessage403AIS[]> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
-    // TODO did work in 1.13 but is null in 1.15 :(
-    // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
+    assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
     assertThat(actualResponse.getBody()[0].getText(),
         containsString("channel independent blocking"));
   }

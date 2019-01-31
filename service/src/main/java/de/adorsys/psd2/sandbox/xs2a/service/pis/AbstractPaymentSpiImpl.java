@@ -8,6 +8,7 @@ import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
@@ -55,7 +56,7 @@ class AbstractPaymentSpiImpl {
         .fail(SpiResponseStatus.LOGICAL_FAILURE);
   }
 
-  SpiResponse<SpiResponse.VoidResponse> checkTanAndSetStatusOfPayment(
+  SpiResponse<SpiPaymentExecutionResponse> checkTanAndSetStatusOfPayment(
       SpiPayment spiPayment,
       SpiScaConfirmation spiScaConfirmation,
       AspspConsentData aspspConsentData) {
@@ -67,16 +68,19 @@ class AbstractPaymentSpiImpl {
         PisPaymentData payment = paymentDataList.get().get(0);
         payment.setTransactionStatus(TransactionStatus.ACCP);
         paymentDataRepository.save(payment);
-        return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+        return SpiResponse.<SpiPaymentExecutionResponse>builder()
+            .aspspConsentData(aspspConsentData)
+            .payload(new SpiPaymentExecutionResponse(SpiTransactionStatus.ACCP))
+            .success();
       }
 
-      return SpiResponse.<SpiResponse.VoidResponse>builder()
+      return SpiResponse.<SpiPaymentExecutionResponse>builder()
           .aspspConsentData(aspspConsentData)
           .message(Collections.singletonList("Payment not found"))
           .fail(SpiResponseStatus.LOGICAL_FAILURE);
     }
 
-    return SpiResponse.<SpiResponse.VoidResponse>builder()
+    return SpiResponse.<SpiPaymentExecutionResponse>builder()
         .aspspConsentData(aspspConsentData)
         .message(Collections.singletonList("Wrong PIN"))
         .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);

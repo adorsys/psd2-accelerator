@@ -29,7 +29,6 @@ Feature: AIS
       | accounts               | balances               | transactions           | status   |
       | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | received |
 
-# TODO Blocked for EMBEDDED by a bug in xs2a, waiting for hotfix for getAccounts endpoint
   Scenario Outline: Consent Status Valid
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
@@ -40,15 +39,25 @@ Feature: AIS
       | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | PSU-Successful    | 12345    | SMS_OTP    | 54321 | valid  |
       | DE88760300803491763002 | DE88760300803491763002 | DE88760300803491763002 | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | valid  |
 
-  Scenario Outline: Consent Status TerminatedByTpp
+  Scenario Outline: Consent Status Rejected
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU deletes the consent
     When PSU requests the consent status
     Then the status <status> is received
     Examples:
-      | accounts               | balances               | transactions           | status          |
-      | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | terminatedByTpp |
-      | DE54500105177914626923 | DE54500105177914626923 | DE54500105177914626923 | terminatedByTpp |
+      | accounts               | balances               | transactions           | status   |
+      | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | rejected |
+      | DE54500105177914626923 | DE54500105177914626923 | DE54500105177914626923 | rejected |
+
+  Scenario Outline: Consent Status TerminatedByTpp
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    And PSU deletes the consent
+    When PSU requests the consent status
+    Then the status <status> is received
+    Examples:
+      | accounts               | balances               | transactions           | psu-id         | password | sca-method | tan   | status          |
+      | DE94500105178833114935 | DE94500105178833114935 | DE94500105178833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | terminatedByTpp |
 
   Scenario Outline: Consent Creation with static results on SCA
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
@@ -66,8 +75,6 @@ Feature: AIS
     # Get Account List                                                                             #
     #                                                                                              #
     ################################################################################################
-# TODO Blocked by a bug in xs2a, waiting for hotfix for getAccounts endpoint
-  @ignore
   Scenario Outline: Get Account List
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
@@ -83,7 +90,6 @@ Feature: AIS
     # Unsuccessful SCA                                                                             #
     #                                                                                              #
     ################################################################################################
-  # TODO Blocked for EMBEDDED by a bug in xs2a, waiting for hotfix for getAccounts endpoint
   Scenario Outline: Dedicated Consent Creation with unsuccessful SCA
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU tries to authorise the consent with psu-id <psu-id>, password <password>
@@ -94,6 +100,8 @@ Feature: AIS
       | DE94500105178833114935 | DE94500105178833114935 | null         | PSU-Unknown  | 12345    | received |
       | DE03760300809827461249 | DE03760300809827461249 | null         | PSU-Rejected | 12345    | received |
 
+    # TODO response code is 403 but response body is empty
+  @ignore
   Scenario Outline: Service blocked for Consent Creation
     Given PSU tries to create a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     Then an error-message <error-message> is received

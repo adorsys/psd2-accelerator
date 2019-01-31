@@ -7,9 +7,9 @@ import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisCommonPaymentData;
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
-import de.adorsys.psd2.consent.repository.AisConsentAuthorizationRepository;
+import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.AisConsentRepository;
-import de.adorsys.psd2.consent.repository.PisAuthorizationRepository;
+import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
 public class RedirectService {
 
   private PisPaymentDataRepository pisPaymentDataRepository;
-  private PisAuthorizationRepository pisAuthorizationRepository;
-  private AisConsentAuthorizationRepository aisConsentAuthorizationRepository;
+  private PisAuthorisationRepository pisAuthorizationRepository;
+  private AisConsentAuthorisationRepository aisConsentAuthorizationRepository;
   private AisConsentRepository aisConsentRepository;
   private PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
   private TestDataService testDataService;
@@ -43,8 +43,8 @@ public class RedirectService {
    * @param testDataService                   TestDataService
    */
   public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
-      PisAuthorizationRepository pisAuthorizationRepository,
-      AisConsentAuthorizationRepository aisConsentAuthorizationRepository,
+      PisAuthorisationRepository pisAuthorizationRepository,
+      AisConsentAuthorisationRepository aisConsentAuthorizationRepository,
       AisConsentRepository aisConsentRepository,
       PisCommonPaymentDataRepository pisCommonPaymentDataRepository,
       TestDataService testDataService) {

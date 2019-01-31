@@ -5,6 +5,7 @@ import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPeriodicPaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.PeriodicPaymentSpi;
@@ -16,15 +17,15 @@ import org.springframework.stereotype.Service;
 public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements PeriodicPaymentSpi {
 
   @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> executePaymentWithoutSca(
+  public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
       @NotNull SpiContextData ctx,
       @NotNull SpiPeriodicPayment spiPeriodicPayment,
       @NotNull AspspConsentData aspspConsentData) {
-    return SpiResponse.<SpiResponse.VoidResponse>builder().success();
+    return SpiResponse.<SpiPaymentExecutionResponse>builder().success();
   }
 
   @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisationAndExecutePayment(
+  public @NotNull SpiResponse<SpiPaymentExecutionResponse> verifyScaAuthorisationAndExecutePayment(
       @NotNull SpiContextData ctx,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiPeriodicPayment spiPeriodicPayment,
