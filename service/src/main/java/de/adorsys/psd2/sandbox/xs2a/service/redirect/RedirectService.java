@@ -66,7 +66,7 @@ public class RedirectService {
     Optional<AisConsentAuthorization> aisConsentAuthorization = aisConsentAuthorizationRepository
         .findByExternalId(externalId);
 
-    if (!aisConsentAuthorization.isPresent() || !testDataService.getPsu(psuId).isPresent()) {
+    if (!aisConsentAuthorization.isPresent()) {
       //TODO handle error case
       return;
     }
@@ -77,11 +77,10 @@ public class RedirectService {
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
     if (psu.isPresent()) {
       Optional<ConsentStatus> consentStatus = ConsentStatus.fromValue(psu.get()
-          .getConsentStatusAfterSca());
-      if (consentStatus.isPresent()) {
-        consent.setConsentStatus(consentStatus.get());
-      }
-      aisConsentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getInitiationScaStatus()));
+          .getConsentStatusAfterSca().xs2aValue());
+      consentStatus.ifPresent(consent::setConsentStatus);
+      ScaStatus newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
+      aisConsentAuth.setScaStatus(newScaStatus);
 
     }
     aisConsentRepository.save(consent);
@@ -120,18 +119,22 @@ public class RedirectService {
 
     if (psu.isPresent()) {
       if (scaOperation == ScaOperation.CANCEL) {
-        TransactionStatus newTxStatus = TransactionStatus
-            .getByValue(psu.get().getTransactionStatusAfterCancellation());
+        TransactionStatus newTxStatus = TransactionStatus.getByValue(
+            psu.get().getTransactionStatusAfterCancellation().xs2aValue()
+        );
         pisPaymentData.setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
-        paymentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getCancellationScaStatus()));
+        ScaStatus newScaStatus = ScaStatus
+            .fromValue(psu.get().getCancellationScaStatus().xs2aValue());
+        paymentAuth.setScaStatus(newScaStatus);
       } else {
         TransactionStatus newTxStatus = TransactionStatus
-            .getByValue(psu.get().getTransactionStatusAfterSca());
+            .getByValue(psu.get().getTransactionStatusAfterSca().xs2aValue());
         pisPaymentData.setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
 
-        ScaStatus newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus());
+        ScaStatus newScaStatus = ScaStatus
+            .fromValue(psu.get().getInitiationScaStatus().xs2aValue());
         if (newScaStatus.isFinalisedStatus()) {
           // We need to update the payment with the PSU so that cancellation works. This happens
           // automatically in the embedded approach (rat).
@@ -140,7 +143,7 @@ public class RedirectService {
           pisPaymentData.getPaymentData().getPsuData().add(psuData);
         }
 
-        paymentAuth.setScaStatus(ScaStatus.fromValue(psu.get().getInitiationScaStatus()));
+        paymentAuth.setScaStatus(newScaStatus);
       }
       pisAuthorizationRepository.save(paymentAuth);
       pisPaymentDataRepository.save(pisPaymentData);

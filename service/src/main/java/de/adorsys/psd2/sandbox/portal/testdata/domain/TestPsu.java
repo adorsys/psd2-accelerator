@@ -1,5 +1,8 @@
 package de.adorsys.psd2.sandbox.portal.testdata.domain;
 
+import de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus;
+import de.adorsys.psd2.sandbox.portal.testdata.ScaStatus;
+import de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus;
 import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +15,12 @@ public class TestPsu {
   private String password;
   private String tan;
   private HashMap<String, Account> accounts;
-  private String transactionStatusAfterSca;
-  private String consentStatusAfterSca;
-  private String initiationScaStatus;
-  private String transactionStatusAfterCancellation;
-  private String consentStatusAfterDeletion;
-  private String cancellationScaStatus;
+  private TransactionStatus transactionStatusAfterSca;
+  private ConsentStatus consentStatusAfterSca;
+  private ScaStatus initiationScaStatus;
+  private TransactionStatus transactionStatusAfterCancellation;
+  private ConsentStatus consentStatusAfterDeletion;
+  private ScaStatus cancellationScaStatus;
+
 }
+

@@ -1,5 +1,17 @@
 package de.adorsys.psd2.sandbox.portal.testdata;
 
+import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.Expired;
+import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.RevokedByPsu;
+import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.TerminatedByTpp;
+import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.Valid;
+import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Failed;
+import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Finalised;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedCustomerProfile;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Canceled;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Pending;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Received;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Rejected;
+
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Amount;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
@@ -26,7 +38,6 @@ public class TestDataService {
 
   private Map<String, TestPsu> psuMap;
 
-  // Checkstyle forces constructor to have java docs comments. TODO Fix checkstyle, use constructor
   {
     HashMap<String, TestPsu> map = new HashMap<>();
 
@@ -48,7 +59,6 @@ public class TestDataService {
     map.put(psuConsentExpired.getPsuId(), psuConsentExpired);
     map.put(psuConsentRevokedByPsu.getPsuId(), psuConsentRevokedByPsu);
 
-
     this.psuMap = Collections.unmodifiableMap(map);
   }
 
@@ -58,7 +68,7 @@ public class TestDataService {
   }
 
   /**
-   * Returns Identification of Psu that matches the passed Iban.
+   * Returns Identification of Psu that matches the passed IBAN.
    *
    * @param iban Iban
    * @return Psu-Id
@@ -79,7 +89,7 @@ public class TestDataService {
   }
 
   /**
-   * Returns Identification Number of an Account that matches the passed Iban.
+   * Returns Identification Number of an Account that matches the passed IBAN.
    *
    * @param psuId Identification of Psu
    * @param iban  Iban
@@ -99,9 +109,9 @@ public class TestDataService {
   }
 
   /**
-   * Returns Accounts of the Psu.
+   * Returns Accounts of the PSU.
    *
-   * @param psuId Identification of Psu
+   * @param psuId Identification of PSU
    * @return List of Accounts
    */
   public Optional<List<Account>> getAccounts(String psuId) {
@@ -114,7 +124,7 @@ public class TestDataService {
   /**
    * Returns requested Account of the Psu.
    *
-   * @param psuId     Identification of Psu
+   * @param psuId     Identification of PSU
    * @param accountId Identification of account
    * @return Account
    */
@@ -128,22 +138,22 @@ public class TestDataService {
   /**
    * Returns List of requested Accounts of the Psu.
    *
-   * @param psuId Identification of Psu
-   * @param ibans List of Ibans
+   * @param psuId Identification of PSU
+   * @param ibans List of IBANs
    * @return List of Accounts
    */
   public Optional<List<Account>> getRequestedAccounts(String psuId, List<String> ibans) {
     List<Account> allAccounts = new ArrayList<>(psuMap.get(psuId).getAccounts().values());
 
-    return Optional.ofNullable(allAccounts.stream()
+    return Optional.of(allAccounts.stream()
         .filter(account -> ibans.contains(account.getIban()))
         .collect(Collectors.toList()));
   }
 
   /**
-   * Returns List of Transactions of the Psus Account.
+   * Returns List of Transactions of the PSUs Account.
    *
-   * @param psuId     Identification of Psu
+   * @param psuId     Identification of PSU
    * @param accountId Identification of Account
    * @return List of Transactions
    */
@@ -157,7 +167,7 @@ public class TestDataService {
   }
 
   /**
-   * Returns distinct Transaction of the Psus Account.
+   * Returns distinct Transaction of the PSUs Account.
    *
    * @param psuId         Identification of Psu
    * @param accountId     Identification of Account
@@ -343,12 +353,12 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         accounts,
-        "AcceptedCustomerProfile",
-        "valid",
-        "finalised",
-        "Canceled",
-        "terminatedByTpp",
-        "finalised"
+        AcceptedCustomerProfile,
+        Valid,
+        Finalised,
+        Canceled,
+        TerminatedByTpp,
+        Finalised
     );
   }
 
@@ -374,9 +384,9 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
-        "Received",
-        "received",
-        "failed",
+        Received,
+        ConsentStatus.Received,
+        Failed,
         null,
         null,
         null
@@ -405,12 +415,12 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
-        "AcceptedCustomerProfile",
-        "valid",
-        "finalised",
-        "AcceptedCustomerProfile",
-        "terminatedByTpp",
-        "failed"
+        AcceptedCustomerProfile,
+        Valid,
+        Finalised,
+        AcceptedCustomerProfile,
+        TerminatedByTpp,
+        Failed
     );
   }
 
@@ -468,12 +478,12 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), transaction),
-        "Rejected",
-        "valid",
-        "finalised",
+        Rejected,
+        Valid,
+        Finalised,
         null,
-        "terminatedByTpp",
-        "finalised"
+        TerminatedByTpp,
+        Finalised
     );
   }
 
@@ -499,17 +509,17 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
-        "Pending",
-        "valid",
-        "finalised",
+        Pending,
+        Valid,
+        Finalised,
         null,
         null,
-        "finalised"
+        Finalised
     );
   }
 
   private TestPsu initPsuConsentExpired() {
-    String iban = "DE86760300801729983660";
+    String iban = "DE09760300807895439876";
     String accountOwner = "Meryl Streep";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
@@ -526,16 +536,16 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Pending",
+        "PSU-ConsentExpired",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
-        "AcceptedCustomerProfile",
-        "expired",
-        "finalised",
-        "Canceled",
+        AcceptedCustomerProfile,
+        Expired,
+        Finalised,
+        Canceled,
         null,
-        "finalised"
+        Finalised
     );
   }
 
@@ -557,16 +567,16 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Pending",
+        "PSU-ConsentRevokedByPsu",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
-        "AcceptedCustomerProfile",
-        "revokedByPsu",
-        "finalised",
-        "Canceled",
+        AcceptedCustomerProfile,
+        RevokedByPsu,
+        Finalised,
+        Canceled,
         null,
-        "finalised"
+        Finalised
     );
   }
 
