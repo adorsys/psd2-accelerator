@@ -44,7 +44,6 @@ import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 @Ignore("without this ignore intellij tries to run the step files")
 public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
@@ -223,6 +222,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
     context.setActualResponse(response);
+
+    // TODO get scaRedirect from cancellation response. Currently waiting for XS2A fix.
+    //if (scaApproach.equalsIgnoreCase("redirect")) {
+    //  context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+    //}
   }
 
   @Then("^the transaction status (.*) is received$")
@@ -470,6 +474,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         TppMessage401PIS.class, url, psuId, password);
 
     assertTrue(response.getStatusCode().is4xxClientError());
+    //TODO check for scaStatus == failed?!
 
     context.setActualResponse(response);
   }

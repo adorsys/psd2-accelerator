@@ -35,10 +35,10 @@ Feature: Payment Initiation Service
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     When PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     When PSU requests the payment status
-    Then the transaction status <status> and response code <code> are received
+    Then the transaction status <status> is received
     Examples:
-      | payment-type | iban                   | payment-product       | psu-id            | password | sca-method | tan   | status | code |
-      | single       | DE88760300803491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   | 200  |
+      | payment-type | iban                   | payment-product       | psu-id            | password | sca-method | tan   | status |
+      | single       | DE88760300803491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   |
 
   Scenario Outline: Initiation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -109,8 +109,8 @@ Feature: Payment Initiation Service
     ################################################################################################
 
   Scenario Outline: Service blocked for initiation of a payment
-    When PSU tries to initiate a payment <payment-type> with iban <iban> using the payment product <payment-product>
+    When PSU tries to initiate a payment <payment-service> with iban <iban> using the payment product <payment-product>
     Then an error-message <error-message> is received
     Examples:
-      | payment-type | iban                   | payment-product       | error-message   |
-      | payments     | DE10760300801209386222 | sepa-credit-transfers | SERVICE_BLOCKED |
+      | payment-service | iban                   | payment-product       | error-message   |
+      | payments        | DE10760300801209386222 | sepa-credit-transfers | SERVICE_BLOCKED |
