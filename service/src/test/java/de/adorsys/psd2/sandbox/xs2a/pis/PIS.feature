@@ -35,7 +35,7 @@ Feature: Payment Initiation Service
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     When PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     When PSU requests the payment status
-    Then the transaction status <status> and response code <code> are received
+    Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id            | password | sca-method | tan   | status | code |
       | single       | DE88760300803491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   | 200  |
