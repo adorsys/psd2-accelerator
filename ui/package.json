@@ -65,7 +65,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "lint-staged"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
@@ -73,7 +73,7 @@
       "tslint --fix -p tslint.json"
     ],
     "*.{js,ts,json,css,scss,md,html}": [
-      "prettier --write --config ./src/.prettierrc.json",
+      "prettier --write",
       "git add"
     ]
   }
