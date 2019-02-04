@@ -106,8 +106,6 @@ Feature: PIS
     # Service Blocked                                                                              #
     #                                                                                              #
     ################################################################################################
-  # TODO response code is 403 but response body is empty
-  @ignore
   Scenario Outline: Service blocked for initiation of a payment
     When PSU tries to initiate a payment <payment-service> with iban <iban> using the payment product <payment-product>
     Then an error-message <error-message> is received
