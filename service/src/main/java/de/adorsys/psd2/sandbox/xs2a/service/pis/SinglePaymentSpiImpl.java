@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
@@ -33,12 +34,12 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
       @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData initialAspspConsentData) {
 
-    Optional<String> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
+    Optional<TestPsu> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
     if (!psuId.isPresent()) {
       throw new RestException(HttpStatus.UNAUTHORIZED, "PSU not found");
     }
 
-    if (testDataService.isBlockedPsu(psuId.get())) {
+    if (testDataService.isBlockedPsu(psuId.get().getPsuId())) {
       throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
     }
 

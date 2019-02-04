@@ -6,9 +6,11 @@ import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
+@Setter
 @EqualsAndHashCode
 public class Account {
 
@@ -20,6 +22,11 @@ public class Account {
   private Balance bookedBalance;
   private Balance availableBalance;
   private HashMap<String, Transaction> transactions;
+
+  public Account(String iban, Currency currency) {
+    this.iban = iban;
+    this.currency = currency;
+  }
 }
 
 

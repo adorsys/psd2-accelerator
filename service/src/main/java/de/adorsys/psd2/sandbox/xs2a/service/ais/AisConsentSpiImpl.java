@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.ais;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
@@ -40,12 +41,12 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       SpiAccountConsent spiAccountConsent,
       AspspConsentData aspspConsentData) {
 
-    Optional<String> psuId = testDataService
+    Optional<TestPsu> psuId = testDataService
         .getPsuByIban(spiAccountConsent.getAccess().getAccounts().get(0).getIban());
     if (!psuId.isPresent()) {
       throw new RestException(MessageErrorCode.FORMAT_ERROR);
     }
-    boolean isBlocked = testDataService.isBlockedPsu(psuId.get());
+    boolean isBlocked = testDataService.isBlockedPsu(psuId.get().getPsuId());
 
     if (isBlocked) {
       throw new RestException(MessageErrorCode.SERVICE_BLOCKED);

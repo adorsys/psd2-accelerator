@@ -47,24 +47,24 @@ public class TestDataServiceTest {
   @Test
   public void getPsuIdByIbanTestSuccessful() {
     final String expectedPsuId = "PSU-Successful";
-    Optional<String> returnedPsuId1 = testDataService.getPsuByIban("DE11760365688833114935");
-    Optional<String> returnedPsuId2 = testDataService.getPsuByIban("DE13760365689669622432");
-    Optional<String> returnedPsuId3 = testDataService.getPsuByIban("DE07760365680034562391");
-    Optional<String> returnedPsuId4 = testDataService.getPsuByIban("DE89760365681134661389");
-    Optional<String> returnedPsuId5 = testDataService.getPsuByIban("DE71760365681257681381");
-    Optional<String> returnedPsuId6 = testDataService.getPsuByIban("DE56760365681650680255");
+    Optional<TestPsu> returnedPsu1 = testDataService.getPsuByIban("DE11760365688833114935");
+    Optional<TestPsu> returnedPsu2 = testDataService.getPsuByIban("DE13760365689669622432");
+    Optional<TestPsu> returnedPsu3 = testDataService.getPsuByIban("DE07760365680034562391");
+    Optional<TestPsu> returnedPsu4 = testDataService.getPsuByIban("DE89760365681134661389");
+    Optional<TestPsu> returnedPsu5 = testDataService.getPsuByIban("DE71760365681257681381");
+    Optional<TestPsu> returnedPsu6 = testDataService.getPsuByIban("DE56760365681650680255");
 
-    assertEquals(returnedPsuId1.get(), expectedPsuId);
-    assertEquals(returnedPsuId2.get(), expectedPsuId);
-    assertEquals(returnedPsuId3.get(), expectedPsuId);
-    assertEquals(returnedPsuId4.get(), expectedPsuId);
-    assertEquals(returnedPsuId5.get(), expectedPsuId);
-    assertEquals(returnedPsuId6.get(), expectedPsuId);
+    assertEquals(returnedPsu1.get().getPsuId(), expectedPsuId);
+    assertEquals(returnedPsu2.get().getPsuId(), expectedPsuId);
+    assertEquals(returnedPsu3.get().getPsuId(), expectedPsuId);
+    assertEquals(returnedPsu4.get().getPsuId(), expectedPsuId);
+    assertEquals(returnedPsu5.get().getPsuId(), expectedPsuId);
+    assertEquals(returnedPsu6.get().getPsuId(), expectedPsuId);
   }
 
   @Test
   public void getPsuIdByIbanTestWithErrors() {
-    Optional<String> returnedPsuId = testDataService.getPsuByIban("DE94500105178833114936");
+    Optional<TestPsu> returnedPsuId = testDataService.getPsuByIban("DE94500105178833114936");
 
     assertEquals(returnedPsuId, Optional.empty());
   }
@@ -259,7 +259,8 @@ public class TestDataServiceTest {
     final String accountId = "9b86539d-589b-4082-90c2-d725c019777f";
     final String transactionId = "8508921e-2cd4-43e8-ba1e-26b143307927";
 
-    Optional<Transaction> account = testDataService.getDistinctTransaction(psuId, accountId, transactionId);
+    Optional<Transaction> account = testDataService
+        .getDistinctTransaction(psuId, accountId, transactionId);
 
     assertEquals(account, Optional.empty());
   }
@@ -270,7 +271,8 @@ public class TestDataServiceTest {
     final String accountId = "ACCOUNT_UNKOWN";
     final String transactionId = "8508921e-2cd4-43e8-ba1e-26b143307927";
 
-    Optional<Transaction> account = testDataService.getDistinctTransaction(psuId, accountId, transactionId);
+    Optional<Transaction> account = testDataService
+        .getDistinctTransaction(psuId, accountId, transactionId);
 
     assertEquals(account, Optional.empty());
   }

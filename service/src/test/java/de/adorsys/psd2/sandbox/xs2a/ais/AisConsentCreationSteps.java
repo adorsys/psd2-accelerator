@@ -28,6 +28,8 @@ import de.adorsys.psd2.model.TppMessage401AIS;
 import de.adorsys.psd2.model.TppMessage403AIS;
 import de.adorsys.psd2.model.TppMessageCategory;
 import de.adorsys.psd2.model.TransactionAuthorisation;
+import de.adorsys.psd2.model.TransactionDetails;
+import de.adorsys.psd2.model.TransactionsResponse200Json;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
@@ -104,7 +106,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
   }
 
   @Given("PSU tries to create a consent on dedicated accounts for account information (.*), balances (.*) and transactions (.*)")
-  public void psuTriesToCreateConsent(String accounts, String balances, String transactions){
+  public void psuTriesToCreateConsent(String accounts, String balances, String transactions) {
     String[] ibansForAccountAccess = accounts.split(";");
     String[] ibansForBalances = balances.split(";");
     String[] ibansForTransactions = transactions.split(";");
@@ -251,12 +253,67 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
+  @When("PSU accesses the transaction list")
+  public void getTransactionList() {
+    ResponseEntity<AccountList> actualResponse = context.getActualResponse();
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("Consent-ID", context.getConsentId());
+    Request<?> request = Request.emptyRequest(headers);
+    context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
+    String queryParams = "?bookingStatus=both&dateFrom="
+        + LocalDate.now().minusYears(1) + "&dateTo="
+        + LocalDate.now();
+
+    ResponseEntity<TransactionsResponse200Json> response = template.exchange(
+        "accounts/" + context.getAccountId() + "/transactions/" + queryParams,
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        TransactionsResponse200Json.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    context.setActualResponse(response);
+  }
+
+  @When("PSU accesses a single transaction")
+  public void getTransaction() {
+    ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("Consent-ID", context.getConsentId());
+    Request<?> request = Request.emptyRequest(headers);
+    TransactionDetails transaction = actualResponse.getBody().getTransactions().getBooked().get(0);
+
+    ResponseEntity<TransactionDetails> response = template.exchange(
+        "accounts/" + context.getAccountId() + "/transactions/" + transaction.getTransactionId(),
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        TransactionDetails.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    context.setActualResponse(response);
+  }
+
   @Then("the account data are received")
   public void receiveAccountData() {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody().getAccounts().size(),
         equalTo(context.getConsentAccountAccess().getAccounts().size()));
+  }
+
+  @Then("the transaction list data are received")
+  public void receiveTransactionListData() {
+    ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody().getTransactions().getBooked().size(), equalTo(5));
+  }
+
+  @Then("the transaction data are received")
+  public void receiveTransactionData() {
+    ResponseEntity<TransactionDetails> actualResponse = context.getActualResponse();
+
+    //TODO: Check for response body. Mapper TransactionDetails does not work
   }
 
   @When("PSU tries to authorise the consent with psu-id (.*), password (.*)")
