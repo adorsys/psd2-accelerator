@@ -186,8 +186,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuSuccessfull() {
-    String ibanGiro = "DE94500105178833114935";
-    String accountOwner = "Melanie Klein";
+    String ibanGiro = "DE11760365688833114935";
+    String accountOwner = "Isabella Ionescu";
     String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
 
     Transaction giroTransaction1 = new Transaction(
@@ -269,7 +269,7 @@ public class TestDataService {
 
     accounts.put(giroAccount.getAccountId(), giroAccount);
 
-    String ibanSavings = "DE96500105179669622432";
+    String ibanSavings = "DE13760365689669622432";
     String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
     Transaction savingsTransaction1 = new Transaction(
@@ -363,8 +363,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuRejected() {
-    String iban = "DE03760300809827461249";
-    String accountOwner = "Klaus Bauer";
+    String iban = "DE06760365689827461249";
+    String accountOwner = "Tarkan Nein";
     String accountId = "2b163b22-8b7a-46cc-9ba4-7c8730ed3edd";
 
     Transaction transaction = new Transaction(
@@ -394,8 +394,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuCancellationRejected() {
-    String iban = "DE54500105177914626923";
-    String accountOwner = "Sebastian Sommer";
+    String iban = "DE68760365687914626923";
+    String accountOwner = "Sebastian Wild";
     String accountId = "a9231724-1bd5-4070-99bb-8c97e11982ad";
 
     Transaction transaction = new Transaction(
@@ -425,8 +425,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuBlocked() {
-    String iban = "DE10760300801209386222";
-    String accountOwner = "Martina Sandfeuer";
+    String iban = "DE13760365681209386222";
+    String accountOwner = "Roman Ataman";
     String accountId = "3ce6eee1-56c2-49cd-9314-36a2a8bb892b";
 
     Transaction transaction = new Transaction(
@@ -456,8 +456,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuInternalLimit() {
-    String iban = "DE88760300803491763002";
-    String accountOwner = "Laura Holzer";
+    String iban = "DE91760365683491763002";
+    String accountOwner = "Jana Tiimus";
     String accountId = "4ed8f9bb-f239-463f-a3ae-2b90b7924ffa";
 
     Transaction transaction = new Transaction(
@@ -488,8 +488,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuPending() {
-    String iban = "DE86760300801729983660";
-    String accountOwner = "Andreas Watzke";
+    String iban = "DE89760365681729983660";
+    String accountOwner = "Nadja Krendel";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
     Transaction transaction = new Transaction(
@@ -519,8 +519,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentExpired() {
-    String iban = "DE09760300807895439876";
-    String accountOwner = "Meryl Streep";
+    String iban = "DE12760365687895439876";
+    String accountOwner = "Andreas Winter";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
     Transaction transaction = new Transaction(
@@ -550,8 +550,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentRevokedByPsu() {
-    String iban = "DE86760300801729983660";
-    String accountOwner = "Tom Cruise";
+    String iban = "DE89760365681729983660";
+    String accountOwner = "Annina Kiupel";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
     Transaction transaction = new Transaction(
