@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
@@ -10,7 +11,6 @@ import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiSinglePaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
-import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,18 +37,15 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
     if (!psuId.isPresent()) {
       throw new RestException(HttpStatus.UNAUTHORIZED, "PSU not found");
     }
-    boolean isBlocked = testDataService.isBlockedPsu(psuId.get());
 
-    if (isBlocked) {
-      return SpiResponse.<SpiSinglePaymentInitiationResponse>builder()
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+    if (testDataService.isBlockedPsu(psuId.get())) {
+      throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
     }
-    SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
-    response.setTransactionStatus(SpiTransactionStatus.RCVD);
 
+    SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
     String paymentId = UUID.randomUUID().toString();
-    payment.setPaymentId(paymentId);
     response.setPaymentId(paymentId);
+    response.setTransactionStatus(SpiTransactionStatus.RCVD);
 
     return new SpiResponse<>(response, initialAspspConsentData);
   }

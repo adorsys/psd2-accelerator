@@ -17,6 +17,7 @@ import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.DayOfExecution;
 import de.adorsys.psd2.model.ExecutionRule;
 import de.adorsys.psd2.model.FrequencyCode;
+import de.adorsys.psd2.model.MessageCode403PIS;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
@@ -40,6 +41,7 @@ import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import de.adorsys.psd2.xs2a.domain.TransactionStatusResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -119,15 +121,25 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     Request<PaymentInitiationSctJson> request = new Request<>(payment, headers);
 
-    ResponseEntity<TppMessage403PIS[]> response = template.exchange(
+    ResponseEntity<KeyedTpp403Messages> response = template.exchange(
         paymentService + "/" + paymentProduct,
         HttpMethod.POST,
         request.toHttpEntity(),
-        TppMessage403PIS[].class);
+        KeyedTpp403Messages.class);
 
     assertTrue(response.getStatusCode().is4xxClientError());
 
     context.setActualResponse(response);
+  }
+
+  // TODO can't parse to TppMessage403PIS[] because we get `{tppMessages: TppMessage403PIS[]}`
+  private static class KeyedTpp403Messages {
+
+    List<TppMessage403PIS> tppMessages;
+
+    public List<TppMessage403PIS> getTppMessages() {
+      return tppMessages;
+    }
   }
 
   @And("^PSU authorised the payment with psu-id (.*), password (.*), sca-method (.*) and tan (.*)$")
@@ -249,13 +261,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @Then("an error-message (.*) is received")
   public void receiveErrorMessageAndCode(String errorMessage) {
-    ResponseEntity<TppMessage403PIS[]> actualResponse = context.getActualResponse();
+    TppMessage403PIS err = ((KeyedTpp403Messages) context.getActualResponse().getBody()).getTppMessages().get(0);
 
-    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
-    // TODO did work in 1.13 but is null in 1.15 :(
-    // assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
-    assertThat(actualResponse.getBody()[0].getText(),
-        containsString("channel independent blocking"));
+    assertThat(err.getCategory(), equalTo(TppMessageCategory.ERROR));
+    assertThat(err.getCode(), equalTo(MessageCode403PIS.valueOf(errorMessage)));
+    assertThat(err.getText(), containsString("channel independent blocking"));
   }
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
@@ -357,7 +367,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     UpdatePsuAuthentication authenticationData = new UpdatePsuAuthentication();
     authenticationData.setPsuData(psuData);
 
-    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>(authenticationData, headers);
+    Request<UpdatePsuAuthentication> updateCredentialRequest = new Request<>(authenticationData,
+        headers);
 
     return template.exchange(
         url,
