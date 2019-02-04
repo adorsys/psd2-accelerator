@@ -13,6 +13,7 @@ public class Context {
   private String paymentProduct;
   private String paymentService;
   private String paymentId;
+  private String accountId;
   private String authorisationId;
   private String cancellationId;
   private String scaRedirect;

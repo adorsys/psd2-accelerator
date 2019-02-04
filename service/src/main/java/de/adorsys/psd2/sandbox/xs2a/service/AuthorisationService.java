@@ -40,10 +40,10 @@ public class AuthorisationService {
       boolean forceFailure) {
 
     Optional<TestPsu> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
-    Optional<String> accountOwner = testDataService.getPsuByIban(iban);
+    Optional<TestPsu> accOwner = testDataService.getPsuByIban(iban);
 
     if (!inquiringPsu.isPresent() || !password.equals(inquiringPsu.get().getPassword())
-        || !accountOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accountOwner.get())
+        || !accOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accOwner.get().getPsuId())
         || inquiringPsu.get().getPsuId().equals("PSU-Rejected")) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
           .aspspConsentData(aspspConsentData)

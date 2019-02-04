@@ -75,12 +75,12 @@ public class TestDataService {
    * @param iban Iban
    * @return Psu-Id
    */
-  public Optional<String> getPsuByIban(String iban) {
+  public Optional<TestPsu> getPsuByIban(String iban) {
     for (TestPsu psu : psuMap.values()) {
       boolean hasAccountWithIban = psu.getAccounts().values().stream()
           .anyMatch(account -> account.getIban().equals(iban));
       if (hasAccountWithIban) {
-        return Optional.of(psu.getPsuId());
+        return Optional.of(psu);
       }
     }
     return Optional.empty();

@@ -3,6 +3,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.piis;
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
@@ -35,7 +36,7 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
 
     String iban = spiFundsConfirmationRequest.getPsuAccount().getIban();
 
-    Optional<String> psuId = testDataService.getPsuByIban(iban);
+    Optional<TestPsu> psuId = testDataService.getPsuByIban(iban);
 
     // Passed iban could not be matched to an existing PSU
     if (!psuId.isPresent()) {
@@ -43,11 +44,12 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       return new SpiResponse<>(response, aspspConsentData);
     }
 
-    Optional<String> accountId = testDataService.getAccountIdByIban(psuId.get(), iban);
+    Optional<String> accountId = testDataService.getAccountIdByIban(psuId.get().getPsuId(), iban);
     BigDecimal requestedAmount = spiFundsConfirmationRequest.getInstructedAmount().getAmount();
 
     if (accountId.isPresent()) {
-      Optional<Account> account = testDataService.getDistinctAccount(psuId.get(), accountId.get());
+      Optional<Account> account = testDataService.getDistinctAccount(
+          psuId.get().getPsuId(), accountId.get());
       if (account.isPresent()) {
         Balance balance = account.get().getAvailableBalance();
         response
