@@ -9,6 +9,7 @@ import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountDetails;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
+import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountType;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiBalanceType;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransaction;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransactionReport;
@@ -86,8 +87,8 @@ public class AccountSpiImpl implements AccountSpi {
         "",
         account.getCurrency(),
         "",
-        "",
-        null,
+        account.getProduct(),
+        SpiAccountType.getByValue(account.getCashAccountType().value()).get(),
         null,
         "",
         "",
