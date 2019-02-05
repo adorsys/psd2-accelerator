@@ -68,16 +68,42 @@
         </figcaption>
       </div>
 
-      <h3>Configuration of XS2A:</h3>
-      <p>Currently the PSD2 Accelerator is configured as follows:</p>
-      <ul>
-        <li>
-          TSP: The generation of client certificates works without registration
-        </li>
-        <li>Payment-Product: Sepa-credit-transfers</li>
-        <li>Payment-Service: Single-payments</li>
-        <li>SCA-Approach: Embedded</li>
-      </ul>
+      <h3>Active XS2A Configuration (Bank Profile)</h3>
+      <pre><code>
+        ---
+        setting:
+          frequencyPerDay: 5
+          combinedServiceIndicator: false
+          scaApproach: REDIRECT
+          tppSignatureRequired: false
+          bankOfferedConsentSupport: false
+          pisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/:redirect-id
+          pisPaymentCancellationRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/cancel/pis/:redirect-id
+          aisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/ais/:redirect-id
+          multicurrencyAccountLevel: SUBACCOUNT
+          availableBookingStatuses:
+            - BOOKED
+            - PENDING
+          supportedAccountReferenceFields:
+            - MSISDN
+          consentLifetime: 0
+          transactionLifetime: 0
+          allPsd2Support: false
+          transactionsWithoutBalancesSupported: false
+          signingBasketSupported: false
+          paymentCancellationAuthorizationMandated: true
+          piisConsentSupported: false
+          deltaReportSupported: false
+          redirectUrlExpirationTimeMs: 600000
+          notConfirmedConsentExpirationPeriodMs: 86400000
+          notConfirmedPaymentExpirationPeriodMs: 86400000
+          supportedPaymentTypeAndProductMatrix:
+            SINGLE:
+              - sepa-credit-transfers
+            PERIODIC:
+              - sepa-credit-transfers
+          paymentCancellationRedirectUrlExpirationTimeMs: 600000
+      </code></pre>
     </section>
 
     <section>
@@ -93,7 +119,7 @@
           embed the .pem and .key files in your requests.
         </li>
         <li>
-          The most popular Use Cases are described in the following section.
+          The most popular use cases are described in the following section.
         </li>
       </ul>
     </section>
@@ -115,9 +141,9 @@
         >.
       </p>
       <p>
-        Each Use Case contains a table with the fitting PSU-IDs, the Iban and
+        Each use case contains a table with the fitting PSU-IDs, the Iban and
         the expected status. Therefore, you can check if your outcome is
-        correct. Furthermore, some Use Cases contain an example request and its
+        correct. Furthermore, some use cases contain an example request and its
         response.
       </p>
       <h3>Simulation of SCA</h3>
@@ -129,7 +155,7 @@
         Iban "DE11760365688833114935" and the corresponding PSU-ID
         "PSU-Successful". The same goes for all other combinations of PSUs.
         After sending your payment or consent request, you receive a scaRedirect
-        Url. Insert this url in your browser and attach your PSU-ID as
+        url. Insert this url in your browser and attach your PSU-ID as
         Query-Parameter to the url. And example would be:
         <span
           ><code class="border shadow-none p-2 mb-2 bg-light rounded"
@@ -164,7 +190,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "PSU-IP-Address: 192.168.8.78" \
   -H "Content-Type: application/json" \
-  -H "tpp-redirect-uri: http://kicker.de" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
   `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
@@ -374,7 +400,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "Content-Type: application/json" \
-  -H "tpp-redirect-uri: http://kicker.de" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
   `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
@@ -513,7 +539,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "Content-Type: application/json" \
   -H "consent-id: I58hV2nWPJVJEvuw0dzl8qBkGcz40Qo_BCd_CjnTf_vsx7DeU-pL5sFaqwNUzbAThuXzrcFlVLs6eEVHdoFgKQ==_=_bS6p6XvTWI" \
-  -H "tpp-redirect-uri: http://kicker.de" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
   `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
