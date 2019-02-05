@@ -11,6 +11,10 @@ const routes: Routes = [
     path: 'developer-portal',
     loadChildren: './dev-portal/dev-portal.module#DevPortalModule',
   },
+  {
+    path: 'faqs',
+    loadChildren: './faqs/faqs.module#FaqsModule',
+  },
 ];
 
 @NgModule({
