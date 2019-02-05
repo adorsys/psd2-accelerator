@@ -283,11 +283,11 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     Request<?> request = Request.emptyRequest(headers);
     TransactionDetails transaction = actualResponse.getBody().getTransactions().getBooked().get(0);
 
-    ResponseEntity<TransactionDetails> response = template.exchange(
+    ResponseEntity<KeyedTransactionDetails> response = template.exchange(
         "accounts/" + context.getAccountId() + "/transactions/" + transaction.getTransactionId(),
         HttpMethod.GET,
         request.toHttpEntity(),
-        TransactionDetails.class);
+        KeyedTransactionDetails.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
@@ -311,9 +311,12 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   @Then("the transaction data are received")
   public void receiveTransactionData() {
-    ResponseEntity<TransactionDetails> actualResponse = context.getActualResponse();
+    ResponseEntity<KeyedTransactionDetails> actualResponse = context.getActualResponse();
 
-    //TODO: Check for response body. Mapper TransactionDetails does not work
+    assertThat(
+        actualResponse.getBody().getTransactionsDetails().getRemittanceInformationStructured()
+            .isEmpty(),
+        equalTo(false));
   }
 
   @When("PSU tries to authorise the consent with psu-id (.*), password (.*)")
@@ -464,5 +467,15 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         psuId, password);
 
     context.setActualResponse(response);
+  }
+
+  // TODO can't parse to TransactionDetails because we get `{transactionsDetails: TransactionDetails}`
+  private static class KeyedTransactionDetails {
+
+    TransactionDetails transactionsDetails;
+
+    public TransactionDetails getTransactionsDetails() {
+      return transactionsDetails;
+    }
   }
 }

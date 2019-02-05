@@ -261,7 +261,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @Then("an error-message (.*) is received")
   public void receiveErrorMessageAndCode(String errorMessage) {
-    TppMessage403PIS err = ((KeyedTpp403Messages) context.getActualResponse().getBody()).getTppMessages().get(0);
+    TppMessage403PIS err = ((KeyedTpp403Messages) context.getActualResponse().getBody())
+        .getTppMessages().get(0);
 
     assertThat(err.getCategory(), equalTo(TppMessageCategory.ERROR));
     assertThat(err.getCode(), equalTo(MessageCode403PIS.valueOf(errorMessage)));
