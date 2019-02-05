@@ -1,8 +1,8 @@
 package de.adorsys.psd2.sandbox.xs2a.service.ais;
 
+import de.adorsys.psd2.sandbox.portal.testdata.TestDataMapper;
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
@@ -11,18 +11,13 @@ import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountDetails;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
-import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountType;
-import de.adorsys.psd2.xs2a.spi.domain.account.SpiBalanceType;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransaction;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransactionReport;
-import de.adorsys.psd2.xs2a.spi.domain.common.SpiAmount;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.AccountSpi;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,9 +28,11 @@ import org.springframework.stereotype.Service;
 public class AccountSpiImpl implements AccountSpi {
 
   private TestDataService testDataService;
+  private TestDataMapper testDataMapper;
 
-  public AccountSpiImpl(TestDataService testDataService) {
+  public AccountSpiImpl(TestDataService testDataService, TestDataMapper testDataMapper) {
     this.testDataService = testDataService;
+    this.testDataMapper = testDataMapper;
   }
 
   @Override
@@ -92,21 +89,18 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
-    Optional<TestPsu> psu = testDataService.getPsuByIban(spiAccountReference.getIban());
-
-    if (!psu.isPresent()) {
-      return null;
-    }
-
-    Optional<List<Transaction>> transactions = testDataService
-        .getTransactions(psu.get().getPsuId(), spiAccountReference.getResourceId());
+    Optional<List<Transaction>> transactions = this.getTransactionsByIbanAndAccountId(
+        spiAccountReference.getIban(),
+        spiAccountReference.getResourceId());
 
     if (!transactions.isPresent()) {
-      return null;
+      return SpiResponse.<SpiTransactionReport>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
     }
 
     List<SpiTransaction> spiTransactions = transactions.get().stream()
-        .map(this::mapTransactionToSpiTransaction)
+        .map(testDataMapper::mapTransactionToSpiTransaction)
         .collect(Collectors.toList());
 
     SpiTransactionReport spiTransactionReport = new SpiTransactionReport(
@@ -129,27 +123,25 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
-    Optional<TestPsu> psu = testDataService.getPsuByIban(spiAccountReference.getIban());
-
-    if (!psu.isPresent()) {
-      return null;
-    }
-
-    Optional<List<Transaction>> transactions = testDataService
-        .getTransactions(psu.get().getPsuId(), spiAccountReference.getResourceId());
+    Optional<List<Transaction>> transactions = this.getTransactionsByIbanAndAccountId(
+        spiAccountReference.getIban(),
+        spiAccountReference.getResourceId());
 
     if (!transactions.isPresent()) {
-      return null;
+      return SpiResponse.<SpiTransaction>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
     }
 
-    Optional<SpiTransaction> spiTransaction = transactions.get().stream()
+    SpiTransaction spiTransaction = transactions.get().stream()
         .filter(t -> t.getTransactionId().equals(transactionId))
-        .map(this::mapTransactionToSpiTransaction)
-        .findFirst();
+        .map(testDataMapper::mapTransactionToSpiTransaction)
+        .findFirst()
+        .get();
 
     return SpiResponse.<SpiTransaction>builder()
         .aspspConsentData(aspspConsentData)
-        .payload(spiTransaction.get())
+        .payload(spiTransaction)
         .success();
   }
 
@@ -187,88 +179,21 @@ public class AccountSpiImpl implements AccountSpi {
     }
 
     List<SpiAccountDetails> spiAccountDetails = optionalAccounts.get().stream()
-        .map(this::mapAccountToSpiAccount)
+        .map(testDataMapper::mapAccountToSpiAccount)
         .collect(Collectors.toList());
 
     return Optional.of(spiAccountDetails);
   }
 
-  private SpiAccountDetails mapAccountToSpiAccount(Account account) {
-    return new SpiAccountDetails(
-        account.getAccountId(),
-        account.getAccountId(),
-        account.getIban(),
-        "",
-        "",
-        "",
-        "",
-        account.getCurrency(),
-        "",
-        account.getProduct(),
-        account.getCashAccountType() != null
-            ? SpiAccountType.getByValue(account.getCashAccountType().value()).get() : null,
-        null,
-        "",
-        "",
-        null,
-        "",
-        account.getBalance() != null
-            ? new ArrayList<>(Arrays.asList(mapBalanceToSpiBalance(account.getBalance())))
-            : null);
-  }
+  private Optional<List<Transaction>> getTransactionsByIbanAndAccountId(String iban,
+      String accountId) {
+    Optional<TestPsu> psu = testDataService.getPsuByIban(iban);
 
-  private SpiTransaction mapTransactionToSpiTransaction(
-      Transaction transaction) {
-    return new SpiTransaction(
-        transaction.getTransactionId(),
-        null,
-        null,
-        null,
-        null,
-        null,
-        transaction.getBookingDate(),
-        null,
-        new SpiAmount(transaction.getCurrency(), transaction.getAmount()),
-        null,
-        transaction.getCreditorName(),
-        new SpiAccountReference(
-            this.mapAccountToSpiAccount(getAccountData(transaction.getCreditorAccount()))),
-        null,
-        null,
-        new SpiAccountReference(
-            this.mapAccountToSpiAccount(getAccountData(transaction.getDebtorAccount()))),
-        transaction.getDebtorName(),
-        transaction.getRemittanceInfo(),
-        transaction.getRemittanceInfo(),
-        null,
-        null,
-        null
-    );
-  }
-
-  private SpiAccountBalance mapBalanceToSpiBalance(Balance balance) {
-    SpiAccountBalance spiAccountBalance = new SpiAccountBalance();
-
-    SpiAmount spiAmount = new SpiAmount(balance.getBalanceAmount().getCurrency(),
-        balance.getBalanceAmount().getAmount());
-    spiAccountBalance.setSpiBalanceAmount(spiAmount);
-    spiAccountBalance.setSpiBalanceType(SpiBalanceType.AVAILABLE);
-
-    return spiAccountBalance;
-  }
-
-  private Account getAccountData(String iban) {
-    Optional<TestPsu> psuId = testDataService.getPsuByIban(iban);
-
-    if (!psuId.isPresent()) {
-      return new Account(iban, Currency.getInstance("EUR"));
+    if (!psu.isPresent()) {
+      return Optional.empty();
     }
 
-    Optional<Account> account = testDataService.getDistinctAccount(psuId.get().getPsuId(), iban);
-
-    return account.orElseGet(() -> new Account(iban, Currency.getInstance("EUR")));
-
+    return testDataService
+        .getTransactions(psu.get().getPsuId(), accountId);
   }
-
-
 }
