@@ -17,7 +17,8 @@ public class Account {
   private Currency currency;
   private String product;
   private CashAccountType cashAccountType;
-  private Balance balance;
+  private Balance bookedBalance;
+  private Balance availableBalance;
   private HashMap<String, Transaction> transactions;
 }
 
