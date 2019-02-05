@@ -40,6 +40,11 @@ $adorsys-blue: #054f72;
       margin-top: 3%;
     }
 
+    h3 {
+      font-size: 21px;
+      margin-top: 3%;
+    }
+
     section {
       margin-top: 3%;
       border-top: 0.5px solid $light-grey;
@@ -47,6 +52,10 @@ $adorsys-blue: #054f72;
       .image-spacing {
         margin-top: 50px;
         margin-bottom: 50px;
+      }
+      div {
+        padding-top: 4%;
+        padding-bottom: 4%;
       }
     }
 

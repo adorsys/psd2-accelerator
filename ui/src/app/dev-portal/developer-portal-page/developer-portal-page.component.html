@@ -68,7 +68,7 @@
         </figcaption>
       </div>
 
-      <p class="description description__intro">Configuration of XS2A:</p>
+      <h3>Configuration of XS2A:</h3>
       <p>Currently the PSD2 Accelerator is configured as follows:</p>
       <ul>
         <li>
@@ -86,49 +86,85 @@
         In order to test the services of XS2A you need to execute the following
         steps:
       </p>
-      <p class="description description__intro">Register/Login</p>
-      <p>User registration/Login is coming soon.</p>
-      <p class="description description__intro">Generate Certificate</p>
+      <ul>
+        <li>
+          To generate a QWAC Certificate follow this link
+          <a routerLink="/certificate-service">Certificate Service UI</a> and
+          embed the .pem and .key files in your requests.
+        </li>
+        <li>
+          The most popular Use Cases are described in the following section.
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Use Cases with PSU Data</h2>
       <p>
-        To generate a QWAC Certificate follow this link
-        <a routerLink="/certificate-service">Certificate Service UI</a> and
-        embed the .pem file in the response header "tpp-qwac-certficate" (see
-        example cURL below).
-      </p>
-      <p class="description description__intro">Fictional PSU Data</p>
-      <p>
-        To execute services of XS2A, you have to use the following PSU
-        credentials
+        To execute services of XS2A using the EMBEDDED SCA approach, you have to
+        use these global PSU credentials:
       </p>
       <ul>
-        <li>PSU-ID: PSU-1</li>
         <li>Password: 12345</li>
-        <li>Account:</li>
-        <ul>
-          <li>IBAN: DE94500105178833114935</li>
-          <li>Account-ID: 9b86539d-589b-4082-90c2-d725c019777f</li>
-          <li>Balance: 1500</li>
-          <li>Currency: EUR</li>
-        </ul>
         <li>TAN: 54321</li>
       </ul>
-      <p>A full set of PSU data will be provided soon.</p>
+      <p>
+        The REST API is available here:
+        <a href="https://sandbox-api.dev.adorsys.de"
+          >https://sandbox-api.dev.adorsys.de</a
+        >.
+      </p>
+      <p>
+        Each Use Case contains a table with the fitting PSU-IDs, the Iban and
+        the expected status. Therefore, you can check if your outcome is
+        correct. Furthermore, some Use Cases contain an example request and its
+        response.
+      </p>
+      <h3>Simulation of SCA</h3>
+      <p>
+        SCA is mandated for the initiation and cancellation of payments as well
+        as for the creation of consents. To simulate the different SCA
+        responses, PSU-IDs and corresponding Ibans are defined. A successful SCA
+        can therefore only be achieved when performing the requests with the
+        Iban "DE11760365688833114935" and the corresponding PSU-ID
+        "PSU-Successful". The same goes for all other combinations of PSUs.
+        After sending your payment or consent request, you receive a scaRedirect
+        Url. Insert this url in your browser and attach your PSU-ID as
+        Query-Parameter to the url. And example would be:
+        <span
+          ><code class="border shadow-none p-2 mb-2 bg-light rounded"
+            >?psu-id=PSU-Successful</code
+          ></span
+        >. "PSU-Successful" can be replaced with other PSUs. When the Iban
+        within the request does not match the PSU-ID, the SCA does not have an
+        effect on the transaction or consent status. Not passing any PSU-ID will
+        lead to a Format Error.
+      </p>
 
-      <p class="description description__intro">Execute XS2A Calls</p>
-      <p>
-        To execute XS2A calls follow this link
-        <a href="../swagger-ui.html">XS2A Swagger UI</a>.
-      </p>
-      <p>
-        The following code snippet is an example cURL command which initiates a
-        single payment from PSU "PSU-Successful":
-      </p>
-      <pre class="code-sample"><code>
+      <div>
+        <h3>Payment Initiation</h3>
+        <p>
+          In order to execute a payment, replace the Debtor-Iban in your request
+          with the one of your favored PSU. To legitimate the payment, use the
+          SCA Redirect described in the previous section.
+        </p>
+        <p>
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            POST
+            https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers
+          </code>
+        </p>
+        <p>
+          The following code snippet is an example cURL command which initiates
+          a single payment for PSU "PSU-Successful":
+        </p>
+        <pre><code>
 curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "PSU-IP-Address: 192.168.8.78" \
   -H "Content-Type: application/json" \
+  -H "tpp-redirect-uri: http://kicker.de" \
   `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
@@ -136,7 +172,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     "endToEndIdentification": "WBG-123456789",
     "debtorAccount": {{ '{' }}
       "currency": "EUR",
-      "iban": "DE94500105178833114935"
+      "iban": "DE11760365688833114935"
     {{ '}' }},
     "instructedAmount": {{ '{' }}
       "currency": "EUR",
@@ -146,7 +182,6 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
       "currency": "EUR",
       "iban": "DE15500105172295759744"
     {{ '}' }},
-    "creditorAgent": "AAAADEBBXXX",
     "creditorName": "WBG",
     "creditorAddress": {{ '{' }}
       "buildingNumber": "56",
@@ -157,6 +192,396 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     {{ '}' }},
     "remittanceInformationUnstructured": "Ref. Number WBG-1222"
   {{ '}' }}'</code></pre>
+
+        <p>
+          The following code snippet is an example response for a successful
+          payment:
+        </p>
+        <pre>
+          <code>
+{{ '{' }}
+  "transactionStatus": "RCVD",
+  "paymentId": "RIhyDdvBQppUKXtuhXVAPPmUXCPeOwiee1ufj6GXR1KuIelI64OVKRnF-EwZ5rtMyRAvFoZcfR9N7c4HVoA8Ng==_=_bS6p6XvTWI",
+  "transactionFees": null,
+  "transactionFeeIndicator": false,
+  "scaMethods": null,
+  "chosenScaMethod": null,
+  "challengeData": null,
+  "_links": {{ '{' }}
+    "scaRedirect": "https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/e6d1e35c-31d9-4d57-9ffd-21a5864b3fb7",
+    "self": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/RIhyDdvBQppUKXtuhXVAPPmUXCPeOwiee1ufj6GXR1KuIelI64OVKRnF-EwZ5rtMyRAvFoZcfR9N7c4HVoA8Ng==_=_bS6p6XvTWI",
+    "status": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/RIhyDdvBQppUKXtuhXVAPPmUXCPeOwiee1ufj6GXR1KuIelI64OVKRnF-EwZ5rtMyRAvFoZcfR9N7c4HVoA8Ng==_=_bS6p6XvTWI/status",
+    "scaStatus": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/RIhyDdvBQppUKXtuhXVAPPmUXCPeOwiee1ufj6GXR1KuIelI64OVKRnF-EwZ5rtMyRAvFoZcfR9N7c4HVoA8Ng==_=_bS6p6XvTWI/authorisations/e6d1e35c-31d9-4d57-9ffd-21a5864b3fb7"
+  {{ '}' }},
+  "psuMessage": null,
+  "tppMessages": null
+{{ '}' }}</code>
+        </pre>
+
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">SCA Status</th>
+              <th scope="col">Transaction Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>finalised</td>
+              <td>ACCP</td>
+            </tr>
+            <tr>
+              <td>PSU-Rejected</td>
+              <td>DE06760365689827461249</td>
+              <td>failed</td>
+              <td>RCVD</td>
+            </tr>
+            <tr>
+              <td>PSU-Blocked</td>
+              <td>DE13760365681209386222</td>
+              <td><i>(no SCA Status available)</i></td>
+              <td><i>(no Transaction Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-InternalLimit</td>
+              <td>DE91760365683491763002</td>
+              <td>finalised</td>
+              <td>RJCT</td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Payment Cancellation</h3>
+        <p>
+          In order to cancel a payment, insert your Payment-Id in the Delete
+          Payment Endpoint. To legitimate the payment cancellation, use the SCA
+          Redirect described in the previous section.
+        </p>
+        <p class="request">
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            DELETE
+            https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/paymentId
+          </code>
+        </p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">SCA Status</th>
+              <th scope="col">Transaction Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>finalised</td>
+              <td>CANC</td>
+            </tr>
+            <tr>
+              <td>PSU-Rejected</td>
+              <td>DE06760365689827461249</td>
+              <td><i>(no SCA Status available)</i></td>
+              <td><i>(no Transaction Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-Blocked</td>
+              <td>DE13760365681209386222</td>
+              <td><i>(no SCA Status available)</i></td>
+              <td><i>(no Transaction Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-InternalLimit</td>
+              <td>DE91760365683491763002</td>
+              <td>finalised</td>
+              <td><i>(no Transaction Status available)</i></td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Get Payment</h3>
+        <p>
+          In order to get the Payment Data, insert your Payment-Id in the GET
+          Payment Data Endpoint.
+        </p>
+        <p class="request">
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            GET https://sandbox-api.dev.adorsys.de/v1/payments/paymentId
+          </code>
+        </p>
+        <p>
+          In order to get the Payment Status, insert your paymentId in the GET
+          Payment Status Endpoint.
+        </p>
+        <p class="request">
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            GET https://sandbox-api.dev.adorsys.de/v1/payments/paymentId/status
+          </code>
+        </p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">SCA Status</th>
+              <th scope="col">Transaction Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>finalised</td>
+              <td>ACCP</td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Consent Creation</h3>
+        <p>
+          In order to create a consent, replace the Iban in your request with
+          the one of your favored PSU. To legitimate the consent creation, use
+          the SCA Redirect described in the previous section.
+        </p>
+        <p>
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            POST https://sandbox-api.dev.adorsys.de/v1/consents
+          </code>
+        </p>
+        <p>
+          The following code snippet is an example cURL command which creates a
+          consent for PSU "PSU-Successful":
+        </p>
+        <pre><code>
+curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  -H "tpp-redirect-uri: http://kicker.de" \
+  `# get these two files from the PSD2 Accelerator certificate generator` \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{{ '{' }}
+  "access": {{ '{' }}
+    "accounts": [
+      {{ '{' }}
+        "iban": "DE11760365688833114935",
+        "currency": "EUR"
+     {{ '}' }}
+    ],
+    "balances": [
+     {{ '{' }}
+        "iban": "DE11760365688833114935",
+        "currency": "EUR"
+     {{ '}' }}
+    ],
+    "transactions": [
+      {{ '{' }}
+        "iban": "DE11760365688833114935",
+        "currency": "EUR"
+    {{ '}' }}
+    ]
+{{ '}' }},
+  "recurringIndicator": true,
+  "validUntil": "2020-12-31",
+  "frequencyPerDay": 4,
+  "combinedServiceIndicator": true
+}'
+    </code></pre>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">SCA Status</th>
+              <th scope="col">Consent Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>finalised</td>
+              <td>valid</td>
+            </tr>
+            <tr>
+              <td>PSU-Rejected</td>
+              <td>DE06760365689827461249</td>
+              <td>failed</td>
+              <td>received</td>
+            </tr>
+            <tr>
+              <td>PSU-Blocked</td>
+              <td>DE13760365681209386222</td>
+              <td><i>(no SCA Status available)</i></td>
+              <td><i>(no Consent Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-InternalLimit</td>
+              <td>DE91760365683491763002</td>
+              <td>finalised</td>
+              <td>valid</td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Consent Deletion</h3>
+        <p>
+          In order to delete a consent, insert your consentId in the Delete
+          Consent Endpoint.
+        </p>
+        <p>
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            DELETE https://sandbox-api.dev.adorsys.de/v1/consents/consentId
+          </code>
+        </p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">Consent Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>terminatedByTpp</td>
+            </tr>
+            <tr>
+              <td>PSU-Rejected</td>
+              <td>DE06760365689827461249</td>
+              <td><i>(no Consent Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-Blocked</td>
+              <td>DE13760365681209386222</td>
+              <td><i>(no Consent Status available)</i></td>
+            </tr>
+            <tr>
+              <td>PSU-InternalLimit</td>
+              <td>DE91760365683491763002</td>
+              <td>terminatedByTpp</td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div>
+        <h3>Get Account Data</h3>
+        <p>
+          In order to get the Account Data, replace the Iban in your request
+          with the one of your favored PSU.
+        </p>
+        <p>
+          <code class="border shadow-none p-2 mb-2 bg-light rounded">
+            GET https://sandbox-api.dev.adorsys.de/v1/accounts
+          </code>
+        </p>
+        <p>
+          The following code snippet is an example cURL command which gets all
+          the account data from PSU "PSU-Successful":
+        </p>
+
+        <pre><code>
+curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  -H "consent-id: I58hV2nWPJVJEvuw0dzl8qBkGcz40Qo_BCd_CjnTf_vsx7DeU-pL5sFaqwNUzbAThuXzrcFlVLs6eEVHdoFgKQ==_=_bS6p6XvTWI" \
+  -H "tpp-redirect-uri: http://kicker.de" \
+  `# get these two files from the PSD2 Accelerator certificate generator` \
+  --cert certificate.pem \
+  --key private.key \
+</code></pre>
+        <p>
+          The following code snippet is an example response for successful GET
+          Account Data:
+        </p>
+        <code>
+          <pre>
+            {{ '{' }}
+  "accounts": [
+      {{ '{' }}
+          "resourceId": "8660d175-2c79-4b68-a175-93b1866dc7e3",
+          "iban": "DE11760365688833114935",
+          "bban": "",
+          "msisdn": "",
+          "currency": "EUR",
+          "name": "",
+          "product": "Current Account",
+          "cashAccountType": "CACC",
+          "status": null,
+          "bic": "",
+          "linkedAccounts": "",
+          "usage": null,
+          "details": "",
+          "balances": [
+              {{ '{' }}
+                  "balanceAmount":  {{ '{' }}
+                      "currency": "EUR",
+                      "amount": "1500"
+                  },
+                  "balanceType": null,
+                  "lastChangeDateTime": null,
+                  "referenceDate": null,
+                  "lastCommittedTransaction": null
+             {{ '}' }}
+          ],
+          "_links":  {{ '{' }}
+              "viewTransactions": "https://sandbox-api.dev.adorsys.de/v1/accounts/8660d175-2c79-4b68-a175-93b1866dc7e3/transactions"
+       {{ '}' }}
+    {{ '}' }}
+  ]
+{{ '}' }}
+        </pre
+          >
+        </code>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">PSU-ID</th>
+              <th scope="col">Iban</th>
+              <th scope="col">SCA Status</th>
+              <th scope="col">Consent Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PSU-Successful</td>
+              <td>DE11760365688833114935</td>
+              <td>finalised</td>
+              <td>valid</td>
+            </tr>
+          </tbody>
+
+          <tbody></tbody>
+        </table>
+      </div>
     </section>
   </div>
 </div>
