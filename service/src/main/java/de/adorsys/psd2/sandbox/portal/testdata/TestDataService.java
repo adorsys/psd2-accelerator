@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 public class TestDataService {
 
   private static final Currency EUR = Currency.getInstance("EUR");
+  private static final Currency USD = Currency.getInstance("USD");
   public static final String GLOBAL_PASSWORD = "12345";
   public static final String GLOBAL_TAN = "54321";
 
@@ -266,6 +267,7 @@ public class TestDataService {
         "Current Account",
         CashAccountType.CACC,
         new Balance(new Amount(EUR, BigDecimal.valueOf(1500))),
+        new Balance(new Amount(EUR, BigDecimal.valueOf(1500))),
         giroMap
     );
 
@@ -347,10 +349,123 @@ public class TestDataService {
         "Savings",
         CashAccountType.SVGS,
         new Balance(new Amount(EUR, BigDecimal.valueOf(2300))),
+        new Balance(new Amount(EUR, BigDecimal.valueOf(2300))),
         savingsMap
     );
 
     accounts.put(savingsAccount.getAccountId(), savingsAccount);
+
+    String ibanEmptyGiro = "DE07760365680034562391";
+    String accountIdEmptyGiro = "e17d99e7-de70-46ed-a59d-0f8051438c1f";
+
+    Account emptyGiroAccount = new Account(
+        accountIdEmptyGiro,
+        ibanEmptyGiro,
+        EUR,
+        "Current",
+        CashAccountType.CACC,
+        new Balance(new Amount(EUR, BigDecimal.valueOf(0))),
+        new Balance(new Amount(EUR, BigDecimal.valueOf(0))),
+        null
+    );
+
+    accounts.put(emptyGiroAccount.getAccountId(), emptyGiroAccount);
+
+    String ibanNegativeBookedBalance = "DE89760365681134661389";
+    String accountIdNegativeBookedBalance = "ed329862-4e58-4bd1-969f-210326f45ac0";
+
+    Transaction transactionNegativeBookedBalance = new Transaction(
+        "87218af6-db8f-4a6e-8192-470c25fca309",
+        BigDecimal.valueOf(-69.95),
+        EUR,
+        LocalDate.parse("2019-02-03"),
+        accountOwner,
+        ibanNegativeBookedBalance,
+        "Lokale Versicherungs AG",
+        "DE74500105175899176762",
+        "Vertrags-Nr. 7621239960 EUV 01.01.2019-01.01.2020"
+    );
+
+    HashMap<String, Transaction> negativeBookedBalanceMap = new HashMap<>();
+    negativeBookedBalanceMap
+        .put(transactionNegativeBookedBalance.getTransactionId(), transactionNegativeBookedBalance);
+
+    Account negativeBookedBalanceAccount = new Account(
+        accountIdNegativeBookedBalance,
+        ibanNegativeBookedBalance,
+        EUR,
+        "Cash Trading",
+        CashAccountType.TRAS,
+        new Balance(new Amount(EUR, BigDecimal.valueOf(-1148.00))),
+        new Balance(new Amount(EUR, BigDecimal.valueOf(0))),
+        negativeBookedBalanceMap
+    );
+
+    accounts.put(negativeBookedBalanceAccount.getAccountId(), negativeBookedBalanceAccount);
+
+    String ibanLowerAvailableBalance = "DE71760365681257681381";
+    String accountIdLowerAvailableBalance = "9750eaa1-c78b-4457-a192-5c9e44bf7ffa";
+
+    Transaction transactionLowerAvailableBalance = new Transaction(
+        "248173d1-a788-4bcf-b158-ca2b2b921cb7",
+        BigDecimal.valueOf(-115.95),
+        EUR,
+        LocalDate.parse("2019-02-04"),
+        accountOwner,
+        ibanLowerAvailableBalance,
+        "Lokale Versicherungs AG",
+        "DE74500105175899176762",
+        "Vertrags-Nr. 4621265960 EUV 01.01.2019-01.01.2020"
+    );
+
+    HashMap<String, Transaction> lowerAvailableBalanceMap = new HashMap<>();
+    lowerAvailableBalanceMap
+        .put(transactionLowerAvailableBalance.getTransactionId(), transactionLowerAvailableBalance);
+
+    Account lowerAvailableBalanceAccount = new Account(
+        accountIdLowerAvailableBalance,
+        ibanLowerAvailableBalance,
+        EUR,
+        "Current",
+        CashAccountType.CACC,
+        new Balance(new Amount(EUR, BigDecimal.valueOf(503.12))),
+        new Balance(new Amount(EUR, BigDecimal.valueOf(439.70))),
+        lowerAvailableBalanceMap
+    );
+
+    accounts.put(lowerAvailableBalanceAccount.getAccountId(), lowerAvailableBalanceAccount);
+
+    String ibanGiroUsd = "DE56760365681650680255";
+    String accountIdGiroUsd = "cfefebae-a72a-4cac-9e6d-ee3f3bb186dc";
+
+    Transaction giroUsdTransaction = new Transaction(
+        "6058dcd0-6f2a-4f8c-b329-b1d99b5fdf6c",
+        BigDecimal.valueOf(-50.00),
+        USD,
+        LocalDate.parse("2018-12-01"),
+        accountOwner,
+        ibanGiroUsd,
+        "BORIC SOMMER",
+        "DE56121432771174003957",
+        "Happy Birthday Boric DATUM 01.12.2018, 21.04 UHR1.TAN 633209"
+    );
+
+    HashMap<String, Transaction> giroUsdMap = new HashMap<>();
+    giroUsdMap
+        .put(giroUsdTransaction.getTransactionId(), giroUsdTransaction);
+
+    Account giroUsdAccount = new Account(
+        accountIdGiroUsd,
+        ibanGiroUsd,
+        USD,
+        "Current",
+        CashAccountType.CACC,
+        new Balance(new Amount(USD, BigDecimal.valueOf(9281.45))),
+        new Balance(new Amount(USD, BigDecimal.valueOf(9281.45))),
+        giroUsdMap
+    );
+
+    accounts.put(giroUsdAccount.getAccountId(), giroUsdAccount);
 
     return new TestPsu(
         "PSU-Successful",
@@ -387,7 +502,8 @@ public class TestDataService {
         "PSU-Rejected",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
+            transaction),
         Received,
         ConsentStatus.Received,
         Failed,
@@ -419,7 +535,8 @@ public class TestDataService {
         "PSU-Cancellation-Rejected",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
+            transaction),
         AcceptedCustomerProfile,
         Valid,
         Finalised,
@@ -450,7 +567,8 @@ public class TestDataService {
         "PSU-Blocked",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), BigDecimal.valueOf(1022.77),
+            transaction),
         null,
         null,
         null,
@@ -482,7 +600,8 @@ public class TestDataService {
         "PSU-InternalLimit",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), BigDecimal.valueOf(7.35),
+            transaction),
         Rejected,
         Valid,
         Finalised,
@@ -513,7 +632,8 @@ public class TestDataService {
         "PSU-Pending",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
+            transaction),
         Pending,
         Valid,
         Finalised,
@@ -544,7 +664,8 @@ public class TestDataService {
         "PSU-ConsentExpired",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
+            transaction),
         AcceptedCustomerProfile,
         Expired,
         Finalised,
@@ -575,7 +696,8 @@ public class TestDataService {
         "PSU-ConsentRevokedByPsu",
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
-        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), transaction),
+        initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
+            transaction),
         AcceptedCustomerProfile,
         RevokedByPsu,
         Finalised,
@@ -586,7 +708,7 @@ public class TestDataService {
   }
 
   private HashMap<String, Account> initSingleAccount(String accountId, String iban,
-      BigDecimal amount, Transaction transaction) {
+      BigDecimal bookedAmount, BigDecimal availableAmount, Transaction transaction) {
     HashMap<String, Account> accounts = new HashMap<>();
 
     HashMap<String, Transaction> transactions = new HashMap<>();
@@ -598,7 +720,8 @@ public class TestDataService {
         EUR,
         "Current Account",
         CashAccountType.CACC,
-        new Balance(new Amount(EUR, amount)),
+        new Balance(new Amount(EUR, bookedAmount)),
+        new Balance(new Amount(EUR, availableAmount)),
         transactions
     );
 

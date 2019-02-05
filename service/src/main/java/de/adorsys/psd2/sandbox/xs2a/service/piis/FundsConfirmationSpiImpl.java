@@ -8,7 +8,6 @@ import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationResponse;
-import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.FundsConfirmationSpi;
 import java.math.BigDecimal;
@@ -50,7 +49,7 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
     if (accountId.isPresent()) {
       Optional<Account> account = testDataService.getDistinctAccount(psuId.get(), accountId.get());
       if (account.isPresent()) {
-        Balance balance = account.get().getBalance();
+        Balance balance = account.get().getAvailableBalance();
         response
             .setFundsAvailable(
                 requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);

@@ -94,7 +94,8 @@ public class AccountSpiImpl implements AccountSpi {
         "",
         null,
         "",
-        new ArrayList<>(Arrays.asList(mapBalanceToSpiBalance(account.getBalance()))));
+        new ArrayList<>(Arrays.asList(mapBalanceToSpiBalance(account.getBookedBalance()),
+            mapBalanceToSpiBalance(account.getAvailableBalance()))));
   }
 
   private SpiAccountBalance mapBalanceToSpiBalance(Balance balance) {

@@ -49,9 +49,17 @@ public class TestDataServiceTest {
     final String expectedPsuId = "PSU-Successful";
     Optional<String> returnedPsuId1 = testDataService.getPsuByIban("DE11760365688833114935");
     Optional<String> returnedPsuId2 = testDataService.getPsuByIban("DE13760365689669622432");
+    Optional<String> returnedPsuId3 = testDataService.getPsuByIban("DE07760365680034562391");
+    Optional<String> returnedPsuId4 = testDataService.getPsuByIban("DE89760365681134661389");
+    Optional<String> returnedPsuId5 = testDataService.getPsuByIban("DE71760365681257681381");
+    Optional<String> returnedPsuId6 = testDataService.getPsuByIban("DE56760365681650680255");
 
     assertEquals(returnedPsuId1.get(), expectedPsuId);
     assertEquals(returnedPsuId2.get(), expectedPsuId);
+    assertEquals(returnedPsuId3.get(), expectedPsuId);
+    assertEquals(returnedPsuId4.get(), expectedPsuId);
+    assertEquals(returnedPsuId5.get(), expectedPsuId);
+    assertEquals(returnedPsuId6.get(), expectedPsuId);
   }
 
   @Test
@@ -66,7 +74,11 @@ public class TestDataServiceTest {
     final String psuId = "PSU-Successful";
     final String iban1 = "DE11760365688833114935";
     final String iban2 = "DE13760365689669622432";
-    final List<String> ibans = Arrays.asList(iban1, iban2);
+    final String iban3 = "DE07760365680034562391";
+    final String iban4 = "DE89760365681134661389";
+    final String iban5 = "DE71760365681257681381";
+    final String iban6 = "DE56760365681650680255";
+    final List<String> ibans = Arrays.asList(iban1, iban2, iban3, iban4, iban5, iban6);
 
     Optional<List<Account>> accounts = testDataService.getRequestedAccounts(psuId, ibans);
 
@@ -82,9 +94,29 @@ public class TestDataServiceTest {
         .filter(account -> account.getIban().equals(iban2))
         .collect(Collectors.toList()).get(0);
 
+    Account account3 = accounts.get().stream()
+        .filter(account -> account.getIban().equals(iban3))
+        .collect(Collectors.toList()).get(0);
+
+    Account account4 = accounts.get().stream()
+        .filter(account -> account.getIban().equals(iban4))
+        .collect(Collectors.toList()).get(0);
+
+    Account account5 = accounts.get().stream()
+        .filter(account -> account.getIban().equals(iban5))
+        .collect(Collectors.toList()).get(0);
+
+    Account account6 = accounts.get().stream()
+        .filter(account -> account.getIban().equals(iban6))
+        .collect(Collectors.toList()).get(0);
+
     assertEquals(accounts.get().size(), ibans.size());
     assertTrue(ibans.contains(account1.getIban()));
     assertTrue(ibans.contains(account2.getIban()));
+    assertTrue(ibans.contains(account3.getIban()));
+    assertTrue(ibans.contains(account4.getIban()));
+    assertTrue(ibans.contains(account5.getIban()));
+    assertTrue(ibans.contains(account6.getIban()));
   }
 
   @Test
@@ -151,9 +183,13 @@ public class TestDataServiceTest {
       fail();
     }
 
-    assertEquals(accounts.get().size(), 2);
+    assertEquals(accounts.get().size(), 6);
     assertNotNull(accounts.get().get(0));
     assertNotNull(accounts.get().get(1));
+    assertNotNull(accounts.get().get(2));
+    assertNotNull(accounts.get().get(3));
+    assertNotNull(accounts.get().get(4));
+    assertNotNull(accounts.get().get(5));
   }
 
 
