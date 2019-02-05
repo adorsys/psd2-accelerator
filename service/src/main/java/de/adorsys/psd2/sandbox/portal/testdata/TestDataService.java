@@ -186,39 +186,39 @@ public class TestDataService {
   }
 
   private TestPsu initPsuSuccessfull() {
-    String ibanGiro = "DE94500105178833114935";
-    String accountOwner = "Melanie Klein";
+    String ibanGiro = "DE11760365688833114935";
+    String accountOwner = "Isabella Ionescu";
     String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
 
     Transaction giroTransaction1 = new Transaction(
         "b2789674-1ea8-4a0d-a9e3-01319bd72d2e",
-        BigDecimal.valueOf(-50),
+        BigDecimal.valueOf(-52.12),
         EUR,
         LocalDate.parse("2018-07-22"),
         accountOwner,
         ibanGiro,
-        "Greenpeace",
+        "Tankstelle Weyarn Munchener Strase 32//Weyarn/DE",
         "DE48500105171923711479",
-        "Spende Greenpeace"
+        "2018-07-20T15:08 Debitk.3 2019-03"
     );
 
     Transaction giroTransaction2 = new Transaction(
         "22ab6547-aa75-4a8c-977c-b3bf50fc6f88",
-        BigDecimal.valueOf(-75),
+        BigDecimal.valueOf(-67.00),
         EUR,
-        LocalDate.parse("2018-08-18"),
+        LocalDate.parse("2018-08-01"),
         accountOwner,
         ibanGiro,
-        "Telekom",
+        "Strom-Gesellschaft Nürnberg",
         "DE74500105175899176762",
-        "Internet Rechnung August 2018 - MC-13058247"
+        "KTO 84633821 Abschlag 67,00 EUR faellig 01.08.18 Moritz-Str. 12"
     );
 
     Transaction giroTransaction3 = new Transaction(
         "8ddd6465-4e07-4b35-9e85-7fe63a13fbc9",
         BigDecimal.valueOf(2500),
         EUR,
-        LocalDate.parse("2018-09-08"),
+        LocalDate.parse("2018-09-04"),
         "Felix Borchert & Söhne GmbH",
         "DE94500105176912986937",
         accountOwner,
@@ -228,14 +228,14 @@ public class TestDataService {
 
     Transaction giroTransaction4 = new Transaction(
         "a65e8d54-708b-4f8d-bb8c-aa0b089fd273",
-        BigDecimal.valueOf(-210),
+        BigDecimal.valueOf(-17.50),
         EUR,
         LocalDate.parse("2018-10-08"),
         accountOwner,
         ibanGiro,
-        "Amazon",
+        "CLIMBING-SOLUTIONS GMBH//Stuttgart/DE",
         "DE94500105176912986937",
-        "Ihr Einkauf bei Amazon - FL-472254X5"
+        "2018-10-08T11:05 Debitk.3 2029-03"
     );
 
     Transaction giroTransaction5 = new Transaction(
@@ -245,9 +245,9 @@ public class TestDataService {
         LocalDate.parse("2018-11-03"),
         accountOwner,
         ibanGiro,
-        "WBG Nürnberg",
+        "Hans Schlegl",
         "DE74500105175899176762",
-        "Miete November 2018"
+        "Miete, Grünwälderstr. 49, 2.OG rechts"
     );
 
     HashMap<String, Transaction> giroMap = new HashMap<>();
@@ -263,13 +263,15 @@ public class TestDataService {
         accountIdGiro,
         ibanGiro,
         EUR,
+        "Current Account",
+        CashAccountType.CACC,
         new Balance(new Amount(EUR, BigDecimal.valueOf(1500))),
         giroMap
     );
 
     accounts.put(giroAccount.getAccountId(), giroAccount);
 
-    String ibanSavings = "DE96500105179669622432";
+    String ibanSavings = "DE13760365689669622432";
     String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
     Transaction savingsTransaction1 = new Transaction(
@@ -342,6 +344,8 @@ public class TestDataService {
         accountIdSavings,
         ibanSavings,
         EUR,
+        "Savings",
+        CashAccountType.SVGS,
         new Balance(new Amount(EUR, BigDecimal.valueOf(2300))),
         savingsMap
     );
@@ -363,20 +367,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuRejected() {
-    String iban = "DE03760300809827461249";
-    String accountOwner = "Klaus Bauer";
+    String iban = "DE06760365689827461249";
+    String accountOwner = "Tarkan Nein";
     String accountId = "2b163b22-8b7a-46cc-9ba4-7c8730ed3edd";
 
     Transaction transaction = new Transaction(
         "2b968e08-c3d4-4270-9acc-eb8ef92a79d1",
-        BigDecimal.valueOf(38.82),
+        BigDecimal.valueOf(-20.00),
         EUR,
         LocalDate.parse("2018-11-01"),
         accountOwner,
         iban,
-        "REWE",
-        "",
-        "Ihr Einkauf bei REWE"
+        "Maria Singer",
+        "DE74500105175899176762",
+        "Geburtstagsgeschenk Mona DATUM 01.11.2018, 21.21 UHR1.TAN 673209"
     );
 
     return new TestPsu(
@@ -394,20 +398,21 @@ public class TestDataService {
   }
 
   private TestPsu initPsuCancellationRejected() {
-    String iban = "DE54500105177914626923";
-    String accountOwner = "Sebastian Sommer";
+    String iban = "DE68760365687914626923";
+    String accountOwner = "Sebastian Wild";
     String accountId = "a9231724-1bd5-4070-99bb-8c97e11982ad";
 
     Transaction transaction = new Transaction(
         "ed821677-edc8-4263-a3c9-e154a8ae9749",
-        BigDecimal.valueOf(50.82),
+        BigDecimal.valueOf(-52.50),
         EUR,
-        LocalDate.parse("2018-11-01"),
+        LocalDate.parse("2018-12-01"),
         accountOwner,
         iban,
-        "Lidl",
-        "",
-        "Ihr Einkauf bei Lidl"
+        "ARD ZDF DRadio Beitragsservice",
+        "DE74500105175899176762",
+        "Rundfunk 12.2018 - 02.2019 Beitragsnr. 591091003 Aenderungen ganz bequem: +"
+            + "www.rundfunkbeitrag.de"
     );
 
     return new TestPsu(
@@ -425,20 +430,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuBlocked() {
-    String iban = "DE10760300801209386222";
-    String accountOwner = "Martina Sandfeuer";
+    String iban = "DE13760365681209386222";
+    String accountOwner = "Roman Ataman";
     String accountId = "3ce6eee1-56c2-49cd-9314-36a2a8bb892b";
 
     Transaction transaction = new Transaction(
         "5c58560a-0ee8-4c2d-8e39-0aa967ae7784",
-        BigDecimal.valueOf(12.09),
+        BigDecimal.valueOf(-59.78),
         EUR,
-        LocalDate.parse("2019-01-17"),
+        LocalDate.parse("2019-01-04"),
         accountOwner,
         iban,
-        "Amazon",
-        "",
-        "Amazon.de: Ihre Bestellung #81023412"
+        "Lokale Versicherungs AG",
+        "DE74500105175899176762",
+        "Vertrags-Nr. 8100230560 EUV 01.01.2019-01.01.2020"
     );
 
     return new TestPsu(
@@ -456,20 +461,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuInternalLimit() {
-    String iban = "DE88760300803491763002";
-    String accountOwner = "Laura Holzer";
+    String iban = "DE91760365683491763002";
+    String accountOwner = "Jana Tiimus";
     String accountId = "4ed8f9bb-f239-463f-a3ae-2b90b7924ffa";
 
     Transaction transaction = new Transaction(
         "a4f08d5b-fcc6-445d-b422-0971b4c3b0e2",
-        BigDecimal.valueOf(89.99),
+        BigDecimal.valueOf(-89.99),
         EUR,
-        LocalDate.parse("2019-01-10"),
+        LocalDate.parse("2019-02-02"),
         accountOwner,
         iban,
-        "Amazon",
-        "",
-        "Amazon.de: Ihre Bestellung #27189921"
+        "KREDITKARTENABRECHNUNG",
+        "DE74500105175899176762",
+        "VISA-ABR. 820779XXXXXX2508"
     );
 
     // TODO clarify which transaction status should be returned after SCA
@@ -488,20 +493,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuPending() {
-    String iban = "DE86760300801729983660";
-    String accountOwner = "Andreas Watzke";
-    String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
+    String iban = "DE89760365681729983660";
+    String accountOwner = "Nadja Krendel";
+    String accountId = "c3f1943a-acb5-4eed-9882-f386d79a5c5a";
 
     Transaction transaction = new Transaction(
-        "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
-        BigDecimal.valueOf(199.99),
+        "14b5da2e-a07c-4f81-be24-fe23e0f98673",
+        BigDecimal.valueOf(100.00),
         EUR,
-        LocalDate.parse("2018-09-20"),
+        LocalDate.parse("2018-12-20"),
         accountOwner,
         iban,
-        "Amazon",
-        "",
-        "Amazon.de: Ihre Bestellung #4528499"
+        "Lisa Wartburg",
+        "DE74500105175899176762",
+        "Weihnachten DATUM 20.12.2018, 11.21 UHR1.TAN 611099"
     );
 
     return new TestPsu(
@@ -519,20 +524,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentExpired() {
-    String iban = "DE09760300807895439876";
-    String accountOwner = "Meryl Streep";
-    String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
+    String iban = "DE12760365687895439876";
+    String accountOwner = "Andreas Winter";
+    String accountId = "d0b03df8-54b6-45b7-91b1-b4249897aff0";
 
     Transaction transaction = new Transaction(
-        "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
-        BigDecimal.valueOf(199.99),
+        "70fd6b74-bbaa-4c65-920b-8a71c01c3f46",
+        BigDecimal.valueOf(-400.00),
         EUR,
         LocalDate.parse("2018-09-20"),
         accountOwner,
         iban,
-        "Amazon",
-        "",
-        "Amazon.de: Ihre Bestellung #4528499"
+        "Markus Holzer",
+        "DE74500105175899176762",
+        "Auslagen Urlaub DATUM 20.09.2018, 17.40 UHR1.TAN 553289"
     );
 
     return new TestPsu(
@@ -550,20 +555,20 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentRevokedByPsu() {
-    String iban = "DE86760300801729983660";
-    String accountOwner = "Tom Cruise";
+    String iban = "DE89760365681729983660";
+    String accountOwner = "Annina Kiupel";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
     Transaction transaction = new Transaction(
         "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
-        BigDecimal.valueOf(199.99),
+        BigDecimal.valueOf(-100),
         EUR,
-        LocalDate.parse("2018-09-20"),
+        LocalDate.parse("2019-02-04"),
         accountOwner,
         iban,
-        "Amazon",
-        "",
-        "Amazon.de: Ihre Bestellung #4528499"
+        "Robert Betzel",
+        "DE74500105175899176762",
+        "Alles Gute zum Geburstag DATUM 04.02.2018, 21.21 UHR1.TAN 598233"
     );
 
     return new TestPsu(
@@ -591,6 +596,8 @@ public class TestDataService {
         accountId,
         iban,
         EUR,
+        "Current Account",
+        CashAccountType.CACC,
         new Balance(new Amount(EUR, amount)),
         transactions
     );

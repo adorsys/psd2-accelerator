@@ -12,9 +12,9 @@ Feature: PIS
     Then the payment data and its transaction-status is <status> are received
     Examples:
       | payment-type | iban                   | payment-product       | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | RCVD   |
-      | future-dated | DE94500105178833114935 | sepa-credit-transfers | RCVD   |
-      | periodic     | DE94500105178833114935 | sepa-credit-transfers | RCVD   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | RCVD   |
+      | future-dated | DE11760365688833114935 | sepa-credit-transfers | RCVD   |
+      | periodic     | DE11760365688833114935 | sepa-credit-transfers | RCVD   |
 
     ################################################################################################
     #                                                                                              #
@@ -29,7 +29,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
 
   Scenario Outline: Initiation of a Single Payment Internal Limit
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -38,7 +38,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id            | password | sca-method | tan   | status |
-      | single       | DE88760300803491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   |
+      | single       | DE91760365683491763002 | sepa-credit-transfers | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | RJCT   |
 
   Scenario Outline: Initiation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -47,8 +47,8 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id       | password | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RCVD   |
-      | single       | DE03760300809827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RCVD   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RCVD   |
+      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RCVD   |
 
     ################################################################################################
     #                                                                                              #
@@ -62,7 +62,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | RCVD   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | RCVD   |
 
   Scenario Outline: Payment Status Accepted
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -71,7 +71,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
 
     ################################################################################################
     #                                                                                              #
@@ -88,7 +88,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE94500105178833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | CANC   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | CANC   |
 
   Scenario Outline: Cancellation of a Single Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -99,7 +99,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id                    | password | sca-method | tan   | status |
-      | single       | DE54500105177914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | single       | DE68760365687914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 | ACCP   |
 
     ################################################################################################
     #                                                                                              #
@@ -111,4 +111,4 @@ Feature: PIS
     Then an error-message <error-message> is received
     Examples:
       | payment-service | iban                   | payment-product       | error-message   |
-      | payments        | DE10760300801209386222 | sepa-credit-transfers | SERVICE_BLOCKED |
+      | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED |

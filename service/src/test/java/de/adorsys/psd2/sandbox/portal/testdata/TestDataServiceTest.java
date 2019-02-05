@@ -47,8 +47,8 @@ public class TestDataServiceTest {
   @Test
   public void getPsuIdByIbanTestSuccessful() {
     final String expectedPsuId = "PSU-Successful";
-    Optional<String> returnedPsuId1 = testDataService.getPsuByIban("DE94500105178833114935");
-    Optional<String> returnedPsuId2 = testDataService.getPsuByIban("DE96500105179669622432");
+    Optional<String> returnedPsuId1 = testDataService.getPsuByIban("DE11760365688833114935");
+    Optional<String> returnedPsuId2 = testDataService.getPsuByIban("DE13760365689669622432");
 
     assertEquals(returnedPsuId1.get(), expectedPsuId);
     assertEquals(returnedPsuId2.get(), expectedPsuId);
@@ -64,8 +64,8 @@ public class TestDataServiceTest {
   @Test
   public void getRequestedAccountsTestSuccessful() {
     final String psuId = "PSU-Successful";
-    final String iban1 = "DE94500105178833114935";
-    final String iban2 = "DE96500105179669622432";
+    final String iban1 = "DE11760365688833114935";
+    final String iban2 = "DE13760365689669622432";
     final List<String> ibans = Arrays.asList(iban1, iban2);
 
     Optional<List<Account>> accounts = testDataService.getRequestedAccounts(psuId, ibans);
@@ -90,7 +90,7 @@ public class TestDataServiceTest {
   @Test
   public void getSingleRequestedAccountsTestSuccessful() {
     final String psuId = "PSU-Successful";
-    final String iban = "DE96500105179669622432";
+    final String iban = "DE13760365689669622432";
     final List<String> ibans = Arrays.asList(iban);
 
     Optional<List<Account>> accounts = testDataService.getRequestedAccounts(psuId, ibans);
