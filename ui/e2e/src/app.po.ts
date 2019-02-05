@@ -10,7 +10,7 @@ export class AppPage {
   }
 
   getDescriptionTitle() {
-    return element(by.css('.description__title')).getText();
+    return element(by.css('h1')).getText();
   }
 
   clickDownloadButton() {

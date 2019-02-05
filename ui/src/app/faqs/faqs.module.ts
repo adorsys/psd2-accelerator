@@ -5,10 +5,12 @@ import { routes } from './faqs.routing';
 import { FormsModule } from '@angular/forms';
 import { FaqsPageComponent } from './faqs-page/faqs-page.component';
 import { SharedModule } from '../common/shared.module';
+import { MarkdownModule } from 'ngx-markdown';
 
 @NgModule({
   imports: [
     CommonModule,
+    MarkdownModule.forChild(),
     RouterModule.forChild(routes),
     FormsModule,
     SharedModule,

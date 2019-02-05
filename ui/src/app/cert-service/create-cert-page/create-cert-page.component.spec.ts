@@ -1,12 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CreateCertPageComponent } from './create-cert-page.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { PspRole } from '../../../models/pspRole';
 import { CertificateResponse } from '../../../models/certificateResponse';
 import { By } from '@angular/platform-browser';
-import { CertServiceModule } from '../cert-service.module';
-import { RouterModule } from '@angular/router';
+import { HeaderComponent } from '../../common/header/header.component';
+import { FormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MockMarkdownComponent } from '../../common/mock-markdown.component';
+import { validate } from 'codelyzer/walkerFactory/walkerFn';
+import { MaxValidatorDirective } from '../../common/validators/max-validator.directive';
+import { MinValidatorDirective } from '../../common/validators/min-validator.directive';
 
 describe('CreateCertPageComponent', () => {
   let component: CreateCertPageComponent;
@@ -22,17 +26,15 @@ describe('CreateCertPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [CertServiceModule],
-    })
-      .overrideModule(CertServiceModule, {
-        remove: {
-          imports: [RouterModule],
-        },
-        add: {
-          imports: [HttpClientTestingModule, RouterTestingModule],
-        },
-      })
-      .compileComponents();
+      declarations: [
+        CreateCertPageComponent,
+        HeaderComponent,
+        MockMarkdownComponent,
+        MaxValidatorDirective,
+        MinValidatorDirective,
+      ],
+      imports: [RouterTestingModule, FormsModule, HttpClientTestingModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

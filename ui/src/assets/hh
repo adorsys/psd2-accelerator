@@ -1,0 +1,15 @@
+{
+  "tppMessages"
+:
+  [
+    {
+      "category": "ERROR",
+      "code": "CONSENT_INVALID",
+      "path": null,
+      "text": "The consent was created by this TPP but is not valid for the addressed service/resource"
+    }
+  ],
+      "_links"
+:
+  null
+}

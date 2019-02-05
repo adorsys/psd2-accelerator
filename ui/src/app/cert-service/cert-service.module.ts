@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { MarkdownModule } from 'ngx-markdown';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { routes } from './cert-service.routing';
@@ -11,6 +12,7 @@ import { SharedModule } from '../common/shared.module';
 @NgModule({
   imports: [
     CommonModule,
+    MarkdownModule.forChild(),
     RouterModule.forChild(routes),
     FormsModule,
     SharedModule,

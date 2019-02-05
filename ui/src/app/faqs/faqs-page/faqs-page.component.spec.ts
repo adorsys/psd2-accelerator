@@ -1,9 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FaqsPageComponent } from './faqs-page.component';
-import { FaqsModule } from '../faqs.module';
-import { RouterModule } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HeaderComponent } from '../../common/header/header.component';
+import { MockMarkdownComponent } from '../../common/mock-markdown.component';
+import { FormsModule } from '@angular/forms';
 
 describe('FaqsPageComponent', () => {
   let component: FaqsPageComponent;
@@ -11,17 +12,9 @@ describe('FaqsPageComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FaqsModule],
-    })
-      .overrideModule(FaqsModule, {
-        remove: {
-          imports: [RouterModule],
-        },
-        add: {
-          imports: [HttpClientTestingModule, RouterTestingModule],
-        },
-      })
-      .compileComponents();
+      declarations: [FaqsPageComponent, HeaderComponent, MockMarkdownComponent],
+      imports: [HttpClientTestingModule, RouterTestingModule, FormsModule],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
