@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
@@ -60,13 +59,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
     excludeFilters = @ComponentScan.Filter(
         type = FilterType.CUSTOM, classes = Xs2aConfig.Xs2aComponentFilter.class
     )
-)
-@PropertySource(
-    value = {
-        "classpath:xs2a-application.properties",
-        "classpath:xs2a-application-${spring.profiles.active}.properties"
-    },
-    ignoreResourceNotFound = true
 )
 @Import(ContextHolder.class)
 public class Xs2aConfig {

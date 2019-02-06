@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(exclude = {
@@ -19,13 +18,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
     ManagementWebSecurityAutoConfiguration.class
 })
 @Import(ContextHolder.class)
-@PropertySource(
-    value = {
-        "classpath:portal-application.properties",
-        "classpath:portal-application-${spring.profiles.active}.properties"
-    },
-    ignoreResourceNotFound = true
-)
 @EnableSwagger2
 public class PortalConfig {
 

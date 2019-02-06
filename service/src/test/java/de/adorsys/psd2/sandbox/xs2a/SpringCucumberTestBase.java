@@ -11,6 +11,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,7 @@ import org.springframework.web.util.DefaultUriTemplateHandler;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Xs2aConfig.class)
 @ActiveProfiles("test")
+@ContextConfiguration(initializers = Xs2aConfigFileInitializer.class)
 public abstract class SpringCucumberTestBase {
 
   @LocalServerPort
@@ -50,5 +52,4 @@ public abstract class SpringCucumberTestBase {
 
     this.template = restTemplate;
   }
-
 }

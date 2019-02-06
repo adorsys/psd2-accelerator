@@ -1,0 +1,4 @@
+sandbox.testdata.test=12345
+sandbox.testdata.psus.PSU-Successful[0]=DE1
+sandbox.testdata.psus.PSU-Successful[1]=DE2
+sandbox.testdata.psus.PSU-Blocked[0]=DE3
