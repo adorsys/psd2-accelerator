@@ -18,7 +18,6 @@ import java.util.HashMap;
 import org.junit.Ignore;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.testcontainers.shaded.org.bouncycastle.cert.ocsp.Req;
 
 @Ignore("Cucumber steps")
 public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {

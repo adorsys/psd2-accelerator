@@ -11,23 +11,18 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
+import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  * Parent Spring Context which only does feature configuration.
  */
 @Configuration
-@PropertySource(
-    value = {
-        "classpath:sandbox-application.properties",
-        "classpath:sandbox-application-${spring.profiles.active}.properties"
-    },
-    ignoreResourceNotFound = true
-)
 @EnableAutoConfiguration(exclude = {
     // TODO no persistence for now
     DataSourceAutoConfiguration.class,
@@ -51,9 +46,23 @@ public class SandboxApplication {
           .run(args);
     } else {
       new SpringApplicationBuilder()
-          .parent(SandboxApplication.class).web(false)
-          .child(PortalConfig.class).listeners(new StartFailedListener()).web(true)
-          .sibling(Xs2aConfig.class).listeners(new StartFailedListener()).web(true)
+          .parent(SandboxApplication.class)
+          .web(false)
+          .listeners(new CustomNameConfigFileListener("sandbox-application"))
+
+          .child(PortalConfig.class)
+          .web(true)
+          .listeners(
+              new CustomNameConfigFileListener("portal-application"),
+              new StartFailedListener()
+          )
+
+          .sibling(Xs2aConfig.class)
+          .listeners(
+              new CustomNameConfigFileListener("xs2a-application, testdata"),
+              new StartFailedListener()
+          )
+          .web(true)
           .run(args);
     }
   }
@@ -65,5 +74,13 @@ public class SandboxApplication {
       SpringApplication.exit(applicationFailedEvent.getApplicationContext().getParent(),
           (ExitCodeGenerator) () -> 1);
     }
+  }
+
+  public static class CustomNameConfigFileListener extends ConfigFileApplicationListener {
+
+    public CustomNameConfigFileListener(String appplicationName) {
+      setSearchNames(appplicationName);
+    }
+
   }
 }
