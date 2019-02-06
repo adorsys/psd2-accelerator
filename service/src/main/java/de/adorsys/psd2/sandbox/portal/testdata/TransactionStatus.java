@@ -3,7 +3,8 @@ package de.adorsys.psd2.sandbox.portal.testdata;
 public enum TransactionStatus {
   Received("Received"),
   Pending("Pending"),
-  AcceptedCustomerProfile("AcceptedCustomerProfile"),
+  AcceptedSettlementCompleted("AcceptedSettlementCompleted"),
+  AcceptedTechnicalValidation("AcceptedTechnicalValidation"),
   Rejected("Rejected"),
   Canceled("Canceled");
 

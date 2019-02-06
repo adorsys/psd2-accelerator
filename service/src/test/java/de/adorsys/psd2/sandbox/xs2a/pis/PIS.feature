@@ -29,7 +29,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
 
   Scenario Outline: Initiation of a Single Payment Internal Limit
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
@@ -71,7 +71,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
 
     ################################################################################################
     #                                                                                              #
@@ -79,7 +79,7 @@ Feature: PIS
     #                                                                                              #
     ################################################################################################
 
-  Scenario Outline: Cancellation of a Single Payment
+  Scenario Outline: Cancellation of a Future-Dated Payment
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     And PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU cancels the payment
@@ -88,9 +88,9 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | CANC   |
+      | future-dated | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | CANC   |
 
-  Scenario Outline: Cancellation of a Single Payment with unsuccessful SCA
+  Scenario Outline: Cancellation of a Future-Dated Payment with unsuccessful SCA
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     And PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU cancels the payment
@@ -99,7 +99,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id                    | password | sca-method | tan   | status |
-      | single       | DE68760365687914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 | ACCP   |
+      | future-dated | DE68760365687914626923 | sepa-credit-transfers | PSU-Cancellation-Rejected | 12345    | SMS_OTP    | 54321 | ACTC   |
 
     ################################################################################################
     #                                                                                              #

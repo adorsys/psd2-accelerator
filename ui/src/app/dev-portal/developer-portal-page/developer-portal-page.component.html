@@ -258,7 +258,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
               <td>PSU-Successful</td>
               <td>DE11760365688833114935</td>
               <td>finalised</td>
-              <td>ACCP</td>
+              <td>ACTC/ACTS*</td>
             </tr>
             <tr>
               <td>PSU-Rejected</td>
@@ -282,6 +282,13 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 
           <tbody></tbody>
         </table>
+        <p>
+          (*) The Status is depending on the payment-type. A single payment will
+          get "executed" by our mocked backend. A future-dated payment will get
+          executed when the "requestedExecutionDate" is reached. A similar
+          behaviour is implemented for periodic-payments which is depending on
+          the "endDate".
+        </p>
       </div>
 
       <div>
@@ -311,18 +318,23 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
               <td>PSU-Successful</td>
               <td>DE11760365688833114935</td>
               <td>finalised</td>
-              <td>CANC</td>
+              <td>CANC*</td>
             </tr>
             <tr>
               <td>PSU-Cancellation-Rejected</td>
               <td>DE68760365687914626923</td>
               <td>failed</td>
-              <td>ACCP</td>
+              <td>ACTC</td>
             </tr>
           </tbody>
 
           <tbody></tbody>
         </table>
+        <p>
+          (*) It is only possible to cancel payments which are not yet executed.
+          Since our mocked backend "executes" single payments directly, only
+          future-dated- and periodic-payments can be deleted.
+        </p>
       </div>
 
       <div>
@@ -357,7 +369,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
           <tbody>
             <tr>
               <td>PSU-Successful</td>
-              <td>DE11760365688833114935</td>
+              <td>DE11760365688833114935*</td>
               <td>finalised</td>
               <td>ACCP</td>
             </tr>
@@ -365,6 +377,24 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 
           <tbody></tbody>
         </table>
+        <p>
+          (*) PSU-Successful has further accounts to test the behaviour where
+        </p>
+        <ul>
+          <li>
+            an account has a negative accounting and available balance
+            (DE89760365681134661389)
+          </li>
+          <li>
+            an account has no transactions and the available balance is 0
+            (DE07760365680034562391)
+          </li>
+          <li>
+            an account has a lower available balance than accounting balance
+            (DE71760365681257681381)
+          </li>
+          <li>the currency of an account is USD (DE56760365681650680255)</li>
+        </ul>
       </div>
 
       <div>

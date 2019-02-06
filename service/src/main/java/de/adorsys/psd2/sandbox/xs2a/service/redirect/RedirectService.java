@@ -130,6 +130,11 @@ public class RedirectService {
       } else {
         TransactionStatus newTxStatus = TransactionStatus
             .getByValue(psu.get().getTransactionStatusAfterSca().xs2aValue());
+
+        if (newTxStatus.equals(TransactionStatus.ACSC)
+            && isFutureOrPeriodicPayment(pisPaymentData)) {
+          newTxStatus = TransactionStatus.ACTC;
+        }
         pisPaymentData.setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
 
@@ -214,7 +219,6 @@ public class RedirectService {
     TransactionStatus transactionStatus = pisAuthorizationRepository.findByExternalId(externalId)
         .get().getPaymentData().getTransactionStatus();
 
-
     return transactionStatus.getTransactionStatus();
   }
 
@@ -235,5 +239,10 @@ public class RedirectService {
     ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
 
     return consentStatus.getValue();
+  }
+
+  private boolean isFutureOrPeriodicPayment(PisPaymentData pisPaymentData) {
+    return pisPaymentData.getRequestedExecutionDate() != null
+        || pisPaymentData.getStartDate() != null;
   }
 }

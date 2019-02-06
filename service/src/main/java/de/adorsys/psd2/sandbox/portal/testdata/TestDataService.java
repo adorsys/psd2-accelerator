@@ -6,7 +6,8 @@ import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.TerminatedBy
 import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.Valid;
 import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Failed;
 import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Finalised;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedCustomerProfile;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedSettlementCompleted;
+import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedTechnicalValidation;
 import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Canceled;
 import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Pending;
 import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Received;
@@ -472,7 +473,7 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         accounts,
-        AcceptedCustomerProfile,
+        AcceptedSettlementCompleted,
         Valid,
         Finalised,
         Canceled,
@@ -537,10 +538,10 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
             transaction),
-        AcceptedCustomerProfile,
+        AcceptedSettlementCompleted,
         Valid,
         Finalised,
-        AcceptedCustomerProfile,
+        AcceptedTechnicalValidation,
         TerminatedByTpp,
         Failed
     );
@@ -666,7 +667,7 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
             transaction),
-        AcceptedCustomerProfile,
+        AcceptedSettlementCompleted,
         Expired,
         Finalised,
         Canceled,
@@ -698,7 +699,7 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
             transaction),
-        AcceptedCustomerProfile,
+        AcceptedSettlementCompleted,
         RevokedByPsu,
         Finalised,
         Canceled,
