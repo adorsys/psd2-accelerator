@@ -107,7 +107,7 @@ public class TestDataMapper {
       SpiAmount spiAmount = new SpiAmount(balance.getBalanceAmount().getCurrency(),
           balance.getBalanceAmount().getAmount());
       spiBalance.setSpiBalanceAmount(spiAmount);
-      spiBalance.setSpiBalanceType(SpiBalanceType.AVAILABLE);
+      spiBalance.setSpiBalanceType(SpiBalanceType.valueOf(balance.getBalanceType().name()));
       spiAccountBalances.add(spiBalance);
     }
 
