@@ -314,22 +314,10 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
               <td>CANC</td>
             </tr>
             <tr>
-              <td>PSU-Rejected</td>
-              <td>DE06760365689827461249</td>
-              <td><i>(no SCA Status available)</i></td>
-              <td><i>(no Transaction Status available)</i></td>
-            </tr>
-            <tr>
-              <td>PSU-Blocked</td>
-              <td>DE13760365681209386222</td>
-              <td><i>(no SCA Status available)</i></td>
-              <td><i>(no Transaction Status available)</i></td>
-            </tr>
-            <tr>
-              <td>PSU-InternalLimit</td>
-              <td>DE91760365683491763002</td>
-              <td>finalised</td>
-              <td><i>(no Transaction Status available)</i></td>
+              <td>PSU-Cancellation-Rejected</td>
+              <td>DE68760365687914626923</td>
+              <td>failed</td>
+              <td>ACCP</td>
             </tr>
           </tbody>
 
@@ -460,10 +448,16 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
               <td><i>(no Consent Status available)</i></td>
             </tr>
             <tr>
-              <td>PSU-InternalLimit</td>
-              <td>DE91760365683491763002</td>
+              <td>PSU-ConsentExpired</td>
+              <td>DE12760365687895439876</td>
               <td>finalised</td>
-              <td>valid</td>
+              <td>expired</td>
+            </tr>
+            <tr>
+              <td>PSU-ConsentRevokedByPsu</td>
+              <td>DE89760365681729983660</td>
+              <td>finalised</td>
+              <td>revokedByPsu</td>
             </tr>
           </tbody>
 
@@ -494,21 +488,6 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
             <tr>
               <td>PSU-Successful</td>
               <td>DE11760365688833114935</td>
-              <td>terminatedByTpp</td>
-            </tr>
-            <tr>
-              <td>PSU-Rejected</td>
-              <td>DE06760365689827461249</td>
-              <td><i>(no Consent Status available)</i></td>
-            </tr>
-            <tr>
-              <td>PSU-Blocked</td>
-              <td>DE13760365681209386222</td>
-              <td><i>(no Consent Status available)</i></td>
-            </tr>
-            <tr>
-              <td>PSU-InternalLimit</td>
-              <td>DE91760365683491763002</td>
               <td>terminatedByTpp</td>
             </tr>
           </tbody>
@@ -592,7 +571,6 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
             <tr>
               <th scope="col">PSU-ID</th>
               <th scope="col">Iban</th>
-              <th scope="col">SCA Status</th>
               <th scope="col">Consent Status</th>
             </tr>
           </thead>
@@ -600,8 +578,17 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
             <tr>
               <td>PSU-Successful</td>
               <td>DE11760365688833114935</td>
-              <td>finalised</td>
               <td>valid</td>
+            </tr>
+            <tr>
+              <td>PSU-ConsentExpired</td>
+              <td>DE12760365687895439876</td>
+              <td>expired</td>
+            </tr>
+            <tr>
+              <td>PSU-ConsentRevokedByPsu</td>
+              <td>DE89760365681729983660</td>
+              <td>revokedByPsu</td>
             </tr>
           </tbody>
 
