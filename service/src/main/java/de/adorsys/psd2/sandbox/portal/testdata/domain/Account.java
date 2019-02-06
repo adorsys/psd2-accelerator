@@ -3,6 +3,7 @@ package de.adorsys.psd2.sandbox.portal.testdata.domain;
 import de.adorsys.psd2.sandbox.portal.testdata.CashAccountType;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,8 +18,7 @@ public class Account {
   private Currency currency;
   private String product;
   private CashAccountType cashAccountType;
-  private Balance bookedBalance;
-  private Balance availableBalance;
+  private List<Balance> balances;
   private HashMap<String, Transaction> transactions;
 
   public Account(String iban, Currency currency) {
