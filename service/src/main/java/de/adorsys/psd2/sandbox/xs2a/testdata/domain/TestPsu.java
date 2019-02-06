@@ -1,8 +1,8 @@
-package de.adorsys.psd2.sandbox.portal.testdata.domain;
+package de.adorsys.psd2.sandbox.xs2a.testdata.domain;
 
-import de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus;
-import de.adorsys.psd2.sandbox.portal.testdata.ScaStatus;
-import de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus;
+import de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus;
+import de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus;
+import de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus;
 import java.util.HashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

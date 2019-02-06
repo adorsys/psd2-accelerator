@@ -2,8 +2,8 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
-import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;

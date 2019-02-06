@@ -1,4 +1,24 @@
-sandbox.testdata.test=12345
-sandbox.testdata.psus.PSU-Successful[0]=DE1
-sandbox.testdata.psus.PSU-Successful[1]=DE2
-sandbox.testdata.psus.PSU-Blocked[0]=DE3
+sandbox:
+  testdata:
+    psus:
+      "PSU-Successful":
+        - DE11760365688833114935 # GIRO
+        - DE13760365689669622432 # SAVINGS
+        - DE07760365680034562391 # EMPTY GIRO
+        - DE89760365681134661389 # NEGATIVE BALANCE GIRO
+        - DE71760365681257681381 # LOWER BALANCE GIRO
+        - DE56760365681650680255 # USD GIRO
+      "PSU-Rejected":
+        - DE06760365689827461249
+      "PSU-Cancellation-Rejected":
+        - DE68760365687914626923
+      "PSU-Blocked":
+        - DE13760365681209386222
+      "PSU-InternalLimit":
+        - DE91760365683491763002
+      "PSU-Pending":
+        - DE89760365681729983660
+      "PSU-ConsentExpired":
+        - DE12760365687895439876
+      "PSU-ConsentRevokedByPsu":
+        - DE89760365681729983660

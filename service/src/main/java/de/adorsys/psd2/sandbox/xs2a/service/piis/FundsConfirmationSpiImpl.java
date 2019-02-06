@@ -1,10 +1,10 @@
 package de.adorsys.psd2.sandbox.xs2a.service.piis;
 
-import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.BalanceType;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;

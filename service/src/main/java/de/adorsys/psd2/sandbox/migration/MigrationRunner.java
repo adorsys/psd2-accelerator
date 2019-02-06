@@ -12,6 +12,7 @@ import org.springframework.context.annotation.PropertySource;
     SecurityAutoConfiguration.class,
     ManagementWebSecurityAutoConfiguration.class
 })
+// TODO migrate to CustomNameConfigFileInitializer
 @PropertySource("classpath:migration-application.properties")
 public class MigrationRunner implements CommandLineRunner {
 

@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.portal.testdata;
+package de.adorsys.psd2.sandbox.xs2a.testdata;
 
 public enum ConsentStatus {
   Received("received"),
