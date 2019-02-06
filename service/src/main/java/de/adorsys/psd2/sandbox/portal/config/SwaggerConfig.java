@@ -21,6 +21,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
+  static final String XS2A_SWAGGER_YAML = "psd2-api-1.3-20181220.yaml";
+
   @Bean
   UiConfiguration uiConfiguration() {
     return UiConfigurationBuilder.builder()
@@ -58,7 +60,7 @@ public class SwaggerConfig {
       SwaggerResource swaggerResource = new SwaggerResource();
       swaggerResource.setName("PSD2 API");
       swaggerResource.setSwaggerVersion("3.0.1");
-      swaggerResource.setUrl("/psd2-api-1.3-20181220.yaml");
+      swaggerResource.setUrl("/" + XS2A_SWAGGER_YAML);
 
       ArrayList<SwaggerResource> resources = new ArrayList<>();
 
