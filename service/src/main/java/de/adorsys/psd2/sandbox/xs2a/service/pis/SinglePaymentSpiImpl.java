@@ -1,7 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
-import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;

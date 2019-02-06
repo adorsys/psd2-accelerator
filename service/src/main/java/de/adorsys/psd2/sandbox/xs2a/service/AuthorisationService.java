@@ -2,8 +2,8 @@ package de.adorsys.psd2.sandbox.xs2a.service;
 
 import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus.SUCCESS;
 
-import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.sca.ChallengeData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;

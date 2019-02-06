@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.portal.testdata.domain;
+package de.adorsys.psd2.sandbox.xs2a.testdata.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

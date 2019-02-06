@@ -102,6 +102,24 @@ a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` heade
 include::../../service/src/main/resources/bank_profile.yml[]
 ----
 
+===== Customizing the Test Data
+
+The IBANs of the different PSUs we provide are configurable. There is a default configuration in place which uses a made up routing number (**DE**XX**76036568**XXXXXXXXXX).
+
+.Default Test Data Configuration
+[source,yaml]
+----
+include::../../service/src/main/resources/testdata.yml[]
+----
+
+Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the whole file (e.g. place an edited copy in `$CWD/config` next to the JAR) or change certain PSUs via ENV with `SANDBOX_TESTDATA_PSUS_PSU-Successful[0]=DE...`.
+
+WARNING: Make sure that every IBAN you use is valid. We do not check externally set IBANs for correctness. If you use invalid IBANs, you might encounter problems when interacting with the XS2A API or with external systems.
+
+WARNING: Lists are not merged in Spring Boot Configuration. If you override the first IBAN of _PSU-Successful_ (`SANDBOX_TESTDATA_PSUS_PSU-Successful[0]=...`) you will end up with a single IBAN for that PSU. The application won't start in this case because we require all 6 IBANs. To help with configuration and debugging, the effective `TestDataConfigura†ion` is logged (`INFO`) to the console at startup.
+
+See <<Configuration>> for more information about the Spring Boot configuration mechanism.
+
 ==== ssl-proxy
 
 .Required Properties for ssl-proxy

@@ -1,31 +1,45 @@
-package de.adorsys.psd2.sandbox.portal.testdata;
+package de.adorsys.psd2.sandbox.xs2a.testdata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
 
 public class TestDataServiceTest {
 
+  private static TestDataConfiguration testDataConfiguration = new TestDataConfiguration();
   private TestDataService testDataService;
 
-  public TestDataServiceTest() {
-    this.testDataService = new TestDataService();
+  @SuppressWarnings("unchecked")
+  @BeforeClass
+  public static void createTestDataConfigurationFromYaml() {
+    // this is easier than bootstrapping spring
+    Yaml yml = new Yaml();
+    InputStream src = TestDataServiceTest.class.getResourceAsStream("/testdata.yml");
+    Map<String, Object> doc = (Map<String, Object>) yml.load(src);
+    Map<String, Object> sandbox = (Map<String, Object>) doc.get("sandbox");
+    Map<String, Object> testdata = (Map<String, Object>) sandbox.get("testdata");
+    Map<String, List<String>> psus = (Map<String, List<String>>) testdata.get("psus");
+    testDataConfiguration.getPsus().putAll(psus);
   }
 
   @Before
   public void initService() {
-    testDataService = new TestDataService();
+    testDataService = new TestDataService(testDataConfiguration);
   }
 
   @Test
@@ -276,4 +290,5 @@ public class TestDataServiceTest {
 
     assertEquals(account, Optional.empty());
   }
+
 }

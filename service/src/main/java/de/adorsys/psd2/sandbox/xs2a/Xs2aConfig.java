@@ -54,7 +54,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
         "de.adorsys.psd2.aspsp",
         "de.adorsys.psd2.consent",
         "de.adorsys.psd2.sandbox.xs2a",
-        "de.adorsys.psd2.sandbox.portal.testdata"
     },
     excludeFilters = @ComponentScan.Filter(
         type = FilterType.CUSTOM, classes = Xs2aConfig.Xs2aComponentFilter.class
@@ -100,7 +99,7 @@ public class Xs2aConfig {
 
     private static Logger log = LoggerFactory.getLogger(Xs2aComponentFilter.class);
 
-    public static Set<String> blacklist = Sets.newHashSet(
+    static Set<String> blacklist = Sets.newHashSet(
         ObjectMapperConfig.class.getName(),
         QwacCertificateFilter.class.getName()
     );

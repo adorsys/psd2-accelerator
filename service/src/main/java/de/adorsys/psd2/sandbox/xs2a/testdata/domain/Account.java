@@ -1,6 +1,6 @@
-package de.adorsys.psd2.sandbox.portal.testdata.domain;
+package de.adorsys.psd2.sandbox.xs2a.testdata.domain;
 
-import de.adorsys.psd2.sandbox.portal.testdata.CashAccountType;
+import de.adorsys.psd2.sandbox.xs2a.testdata.CashAccountType;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;

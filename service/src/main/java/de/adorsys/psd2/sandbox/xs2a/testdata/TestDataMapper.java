@@ -1,9 +1,9 @@
-package de.adorsys.psd2.sandbox.portal.testdata;
+package de.adorsys.psd2.sandbox.xs2a.testdata;
 
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountDetails;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;

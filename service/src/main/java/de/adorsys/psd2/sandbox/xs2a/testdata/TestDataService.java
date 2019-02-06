@@ -1,24 +1,24 @@
-package de.adorsys.psd2.sandbox.portal.testdata;
+package de.adorsys.psd2.sandbox.xs2a.testdata;
 
-import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.Expired;
-import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.RevokedByPsu;
-import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.TerminatedByTpp;
-import static de.adorsys.psd2.sandbox.portal.testdata.ConsentStatus.Valid;
-import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Failed;
-import static de.adorsys.psd2.sandbox.portal.testdata.ScaStatus.Finalised;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedSettlementCompleted;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.AcceptedTechnicalValidation;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Canceled;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Pending;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Received;
-import static de.adorsys.psd2.sandbox.portal.testdata.TransactionStatus.Rejected;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.Expired;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.RevokedByPsu;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.TerminatedByTpp;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.Valid;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus.Failed;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus.Finalised;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedSettlementCompleted;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedTechnicalValidation;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Canceled;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Pending;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Received;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Rejected;
 
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Amount;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.BalanceType;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
-import de.adorsys.psd2.sandbox.portal.testdata.domain.Transaction;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Amount;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,8 +41,16 @@ public class TestDataService {
   public static final String GLOBAL_TAN = "54321";
 
   private Map<String, TestPsu> psuMap;
+  private TestDataConfiguration testDataConfiguration;
 
-  {
+  /**
+   * Creates a new TestDataService and inits its data depending on the given configuration.
+   *
+   * @param testDataConfiguration externalized testdata configuration, see testdata.yml
+   */
+  public TestDataService(TestDataConfiguration testDataConfiguration) {
+    this.testDataConfiguration = testDataConfiguration;
+
     HashMap<String, TestPsu> map = new HashMap<>();
 
     TestPsu psuSuccessful = initPsuSuccessfull();
@@ -65,7 +73,6 @@ public class TestDataService {
 
     this.psuMap = Collections.unmodifiableMap(map);
   }
-
 
   public Optional<TestPsu> getPsu(String psuId) {
     return Optional.ofNullable(psuMap.get(psuId));
@@ -190,7 +197,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuSuccessfull() {
-    String ibanGiro = "DE11760365688833114935";
+    String psuId = "PSU-Successful";
+    String ibanGiro = testDataConfiguration.getIbanForPsu(psuId, 0);
     String accountOwner = "Isabella Ionescu";
     String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
 
@@ -277,7 +285,7 @@ public class TestDataService {
 
     accounts.put(giroAccount.getAccountId(), giroAccount);
 
-    String ibanSavings = "DE13760365689669622432";
+    String ibanSavings = testDataConfiguration.getIbanForPsu(psuId, 1);
     String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
     Transaction savingsTransaction1 = new Transaction(
@@ -360,7 +368,7 @@ public class TestDataService {
 
     accounts.put(savingsAccount.getAccountId(), savingsAccount);
 
-    String ibanEmptyGiro = "DE07760365680034562391";
+    String ibanEmptyGiro = testDataConfiguration.getIbanForPsu(psuId, 2);
     String accountIdEmptyGiro = "e17d99e7-de70-46ed-a59d-0f8051438c1f";
 
     Account emptyGiroAccount = new Account(
@@ -377,7 +385,7 @@ public class TestDataService {
 
     accounts.put(emptyGiroAccount.getAccountId(), emptyGiroAccount);
 
-    String ibanNegativeBookedBalance = "DE89760365681134661389";
+    String ibanNegativeBookedBalance = testDataConfiguration.getIbanForPsu(psuId, 3);
     String accountIdNegativeBookedBalance = "ed329862-4e58-4bd1-969f-210326f45ac0";
 
     Transaction transactionNegativeBookedBalance = new Transaction(
@@ -410,7 +418,7 @@ public class TestDataService {
 
     accounts.put(negativeBookedBalanceAccount.getAccountId(), negativeBookedBalanceAccount);
 
-    String ibanLowerAvailableBalance = "DE71760365681257681381";
+    String ibanLowerAvailableBalance = testDataConfiguration.getIbanForPsu(psuId, 4);
     String accountIdLowerAvailableBalance = "9750eaa1-c78b-4457-a192-5c9e44bf7ffa";
 
     Transaction transactionLowerAvailableBalance = new Transaction(
@@ -443,7 +451,7 @@ public class TestDataService {
 
     accounts.put(lowerAvailableBalanceAccount.getAccountId(), lowerAvailableBalanceAccount);
 
-    String ibanGiroUsd = "DE56760365681650680255";
+    String ibanGiroUsd = testDataConfiguration.getIbanForPsu(psuId, 5);
     String accountIdGiroUsd = "cfefebae-a72a-4cac-9e6d-ee3f3bb186dc";
 
     Transaction giroUsdTransaction = new Transaction(
@@ -477,7 +485,7 @@ public class TestDataService {
     accounts.put(giroUsdAccount.getAccountId(), giroUsdAccount);
 
     return new TestPsu(
-        "PSU-Successful",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         accounts,
@@ -491,7 +499,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuRejected() {
-    String iban = "DE06760365689827461249";
+    String psuId = "PSU-Rejected";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Tarkan Nein";
     String accountId = "2b163b22-8b7a-46cc-9ba4-7c8730ed3edd";
 
@@ -508,7 +517,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Rejected",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
@@ -523,7 +532,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuCancellationRejected() {
-    String iban = "DE68760365687914626923";
+    String psuId = "PSU-Cancellation-Rejected";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Sebastian Wild";
     String accountId = "a9231724-1bd5-4070-99bb-8c97e11982ad";
 
@@ -541,7 +551,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Cancellation-Rejected",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
@@ -556,7 +566,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuBlocked() {
-    String iban = "DE13760365681209386222";
+    String psuId = "PSU-Blocked";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Roman Ataman";
     String accountId = "3ce6eee1-56c2-49cd-9314-36a2a8bb892b";
 
@@ -573,7 +584,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Blocked",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(1022.77), BigDecimal.valueOf(1022.77),
@@ -588,7 +599,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuInternalLimit() {
-    String iban = "DE91760365683491763002";
+    String psuId = "PSU-InternalLimit";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Jana Tiimus";
     String accountId = "4ed8f9bb-f239-463f-a3ae-2b90b7924ffa";
 
@@ -606,7 +618,7 @@ public class TestDataService {
 
     // TODO clarify which transaction status should be returned after SCA
     return new TestPsu(
-        "PSU-InternalLimit",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(7.35), BigDecimal.valueOf(7.35),
@@ -621,7 +633,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuPending() {
-    String iban = "DE89760365681729983660";
+    String psuId = "PSU-Pending";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Nadja Krendel";
     String accountId = "c3f1943a-acb5-4eed-9882-f386d79a5c5a";
 
@@ -638,7 +651,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-Pending",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
@@ -653,7 +666,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentExpired() {
-    String iban = "DE12760365687895439876";
+    String psuId = "PSU-ConsentExpired";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Andreas Winter";
     String accountId = "d0b03df8-54b6-45b7-91b1-b4249897aff0";
 
@@ -670,7 +684,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-ConsentExpired",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
@@ -685,7 +699,8 @@ public class TestDataService {
   }
 
   private TestPsu initPsuConsentRevokedByPsu() {
-    String iban = "DE89760365681729983660";
+    String psuId = "PSU-ConsentRevokedByPsu";
+    String iban = testDataConfiguration.getIbanForPsu(psuId);
     String accountOwner = "Annina Kiupel";
     String accountId = "82d10b08-9d41-4211-9e80-130a892a4d8f";
 
@@ -702,7 +717,7 @@ public class TestDataService {
     );
 
     return new TestPsu(
-        "PSU-ConsentRevokedByPsu",
+        psuId,
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
