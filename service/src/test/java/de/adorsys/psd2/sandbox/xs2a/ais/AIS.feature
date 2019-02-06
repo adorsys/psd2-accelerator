@@ -116,6 +116,22 @@ Feature: AIS
 
     ################################################################################################
     #                                                                                              #
+    # Get Balances                                                                                 #
+    #                                                                                              #
+    ################################################################################################
+  Scenario Outline: Get Balance List
+    Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
+    And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    And PSU accesses the account list
+    When PSU accesses the balance list
+    Then the balance data are received
+    Examples:
+      | accounts                                      | balances               | transactions           | psu-id         | password | sca-method | tan   |
+      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 |
+      | DE11760365688833114935                        | null                   | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 |
+
+    ################################################################################################
+    #                                                                                              #
     # Unsuccessful SCA                                                                             #
     #                                                                                              #
     ################################################################################################

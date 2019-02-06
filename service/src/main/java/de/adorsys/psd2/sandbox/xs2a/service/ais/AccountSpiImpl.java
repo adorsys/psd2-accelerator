@@ -152,8 +152,30 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
+    Optional<TestPsu> psu = testDataService.getPsuByIban(spiAccountReference.getIban());
+
+    if (!psu.isPresent()) {
+      return SpiResponse.<List<SpiAccountBalance>>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+    }
+
+    Optional<Account> account = testDataService.getDistinctAccount(
+        psu.get().getPsuId(),
+        spiAccountReference.getResourceId());
+
+    if (!account.isPresent()) {
+      return SpiResponse.<List<SpiAccountBalance>>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+    }
+
+    List<SpiAccountBalance> balances = testDataMapper
+        .mapBalanceListToSpiBalanceList(account.get().getBalances());
+
     return SpiResponse.<List<SpiAccountBalance>>builder()
         .aspspConsentData(aspspConsentData)
+        .payload(balances)
         .success();
   }
 

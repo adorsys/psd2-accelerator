@@ -14,12 +14,14 @@ import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.AccountAccess;
 import de.adorsys.psd2.model.AccountList;
 import de.adorsys.psd2.model.AccountReference;
+import de.adorsys.psd2.model.BalanceType;
 import de.adorsys.psd2.model.ConsentInformationResponse200Json;
 import de.adorsys.psd2.model.ConsentStatus;
 import de.adorsys.psd2.model.ConsentStatusResponse200;
 import de.adorsys.psd2.model.Consents;
 import de.adorsys.psd2.model.ConsentsResponse201;
 import de.adorsys.psd2.model.PsuData;
+import de.adorsys.psd2.model.ReadAccountBalanceResponse200;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
@@ -275,6 +277,25 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
+  @When("PSU accesses the balance list")
+  public void getBalanceList() {
+    ResponseEntity<AccountList> actualResponse = context.getActualResponse();
+    HashMap<String, String> headers = TestUtils.createSession();
+    headers.put("Consent-ID", context.getConsentId());
+    Request<?> request = Request.emptyRequest(headers);
+    context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
+
+    ResponseEntity<ReadAccountBalanceResponse200> response = template.exchange(
+        "accounts/" + context.getAccountId() + "/balances",
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        ReadAccountBalanceResponse200.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    context.setActualResponse(response);
+  }
+
   @When("PSU accesses a single transaction")
   public void getTransaction() {
     ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
@@ -317,6 +338,18 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         actualResponse.getBody().getTransactionsDetails().getRemittanceInformationStructured()
             .isEmpty(),
         equalTo(false));
+  }
+
+  @Then("the balance data are received")
+  public void receiveBalanceData() {
+    ResponseEntity<ReadAccountBalanceResponse200> actualResponse = context.getActualResponse();
+
+    assertThat(actualResponse.getBody().getBalances().size(), equalTo(2));
+    // TODO: XS2A does not show a status for AVAILABLE Types. Responded status is null
+//    assertThat(actualResponse.getBody().getBalances().get(0).getBalanceType(), equalTo(
+//        BalanceType.AVAILABLE));
+    assertThat(actualResponse.getBody().getBalances().get(1).getBalanceType().toString(), equalTo(
+        BalanceType.CLOSINGBOOKED.toString()));
   }
 
   @When("PSU tries to authorise the consent with psu-id (.*), password (.*)")
