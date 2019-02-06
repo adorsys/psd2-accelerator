@@ -12,8 +12,8 @@ import de.adorsys.psd2.xs2a.spi.domain.account.SpiBalanceType;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransaction;
 import de.adorsys.psd2.xs2a.spi.domain.common.SpiAmount;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Currency;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,8 +53,8 @@ public class TestDataMapper {
         "",
         null,
         "",
-        account.getBalance() != null
-            ? new ArrayList<>(Arrays.asList(mapBalanceToSpiBalance(account.getBalance())))
+        account.getBalances() != null
+            ? mapBalanceListToSpiBalanceList(account.getBalances())
             : null);
   }
 
@@ -95,20 +95,23 @@ public class TestDataMapper {
   }
 
   /**
-   * Maps TestData Balance to SpiAccountBalance.
+   * Maps TestData Balance List to SpiAccountBalance List.
    *
-   * @param balance TestData Balance
-   * @return SpiAccountBalance
+   * @param balances TestData List of Balance
+   * @return SpiAccountBalance List
    */
-  public SpiAccountBalance mapBalanceToSpiBalance(Balance balance) {
-    SpiAccountBalance spiAccountBalance = new SpiAccountBalance();
+  public List<SpiAccountBalance> mapBalanceListToSpiBalanceList(List<Balance> balances) {
+    List<SpiAccountBalance> spiAccountBalances = new ArrayList<>();
+    for (Balance balance : balances) {
+      SpiAccountBalance spiBalance = new SpiAccountBalance();
+      SpiAmount spiAmount = new SpiAmount(balance.getBalanceAmount().getCurrency(),
+          balance.getBalanceAmount().getAmount());
+      spiBalance.setSpiBalanceAmount(spiAmount);
+      spiBalance.setSpiBalanceType(SpiBalanceType.AVAILABLE);
+      spiAccountBalances.add(spiBalance);
+    }
 
-    SpiAmount spiAmount = new SpiAmount(balance.getBalanceAmount().getCurrency(),
-        balance.getBalanceAmount().getAmount());
-    spiAccountBalance.setSpiBalanceAmount(spiAmount);
-    spiAccountBalance.setSpiBalanceType(SpiBalanceType.AVAILABLE);
-
-    return spiAccountBalance;
+    return spiAccountBalances;
   }
 
   private Account getAccountData(String iban) {

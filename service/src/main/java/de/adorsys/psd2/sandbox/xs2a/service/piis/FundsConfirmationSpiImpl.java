@@ -3,6 +3,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.piis;
 import de.adorsys.psd2.sandbox.portal.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.portal.testdata.domain.BalanceType;
 import de.adorsys.psd2.sandbox.portal.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
@@ -51,7 +52,10 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       Optional<Account> account = testDataService.getDistinctAccount(
           psuId.get().getPsuId(), accountId.get());
       if (account.isPresent()) {
-        Balance balance = account.get().getAvailableBalance();
+        Balance balance = account.get().getBalances().stream()
+            .filter(b -> b.getBalanceType().equals(BalanceType.AVAILABLE))
+            .findFirst().get();
+
         response
             .setFundsAvailable(
                 requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);

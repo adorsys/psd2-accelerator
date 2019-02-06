@@ -6,5 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class Balance {
+
   private Amount balanceAmount;
+  private BalanceType balanceType;
 }
