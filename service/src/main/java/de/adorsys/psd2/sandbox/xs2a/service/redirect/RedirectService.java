@@ -180,6 +180,12 @@ public class RedirectService {
     TppInfoEntity tppInfo = commonPaymentData.get().getAuthorizations().get(0).getPaymentData()
         .getTppInfo();
 
+    ScaStatus scaStatus = commonPaymentData.get().getAuthorizations().get(0).getScaStatus();
+
+    if (scaStatus.equals(ScaStatus.FAILED)) {
+      String nokRedirectUri = tppInfo.getNokRedirectUri();
+      return nokRedirectUri == null ? tppInfo.getRedirectUri() : nokRedirectUri;
+    }
     return tppInfo.getRedirectUri();
   }
 
@@ -198,6 +204,11 @@ public class RedirectService {
     }
 
     TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
+
+    if (aisAuthorisation.get().getScaStatus().equals(ScaStatus.FAILED)) {
+      String nokRedirectUri = tppInfo.getNokRedirectUri();
+      return nokRedirectUri == null ? tppInfo.getRedirectUri() : nokRedirectUri;
+    }
 
     return tppInfo.getRedirectUri();
   }
