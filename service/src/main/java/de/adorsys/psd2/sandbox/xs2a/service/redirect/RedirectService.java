@@ -72,7 +72,7 @@ public class RedirectService {
     }
     AisConsentAuthorization aisConsentAuth = aisConsentAuthorization.get();
 
-    AisConsent consent = aisConsentRepository.findOne(aisConsentAuth.getId());
+    AisConsent consent = aisConsentAuth.getConsent();
 
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
     if (psu.isPresent()) {
@@ -83,7 +83,6 @@ public class RedirectService {
       aisConsentAuth.setScaStatus(newScaStatus);
 
     }
-    aisConsentRepository.save(consent);
     aisConsentAuthorizationRepository.save(aisConsentAuth);
   }
 
@@ -106,14 +105,13 @@ public class RedirectService {
 
     PisAuthorization paymentAuth = pisAuthorization.get();
 
-    Optional<List<PisPaymentData>> pisPaymentDataList = pisPaymentDataRepository
-        .findByPaymentId(paymentAuth.getPaymentData().getPaymentId());
+    List<PisPaymentData> pisPaymentDataList = paymentAuth.getPaymentData().getPayments();
 
-    if (!pisPaymentDataList.isPresent() || pisPaymentDataList.get().isEmpty()) {
+    if (pisPaymentDataList.isEmpty()) {
       //TODO handle error case
       return;
     }
-    PisPaymentData pisPaymentData = pisPaymentDataList.get().get(0);
+    PisPaymentData pisPaymentData = pisPaymentDataList.get(0);
 
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
 
@@ -151,8 +149,6 @@ public class RedirectService {
         paymentAuth.setScaStatus(newScaStatus);
       }
       pisAuthorizationRepository.save(paymentAuth);
-      pisPaymentDataRepository.save(pisPaymentData);
-      pisCommonPaymentDataRepository.save(pisPaymentData.getPaymentData());
     }
   }
 
