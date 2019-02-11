@@ -215,7 +215,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 | PSU-ID            | Iban                   | SCA Status                  | Transaction Status                  |
 | :---------------- | :--------------------- | :-------------------------- | :---------------------------------- |
 | PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACTS\*                         |
-| PSU-Rejected      | DE06760365689827461249 | failed                      | RCVD                                |
+| PSU-Rejected\*\*  | DE06760365689827461249 | failed                      | RJCT                                |
 | PSU-Blocked       | DE13760365681209386222 | _(no SCA Status available)_ | _(no Transaction Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | finalised                   | RJCT                                |
 
@@ -224,6 +224,8 @@ get "executed" by our mocked backend. A future-dated payment will get
 executed when the "requestedExecutionDate" is reached. A similar
 behaviour is implemented for periodic-payments which is depending on
 the "endDate".
+
+(\*\*) Same behavior is implemented, when PSU does not match iban or the PSU-ID is not known.
 
 ### Payment Cancellation
 
@@ -309,7 +311,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-ID                  | Iban                   | SCA Status                  | Consent Status                  |
 | :---------------------- | :--------------------- | :-------------------------- | :------------------------------ |
 | PSU-Successful          | DE11760365688833114935 | finalised                   | valid                           |
-| PSU-Rejected            | DE06760365689827461249 | failed                      | received                        |
+| PSU-Rejected            | DE06760365689827461249 | failed                      | rejected                        |
 | PSU-Blocked             | DE13760365681209386222 | _(no SCA Status available)_ | _(no Consent Status available)_ |
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |

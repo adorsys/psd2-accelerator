@@ -22,6 +22,7 @@ import de.adorsys.psd2.model.Consents;
 import de.adorsys.psd2.model.ConsentsResponse201;
 import de.adorsys.psd2.model.PsuData;
 import de.adorsys.psd2.model.ReadAccountBalanceResponse200;
+import de.adorsys.psd2.model.ScaStatus;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
@@ -102,6 +103,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
       context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
     }
 
     context.setConsentId(response.getBody().getConsentId());
@@ -220,7 +222,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     if (scaApproach.equalsIgnoreCase("embedded")) {
       this.authoriseWithEmbeddedApproach(psuId, password, selectedScaMethod, tan);
     } else {
-      this.authoriseWithRedirectApproach(psuId);
+      this.authoriseWithRedirectApproach(psuId, true);
     }
   }
 
@@ -357,7 +359,11 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     if (scaApproach.equalsIgnoreCase("embedded")) {
       this.tryToAuthoriseWithEmbeddedApproach(psuId, password);
     } else {
-      this.authoriseWithRedirectApproach(psuId);
+      if (psuId.equals("PSU-ConsentRevokedByPsu") || psuId.equals("PSU-ConsentExpired")) {
+        this.authoriseWithRedirectApproach(psuId, true);
+      } else {
+        this.authoriseWithRedirectApproach(psuId, false);
+      }
     }
   }
 
@@ -409,7 +415,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     return result;
   }
 
-  private void authoriseWithRedirectApproach(String psuId) {
+  private void authoriseWithRedirectApproach(String psuId, boolean isSuccessfulSca) {
     HashMap<String, String> headers = TestUtils.createSession();
     Request request = Request.emptyRequest(headers);
 
@@ -422,6 +428,18 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         String.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    ResponseEntity<ScaStatusResponse> scaStatusResponse = template
+        .exchange(context.getScaStatusUrl(), HttpMethod.GET, request.toHttpEntity(),
+            ScaStatusResponse.class);
+
+    assertTrue(scaStatusResponse.getStatusCode().is2xxSuccessful());
+
+    if (isSuccessfulSca) {
+      assertThat(scaStatusResponse.getBody().getScaStatus(), equalTo(ScaStatus.FINALISED));
+    } else {
+      assertThat(scaStatusResponse.getBody().getScaStatus(), equalTo(ScaStatus.FAILED));
+    }
   }
 
   private void authoriseWithEmbeddedApproach(String psuId, String password,

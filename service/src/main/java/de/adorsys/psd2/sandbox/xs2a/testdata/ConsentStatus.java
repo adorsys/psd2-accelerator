@@ -5,7 +5,8 @@ public enum ConsentStatus {
   Valid("valid"),
   TerminatedByTpp("terminatedByTpp"),
   RevokedByPsu("revokedByPsu"),
-  Expired("expired");
+  Expired("expired"),
+  Rejected("rejected");
 
   private String xs2aValue;
 
