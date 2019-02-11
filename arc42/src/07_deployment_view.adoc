@@ -112,11 +112,9 @@ The IBANs of the different PSUs we provide are configurable. There is a default 
 include::../../service/src/main/resources/testdata.yml[]
 ----
 
-Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the whole file (e.g. place an edited copy in `$CWD/config` next to the JAR) or change certain PSUs via ENV with `SANDBOX_TESTDATA_PSUS_PSU-Successful[0]=DE...`.
+Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the configuration by placing an edited copy in `$CWD/config` next to the JAR.
 
-WARNING: Make sure that every IBAN you use is valid. We do not check externally set IBANs for correctness. If you use invalid IBANs, you might encounter problems when interacting with the XS2A API or with external systems.
-
-WARNING: Lists are not merged in Spring Boot Configuration. If you override the first IBAN of _PSU-Successful_ (`SANDBOX_TESTDATA_PSUS_PSU-Successful[0]=...`) you will end up with a single IBAN for that PSU. The application won't start in this case because we require all 6 IBANs. To help with configuration and debugging, the effective `TestDataConfigura†ion` is logged (`INFO`) to the console at startup.
+WARNING: Make sure that every IBAN you use is valid. We do not check externally set IBANs for correctness. If you use invalid IBANs, you might encounter problems when interacting with the XS2A API or with external systems. If a PSU has more than one IBAN, you need to supply all of them or the application won't start. To help with configuration and debugging, the effective `TestDataConfigura†ion` is logged (`INFO`) to the console at startup.
 
 See <<Configuration>> for more information about the Spring Boot configuration mechanism.
 
