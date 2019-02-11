@@ -20,6 +20,7 @@ public class Context {
   private String consentId;
   private AccountAccess consentAccountAccess;
   private ResponseEntity actualResponse;
+  private String scaStatusUrl;
 
   @SuppressWarnings("unchecked") // "just" test code
   public <T> ResponseEntity<T> getActualResponse() {

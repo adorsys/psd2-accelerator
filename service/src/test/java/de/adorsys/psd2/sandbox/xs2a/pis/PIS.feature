@@ -47,8 +47,8 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id       | password | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RCVD   |
-      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RCVD   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RJCT   |
+      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RJCT   |
 
     ################################################################################################
     #                                                                                              #

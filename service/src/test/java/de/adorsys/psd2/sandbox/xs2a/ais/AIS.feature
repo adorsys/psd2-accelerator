@@ -67,7 +67,7 @@ Feature: AIS
     Then the status <status> is received
     Examples:
       | accounts               | balances               | transactions           | psu-id                  | password | status       |
-      | DE06760365689827461249 | DE06760365689827461249 | DE06760365689827461249 | PSU-Rejected            | 12345    | received     |
+      | DE06760365689827461249 | DE06760365689827461249 | DE06760365689827461249 | PSU-Rejected            | 12345    | rejected     |
       | DE89760365681729983660 | DE89760365681729983660 | DE89760365681729983660 | PSU-ConsentRevokedByPsu | 12345    | revokedByPsu |
       | DE12760365687895439876 | DE12760365687895439876 | DE12760365687895439876 | PSU-ConsentExpired      | 12345    | expired      |
 
@@ -142,8 +142,8 @@ Feature: AIS
     Then the status <status> is received
     Examples:
       | accounts               | balances               | transactions | psu-id       | password | status   |
-      | DE11760365688833114935 | DE11760365688833114935 | null         | PSU-Unknown  | 12345    | received |
-      | DE06760365689827461249 | DE06760365689827461249 | null         | PSU-Rejected | 12345    | received |
+      | DE11760365688833114935 | DE11760365688833114935 | null         | PSU-Unknown  | 12345    | rejected |
+      | DE06760365689827461249 | DE06760365689827461249 | null         | PSU-Rejected | 12345    | rejected |
 
     # TODO response code is 403 but response body is empty
   @ignore

@@ -8,10 +8,8 @@ import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisCommonPaymentData;
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
-import de.adorsys.psd2.consent.repository.AisConsentRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
-import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
@@ -26,32 +24,24 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class RedirectService {
 
-  private PisPaymentDataRepository pisPaymentDataRepository;
   private PisAuthorisationRepository pisAuthorizationRepository;
   private AisConsentAuthorisationRepository aisConsentAuthorizationRepository;
-  private AisConsentRepository aisConsentRepository;
   private PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
   private TestDataService testDataService;
 
   /**
    * Create a new RedirectService instance.
    *
-   * @param pisPaymentDataRepository          PisPaymentRepository
    * @param pisAuthorizationRepository        PisAuthorizationRepository
    * @param aisConsentAuthorizationRepository AisConsentAuthorizationRepository
-   * @param aisConsentRepository              AisConsentRepository
    * @param testDataService                   TestDataService
    */
-  public RedirectService(PisPaymentDataRepository pisPaymentDataRepository,
-      PisAuthorisationRepository pisAuthorizationRepository,
+  public RedirectService(PisAuthorisationRepository pisAuthorizationRepository,
       AisConsentAuthorisationRepository aisConsentAuthorizationRepository,
-      AisConsentRepository aisConsentRepository,
       PisCommonPaymentDataRepository pisCommonPaymentDataRepository,
       TestDataService testDataService) {
-    this.pisPaymentDataRepository = pisPaymentDataRepository;
     this.pisAuthorizationRepository = pisAuthorizationRepository;
     this.aisConsentAuthorizationRepository = aisConsentAuthorizationRepository;
-    this.aisConsentRepository = aisConsentRepository;
     this.testDataService = testDataService;
     this.pisCommonPaymentDataRepository = pisCommonPaymentDataRepository;
   }
@@ -75,14 +65,18 @@ public class RedirectService {
     AisConsent consent = aisConsentAuth.getConsent();
 
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
-    if (psu.isPresent()) {
-      Optional<ConsentStatus> consentStatus = ConsentStatus.fromValue(psu.get()
-          .getConsentStatusAfterSca().xs2aValue());
-      consentStatus.ifPresent(consent::setConsentStatus);
-      ScaStatus newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
-      aisConsentAuth.setScaStatus(newScaStatus);
 
+    Optional<ConsentStatus> consentStatus;
+    ScaStatus newScaStatus;
+    if (psu.isPresent()) {
+      consentStatus = ConsentStatus.fromValue(psu.get().getConsentStatusAfterSca().xs2aValue());
+      newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
+    } else {
+      consentStatus = ConsentStatus.fromValue("rejected");
+      newScaStatus = ScaStatus.FAILED;
     }
+    consentStatus.ifPresent(consent::setConsentStatus);
+    aisConsentAuth.setScaStatus(newScaStatus);
     aisConsentAuthorizationRepository.save(aisConsentAuth);
   }
 
@@ -98,7 +92,7 @@ public class RedirectService {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
 
-    if (!pisAuthorization.isPresent() || !testDataService.getPsu(psuId).isPresent()) {
+    if (!pisAuthorization.isPresent()) {
       //TODO handle error case
       return;
     }
@@ -148,8 +142,13 @@ public class RedirectService {
 
         paymentAuth.setScaStatus(newScaStatus);
       }
-      pisAuthorizationRepository.save(paymentAuth);
+    } else {
+      TransactionStatus newTxStatus = TransactionStatus.RJCT;
+      pisPaymentData.setTransactionStatus(newTxStatus);
+      paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
+      paymentAuth.setScaStatus(ScaStatus.FAILED);
     }
+    pisAuthorizationRepository.save(paymentAuth);
   }
 
   /**

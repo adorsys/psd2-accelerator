@@ -12,10 +12,8 @@ import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisCommonPaymentData;
 import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
-import de.adorsys.psd2.consent.repository.AisConsentRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
-import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import java.util.Collections;
@@ -41,16 +39,10 @@ public class RedirectServiceTest {
   private RedirectService redirectService;
 
   @Mock
-  PisPaymentDataRepository pisPaymentDataRepository;
-
-  @Mock
   PisAuthorisationRepository pisAuthorizationRepository;
 
   @Mock
   AisConsentAuthorisationRepository aisConsentAuthorizationRepository;
-
-  @Mock
-  AisConsentRepository aisConsentRepository;
 
   @Mock
   PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
@@ -62,10 +54,8 @@ public class RedirectServiceTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     redirectService = new RedirectService(
-        pisPaymentDataRepository,
         pisAuthorizationRepository,
         aisConsentAuthorizationRepository,
-        aisConsentRepository,
         pisCommonPaymentDataRepository,
         testDataService);
 

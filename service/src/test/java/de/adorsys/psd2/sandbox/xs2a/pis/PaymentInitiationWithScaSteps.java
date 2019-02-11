@@ -96,6 +96,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
       context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
     }
 
     context.setPaymentId(response.getBody().getPaymentId());
@@ -148,7 +149,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     if (scaApproach.equalsIgnoreCase("embedded")) {
       this.authoriseWithEmbeddedApproach(psuId, password, selectedScaMethod, tan, AUTHORISATIONS);
     } else {
-      this.authoriseWithRedirectApproach(psuId, true);
+      this.authoriseWithRedirectApproach(psuId, true, true);
     }
   }
 
@@ -159,7 +160,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
       this.authoriseWithEmbeddedApproach(psuId, password, selectedScaMethod, tan,
           CANCELLATION_AUTHORISATIONS);
     } else {
-      this.authoriseWithRedirectApproach(psuId, false);
+      this.authoriseWithRedirectApproach(psuId, false, true);
     }
   }
 
@@ -168,7 +169,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     if (scaApproach.equalsIgnoreCase("embedded")) {
       this.tryToAuthoriseWithEmbeddedApproach(psuId, password, AUTHORISATIONS);
     } else {
-      this.authoriseWithRedirectApproach(psuId, true);
+      this.authoriseWithRedirectApproach(psuId, true, false);
     }
   }
 
@@ -177,7 +178,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     if (scaApproach.equalsIgnoreCase("embedded")) {
       this.tryToAuthoriseWithEmbeddedApproach(psuId, password, CANCELLATION_AUTHORISATIONS);
     } else {
-      authoriseWithRedirectApproach(psuId, false);
+      authoriseWithRedirectApproach(psuId, false, false);
     }
   }
 
@@ -337,7 +338,8 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     return creditorAddress;
   }
 
-  private void authoriseWithRedirectApproach(String psuId, boolean isInit) {
+  private void authoriseWithRedirectApproach(String psuId, boolean isInit,
+      boolean isSuccessfulSca) {
     HashMap<String, String> headers = TestUtils.createSession();
     Request<?> request = Request.emptyRequest(headers);
 
@@ -355,6 +357,19 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         String.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    ResponseEntity<ScaStatusResponse> scaStatusResponse = template
+        .exchange(context.getScaStatusUrl(), HttpMethod.GET, request.toHttpEntity(),
+            ScaStatusResponse.class);
+
+    assertTrue(scaStatusResponse.getStatusCode().is2xxSuccessful());
+
+    if (isSuccessfulSca) {
+      assertThat(scaStatusResponse.getBody().getScaStatus(), equalTo(ScaStatus.FINALISED));
+    } else {
+      assertThat(scaStatusResponse.getBody().getScaStatus(), equalTo(ScaStatus.FAILED));
+    }
+
   }
 
   private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,
@@ -479,7 +494,6 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
         TppMessage401PIS.class, url, psuId, password);
 
     assertTrue(response.getStatusCode().is4xxClientError());
-    //TODO check for scaStatus == failed?!
 
     context.setActualResponse(response);
   }
