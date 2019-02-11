@@ -16,7 +16,6 @@ import de.adorsys.psd2.xs2a.spi.service.SinglePaymentSpi;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,7 +35,8 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
 
     Optional<TestPsu> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
     if (!psuId.isPresent()) {
-      throw new RestException(HttpStatus.UNAUTHORIZED, "PSU not found");
+      // TODO what should we do here? (e.g. no account with this IBAN exists)
+      throw new RestException(MessageErrorCode.PAYMENT_FAILED);
     }
 
     if (testDataService.isBlockedPsu(psuId.get().getPsuId())) {

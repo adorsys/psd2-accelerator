@@ -103,12 +103,14 @@ Feature: PIS
 
     ################################################################################################
     #                                                                                              #
-    # Service Blocked                                                                              #
+    # Failed Payments                                                                              #
     #                                                                                              #
     ################################################################################################
-  Scenario Outline: Service blocked for initiation of a payment
+
+  Scenario Outline: Certain payment initiations are blocked
     When PSU tries to initiate a payment <payment-service> with iban <iban> using the payment product <payment-product>
-    Then an error-message <error-message> is received
+    Then an error with code <code>, category <category> and a text containing <text> is received
     Examples:
-      | payment-service | iban                   | payment-product       | error-message   |
-      | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED |
+      | payment-service | iban                   | payment-product       | code            | category | text                                                              |
+      | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
+      | payments        | DE13760365681209386223 | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |

@@ -16,42 +16,16 @@ import org.springframework.stereotype.Service;
 public class BulkPaymentSpiImpl implements BulkPaymentSpi {
 
   @Override
-  public @NotNull SpiResponse<SpiBulkPaymentInitiationResponse> initiatePayment(
-      @NotNull SpiContextData contextData,
-      @NotNull SpiBulkPayment payment,
-      @NotNull AspspConsentData initialAspspConsentData) {
-    return null;
-  }
-
-  @Override
-  public @NotNull SpiResponse<SpiBulkPayment> getPaymentById(@NotNull SpiContextData contextData,
-      @NotNull SpiBulkPayment payment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return null;
-  }
-
-  @Override
-  public @NotNull SpiResponse<SpiTransactionStatus> getPaymentStatusById(
-      @NotNull SpiContextData contextData,
-      @NotNull SpiBulkPayment payment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return null;
-  }
-
-  @Override
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
-      @NotNull SpiContextData spiContextData,
-      @NotNull SpiBulkPayment spiBulkPayment,
+      @NotNull SpiContextData contextData, @NotNull SpiBulkPayment payment,
       @NotNull AspspConsentData aspspConsentData) {
     return null;
   }
 
   @Override
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> verifyScaAuthorisationAndExecutePayment(
-      @NotNull SpiContextData spiContextData,
-      @NotNull SpiScaConfirmation spiScaConfirmation,
-      @NotNull SpiBulkPayment spiBulkPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiContextData contextData, @NotNull SpiScaConfirmation spiScaConfirmation,
+      @NotNull SpiBulkPayment payment, @NotNull AspspConsentData aspspConsentData) {
     return null;
   }
 }

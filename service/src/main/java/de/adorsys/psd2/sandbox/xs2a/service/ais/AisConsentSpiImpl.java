@@ -41,14 +41,15 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       SpiAccountConsent spiAccountConsent,
       AspspConsentData aspspConsentData) {
 
+    // TODO potential bug - we need to check ALL IBANs here? (rat)
     Optional<TestPsu> psuId = testDataService
         .getPsuByIban(spiAccountConsent.getAccess().getAccounts().get(0).getIban());
-    if (!psuId.isPresent()) {
-      throw new RestException(MessageErrorCode.FORMAT_ERROR);
-    }
-    boolean isBlocked = testDataService.isBlockedPsu(psuId.get().getPsuId());
 
-    if (isBlocked) {
+    // TODO what's the right error here? (rat)
+    TestPsu knownPsuId = psuId
+        .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+
+    if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
       throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
     }
 

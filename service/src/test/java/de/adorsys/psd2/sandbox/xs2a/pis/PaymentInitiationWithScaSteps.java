@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
@@ -17,7 +18,6 @@ import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.DayOfExecution;
 import de.adorsys.psd2.model.ExecutionRule;
 import de.adorsys.psd2.model.FrequencyCode;
-import de.adorsys.psd2.model.MessageCode403PIS;
 import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
 import de.adorsys.psd2.model.PaymentInitiationSctJson;
 import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
@@ -29,8 +29,6 @@ import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
 import de.adorsys.psd2.model.TppMessage401PIS;
-import de.adorsys.psd2.model.TppMessage403PIS;
-import de.adorsys.psd2.model.TppMessageCategory;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
@@ -41,7 +39,6 @@ import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import de.adorsys.psd2.xs2a.domain.TransactionStatusResponse;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -122,25 +119,15 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
     Request<PaymentInitiationSctJson> request = new Request<>(payment, headers);
 
-    ResponseEntity<KeyedTpp403Messages> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         paymentService + "/" + paymentProduct,
         HttpMethod.POST,
         request.toHttpEntity(),
-        KeyedTpp403Messages.class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is4xxClientError());
 
     context.setActualResponse(response);
-  }
-
-  // TODO can't parse to TppMessage403PIS[] because we get `{tppMessages: TppMessage403PIS[]}`
-  private static class KeyedTpp403Messages {
-
-    List<TppMessage403PIS> tppMessages;
-
-    public List<TppMessage403PIS> getTppMessages() {
-      return tppMessages;
-    }
   }
 
   @And("^PSU authorised the payment with psu-id (.*), password (.*), sca-method (.*) and tan (.*)$")
@@ -260,14 +247,14 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     assertThat(actualResponse.getBody().getInstructedAmount().getAmount(), equalTo("520.00"));
   }
 
-  @Then("an error-message (.*) is received")
-  public void receiveErrorMessageAndCode(String errorMessage) {
-    TppMessage403PIS err = ((KeyedTpp403Messages) context.getActualResponse().getBody())
-        .getTppMessages().get(0);
+  @Then("an error with code (.*), category (.*) and a text containing (.*) is received")
+  public void receiveErrorMessageAndCode(String code, String category, String text) {
+    JsonNode resp = (JsonNode) context.getActualResponse().getBody();
+    JsonNode err = resp.get("tppMessages").get(0);
 
-    assertThat(err.getCategory(), equalTo(TppMessageCategory.ERROR));
-    assertThat(err.getCode(), equalTo(MessageCode403PIS.valueOf(errorMessage)));
-    assertThat(err.getText(), containsString("channel independent blocking"));
+    assertThat(err.get("code").asText(), equalTo(code));
+    assertThat(err.get("category").asText(), equalTo(category));
+    assertThat(err.get("text").asText(), containsString(text));
   }
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
