@@ -10,7 +10,6 @@ import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedSe
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedTechnicalValidation;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Canceled;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Pending;
-import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Received;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Rejected;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;

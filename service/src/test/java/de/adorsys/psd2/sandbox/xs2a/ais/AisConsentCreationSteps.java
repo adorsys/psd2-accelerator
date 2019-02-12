@@ -4,6 +4,8 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import cucumber.api.java.Before;
@@ -12,6 +14,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.AccountAccess;
+import de.adorsys.psd2.model.AccountDetails;
 import de.adorsys.psd2.model.AccountList;
 import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.BalanceType;
@@ -240,14 +243,16 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     assertTrue(response.getStatusCode().is2xxSuccessful());
   }
 
-  @When("PSU accesses the account list")
-  public void getAccountList() {
+  @When("PSU accesses the account list withBalances (.*)")
+  public void getAccountList(String withBalance) {
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
     Request<?> request = Request.emptyRequest(headers);
 
+    context.setWithBalance(Boolean.parseBoolean(withBalance));
+
     ResponseEntity<AccountList> response = template.exchange(
-        "accounts/",
+        "accounts?withBalance=" + withBalance,
         HttpMethod.GET,
         request.toHttpEntity(),
         AccountList.class);
@@ -323,6 +328,22 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
     assertThat(actualResponse.getBody().getAccounts().size(),
         equalTo(context.getConsentAccountAccess().getAccounts().size()));
+
+    if (!context.isWithBalance()) {
+      actualResponse.getBody().getAccounts()
+          .forEach(accountDetails -> assertNull(accountDetails.getBalances()));
+    } else {
+      List<AccountReference> balances = context.getConsentAccountAccess().getBalances();
+
+      if (balances == null) {
+        actualResponse.getBody().getAccounts()
+            .forEach(account -> assertNull(account.getBalances()));
+        return;
+      }
+
+      assertEveryAccountInConsentHasBalance(actualResponse, balances);
+      assertEveryAccountNotInConsentHasNoBalance(actualResponse, balances);
+    }
   }
 
   @Then("the transaction list data are received")
@@ -528,5 +549,19 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     public TransactionDetails getTransactionsDetails() {
       return transactionsDetails;
     }
+  }
+
+  private void assertEveryAccountInConsentHasBalance(ResponseEntity<AccountList> actualResponse,
+      List<AccountReference> balances) {
+    actualResponse.getBody().getAccounts().stream().filter(accountDetails -> balances.stream()
+        .anyMatch(balance -> balance.getIban().equals(accountDetails.getIban())))
+        .forEach(account -> assertNotNull(account.getBalances()));
+  }
+
+  private void assertEveryAccountNotInConsentHasNoBalance(ResponseEntity<AccountList> actualResponse,
+      List<AccountReference> balances) {
+    actualResponse.getBody().getAccounts().stream().filter(accountDetails -> balances.stream()
+        .noneMatch(balance -> balance.getIban().equals(accountDetails.getIban())))
+        .forEach(account -> assertNull(account.getBalances()));
   }
 }
