@@ -15,9 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties("sandbox.testdata")
 @Component
+@Validated
 public class TestDataConfiguration implements InitializingBean {
 
   private static Logger log = LoggerFactory.getLogger(TestDataConfiguration.class);
