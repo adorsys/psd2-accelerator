@@ -25,7 +25,7 @@ NOTE: In reality all (SSL) traffic get passed through the Load Balancer to the _
 
 === Release Artifacts
 
-We use https://github.com/adorsys/psd2-accelerator/releases[GitHub Releases] to publish our release notes and the Sandbox JAR and its SHA1 checksum.
+We use https://github.com/adorsys/psd2-accelerator/releases[GitHub Releases] to publish our release notes, the Sandbox JAR and its SHA1 checksum.
 
 Docker Images are released to https://hub.docker.com/u/adorsys[adorsys DockerHub account].
 
@@ -276,6 +276,13 @@ The CLI can echo the full schema instead of doing the actual migration, too. Thi
 ----
 $ java -jar sandbox-{acc-version}.jar create-schema --spring.datasource.url=$JDBC_URL --spring.datasource.username=$USR --spring.datasource.password=$PASS
 ----
+
+=== Reset Sandbox Data
+In a sandbox environment it is good practice to reset the data periodically to the factory-defaults. To reset the data of the PSD2 Accelerator, the following steps are needed:
+
+ . Stop the running PSD2 Accelerator process by terminating the jar or by stopping the docker container.
+ . Delete the database data by redeploying your database instance. The procedure of resetting the database depends on your local deployment setup. Check the documentation of your preferred database for further information.
+ . Restart the PSD2 Accelerator.
 
 === Build Pipeline
 
