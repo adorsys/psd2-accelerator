@@ -38,11 +38,12 @@ public class AccountSpiImpl implements AccountSpi {
   @Override
   public SpiResponse<List<SpiAccountDetails>> requestAccountList(
       @NotNull SpiContextData ctx,
-      boolean b,
+      boolean withBalance,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
-    Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent);
+    Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent,
+        withBalance);
 
     if (!spiAccountDetails.isPresent()) {
       return SpiResponse.<List<SpiAccountDetails>>builder()
@@ -59,12 +60,13 @@ public class AccountSpiImpl implements AccountSpi {
   @Override
   public SpiResponse<SpiAccountDetails> requestAccountDetailForAccount(
       @NotNull SpiContextData ctx,
-      boolean b,
+      boolean withBalance,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
-    Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent);
+    Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent,
+        withBalance);
 
     if (!spiAccountDetails.isPresent()) {
       return SpiResponse.<SpiAccountDetails>builder()
@@ -171,7 +173,7 @@ public class AccountSpiImpl implements AccountSpi {
     }
 
     List<SpiAccountBalance> balances = testDataMapper
-        .mapBalanceListToSpiBalanceList(account.get().getBalances());
+        .mapBalanceListToSpiBalanceList(account.get(), spiAccountConsent.getAccess().getBalances());
 
     return SpiResponse.<List<SpiAccountBalance>>builder()
         .aspspConsentData(aspspConsentData)
@@ -179,7 +181,8 @@ public class AccountSpiImpl implements AccountSpi {
         .success();
   }
 
-  private Optional<List<SpiAccountDetails>> getAccountDetails(SpiAccountConsent spiAccountConsent) {
+  private Optional<List<SpiAccountDetails>> getAccountDetails(SpiAccountConsent spiAccountConsent,
+      boolean withBalance) {
     List<SpiAccountReference> accountList = spiAccountConsent.getAccess().getAccounts();
     List<String> ibans = new ArrayList<>();
 
@@ -201,7 +204,8 @@ public class AccountSpiImpl implements AccountSpi {
     }
 
     List<SpiAccountDetails> spiAccountDetails = optionalAccounts.get().stream()
-        .map(testDataMapper::mapAccountToSpiAccount)
+        .map(account -> testDataMapper.mapAccountToSpiAccount(account, withBalance,
+            spiAccountConsent.getAccess().getBalances()))
         .collect(Collectors.toList());
 
     return Optional.of(spiAccountDetails);
