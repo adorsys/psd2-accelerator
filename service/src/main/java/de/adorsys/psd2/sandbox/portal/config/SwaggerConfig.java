@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.portal.config;
 
 import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -21,7 +22,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-  static final String XS2A_SWAGGER_YAML = "psd2-api-1.3-20181220.yaml";
+  private String xs2aYml;
+
+  public SwaggerConfig(@Value("${sandbox.xs2a.spec}") String xs2aYml) {
+    this.xs2aYml = xs2aYml;
+  }
 
   @Bean
   UiConfiguration uiConfiguration() {
@@ -60,7 +65,7 @@ public class SwaggerConfig {
       SwaggerResource swaggerResource = new SwaggerResource();
       swaggerResource.setName("PSD2 API");
       swaggerResource.setSwaggerVersion("3.0.1");
-      swaggerResource.setUrl("/" + XS2A_SWAGGER_YAML);
+      swaggerResource.setUrl("/" + xs2aYml);
 
       ArrayList<SwaggerResource> resources = new ArrayList<>();
 
