@@ -41,5 +41,4 @@ public class Xs2aVersionInfoContributor implements InfoContributor {
       this.impl = impl;
     }
   }
-
 }
