@@ -162,6 +162,23 @@
   </dependencies>
 
   <build>
+    <!-- enable filtering for sandbox-application.properties (replace @variable@) -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>sandbox-application.properties</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>sandbox-application.properties</exclude>
+        </excludes>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -193,6 +210,10 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
+              <delimiters>
+                <delimiter>@</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
               <outputDirectory>${basedir}/target/classes/app</outputDirectory>
               <resources>
                 <resource>

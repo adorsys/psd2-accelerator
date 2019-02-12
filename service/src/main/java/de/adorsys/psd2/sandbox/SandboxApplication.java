@@ -13,9 +13,7 @@ import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.config.ConfigFileApplicationListener;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -31,7 +29,7 @@ import org.springframework.context.annotation.Import;
     SecurityAutoConfiguration.class,
     ManagementWebSecurityAutoConfiguration.class
 })
-@Import(ContextHolder.class)
+@Import({ContextHolder.class, Xs2aVersionInfoContributor.class})
 public class SandboxApplication {
 
   /**
@@ -58,11 +56,11 @@ public class SandboxApplication {
           )
 
           .sibling(Xs2aConfig.class)
+          .web(true)
           .listeners(
               new CustomNameConfigFileListener("xs2a-application, testdata"),
               new StartFailedListener()
           )
-          .web(true)
           .run(args);
     }
   }
