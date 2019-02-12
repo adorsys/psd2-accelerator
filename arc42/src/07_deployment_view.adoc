@@ -145,7 +145,7 @@ NOTE: The PSD2 Accelerator CA certificate (ca.crt) is already embedded in the _s
 
 We use the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration] and log everything to stdout.
 
-The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=WARN` (global) or with `LOGGING_LEVEL_de.adorsys.psd2=WARN` (for everything below `de.adorsys.psd2`; please notice the casing).
+The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=WARN` (global) or with `LOGGING_LEVEL_de.adorsys.psd2=WARN` (for everything below `de.adorsys.psd2`; please note the casing).
 
 === Deploy on Your Own Infrastructure
 
@@ -183,12 +183,41 @@ See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
 - _ssl-proxy_ needs 128 - 512 MiB RAM *(don't use in prod!)*
 - the DB schema needs enough disk space because consents are persisted here (grows over time) *(monitor this!)*
 
-==== Health Checks
+==== Production Ready Features
+
+===== Health Checks
 
 There are health check endpoints for both deployments. They return `200 OK` when healthy.
 
-- `GET http://sandbox:8081/health`
+- `GET http://sandbox:8081/management/health`
+- `GET http://sandbox:8080/management/health`
 - `GET http://ssl-proxy:8090/healthz`
+
+===== Using the Actuator Features
+
+We use Spring Boot Actuator for metrics, health checks and information about the deployment. Per default there are three endpoints enabled (active on both ports).
+
+- `GET /management/health` returns `{status: "UP"}` if we're good
+- `GET /management/info` returns information about
+    ** deployed version
+    ** git commit/tag from which it was build
+    ** bundled XS2A impl and spec version
+- `GET /management/metrics` returns the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/production-ready-metrics.html[Spring Actuator Metrics]
+
+NOTE: The actuator endpoints are all public. We do not expect any sensitive information there. Please verify this.
+
+If you want to disable certain endpoints you can do so:
+
+[source]
+----
+endpoints.metrics.enabled=false
+endpoints.health.enabled=false
+endpoints.info.enabled=false
+----
+
+WARNING: (KNOWN BUG) You can't disable the endpoints with CLI arguments. System properties and environment variables work fine, though.
+
+Disable all production ready features by not exposing `/management/**` to the public.
 
 ==== Use Your Own Database
 
