@@ -1,6 +1,6 @@
 package de.adorsys.psd2.sandbox.feature;
 
-import de.adorsys.psd2.sandbox.SandboxApplication;
+import de.adorsys.psd2.sandbox.ContextHolder;
 import de.adorsys.psd2.sandbox.features.SandboxFeatures;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +9,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SandboxApplication.class)
+@SpringBootTest(classes = ContextHolder.class)
 public class UiFeatureEnabledTest {
 
   @Test
