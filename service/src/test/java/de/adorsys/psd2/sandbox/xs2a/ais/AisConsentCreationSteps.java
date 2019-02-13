@@ -368,9 +368,8 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     ResponseEntity<ReadAccountBalanceResponse200> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody().getBalances().size(), equalTo(2));
-    // TODO: XS2A does not show a status for AVAILABLE Types. Responded status is null
-//    assertThat(actualResponse.getBody().getBalances().get(0).getBalanceType(), equalTo(
-//        BalanceType.AVAILABLE));
+    assertThat(actualResponse.getBody().getBalances().get(0).getBalanceType(), equalTo(
+        BalanceType.INTERIMAVAILABLE));
     assertThat(actualResponse.getBody().getBalances().get(1).getBalanceType().toString(), equalTo(
         BalanceType.CLOSINGBOOKED.toString()));
   }

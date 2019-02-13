@@ -277,7 +277,7 @@ public class TestDataService {
         "Current Account",
         CashAccountType.CACC,
         Arrays.asList(
-            new Balance(new Amount(EUR, BigDecimal.valueOf(1500)), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, BigDecimal.valueOf(1500)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(1500)), BalanceType.CLOSING_BOOKED)),
         giroMap
     );
@@ -360,7 +360,7 @@ public class TestDataService {
         "Savings",
         CashAccountType.SVGS,
         Arrays.asList(
-            new Balance(new Amount(EUR, BigDecimal.valueOf(2300)), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, BigDecimal.valueOf(2300)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(2300)), BalanceType.CLOSING_BOOKED)),
         savingsMap
     );
@@ -377,7 +377,7 @@ public class TestDataService {
         "Current",
         CashAccountType.CACC,
         Arrays.asList(
-            new Balance(new Amount(EUR, BigDecimal.valueOf(0)), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, BigDecimal.valueOf(0)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(0)), BalanceType.CLOSING_BOOKED)),
         null
     );
@@ -410,7 +410,8 @@ public class TestDataService {
         "Cash Trading",
         CashAccountType.TRAS,
         Arrays.asList(
-            new Balance(new Amount(EUR, BigDecimal.valueOf(-1148.00)), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, BigDecimal.valueOf(-1148.00)),
+                BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(0)), BalanceType.CLOSING_BOOKED)),
         negativeBookedBalanceMap
     );
@@ -443,7 +444,7 @@ public class TestDataService {
         "Current",
         CashAccountType.CACC,
         Arrays.asList(
-            new Balance(new Amount(EUR, BigDecimal.valueOf(503.12)), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, BigDecimal.valueOf(503.12)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(439.70)), BalanceType.CLOSING_BOOKED)),
         lowerAvailableBalanceMap
     );
@@ -476,7 +477,8 @@ public class TestDataService {
         "Current",
         CashAccountType.CACC,
         Arrays.asList(
-            new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)), BalanceType.AVAILABLE),
+            new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)),
+                BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)), BalanceType.CLOSING_BOOKED)),
         giroUsdMap
     );
@@ -744,7 +746,7 @@ public class TestDataService {
         "Current Account",
         CashAccountType.CACC,
         Arrays.asList(
-            new Balance(new Amount(EUR, bookedAmount), BalanceType.AVAILABLE),
+            new Balance(new Amount(EUR, bookedAmount), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, availableAmount), BalanceType.CLOSING_BOOKED)),
         transactions
     );

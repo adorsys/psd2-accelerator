@@ -53,7 +53,7 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
           psuId.get().getPsuId(), accountId.get());
       if (account.isPresent()) {
         Balance balance = account.get().getBalances().stream()
-            .filter(b -> b.getBalanceType().equals(BalanceType.AVAILABLE))
+            .filter(b -> b.getBalanceType().equals(BalanceType.INTERIM_AVAILABLE))
             .findFirst().get();
 
         response
