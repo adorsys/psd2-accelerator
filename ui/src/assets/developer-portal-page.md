@@ -214,7 +214,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 
 | PSU-ID            | Iban                   | SCA Status                  | Transaction Status                  |
 | :---------------- | :--------------------- | :-------------------------- | :---------------------------------- |
-| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACTS\*                         |
+| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACSC\*                         |
 | PSU-Rejected\*\*  | DE06760365689827461249 | failed                      | RJCT                                |
 | PSU-Blocked       | DE13760365681209386222 | _(no SCA Status available)_ | _(no Transaction Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | finalised                   | RJCT                                |
@@ -238,7 +238,7 @@ Redirect described in the previous section.
 | PSU-ID                    | Iban                   | SCA Status | Transaction Status |
 | :------------------------ | :--------------------- | :--------- | :----------------- |
 | PSU-Successful            | DE11760365688833114935 | finalised  | CANC\*             |
-| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | ACTC               |
+| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | RJCT               |
 
 (\*) It is only possible to cancel payments which are not yet executed.
 Since our mocked backend "executes" single payments directly, only
@@ -258,7 +258,7 @@ Payment Status Endpoint.
 
 | PSU-ID         | Iban                   | SCA Status | Transaction Status |
 | :------------- | :--------------------- | :--------- | :----------------- |
-| PSU-Successful | DE11760365688833114935 | finalised  | ACCP               |
+| PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
 
 ### Consent Creation
 
