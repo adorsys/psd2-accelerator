@@ -148,8 +148,6 @@ Feature: AIS
       | DE11760365688833114935 | DE11760365688833114935 | null         | PSU-Unknown  | 12345    | rejected |
       | DE06760365689827461249 | DE06760365689827461249 | null         | PSU-Rejected | 12345    | rejected |
 
-    # TODO response code is 403 but response body is empty
-  @ignore
   Scenario Outline: Service blocked for Consent Creation
     Given PSU tries to create a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     Then an error-message <error-message> is received

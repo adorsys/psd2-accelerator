@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -31,7 +32,6 @@ import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
 import de.adorsys.psd2.model.StartScaprocessResponse;
 import de.adorsys.psd2.model.TppMessage401AIS;
-import de.adorsys.psd2.model.TppMessage403AIS;
 import de.adorsys.psd2.model.TppMessageCategory;
 import de.adorsys.psd2.model.TransactionAuthorisation;
 import de.adorsys.psd2.model.TransactionDetails;
@@ -140,11 +140,11 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     consent.setFrequencyPerDay(5);
 
     Request<Consents> request = new Request<>(consent, headers);
-    ResponseEntity<TppMessage403AIS[]> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         "consents",
         HttpMethod.POST,
         request.toHttpEntity(),
-        TppMessage403AIS[].class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is4xxClientError());
 
@@ -274,7 +274,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         + LocalDate.now();
 
     ResponseEntity<TransactionsResponse200Json> response = template.exchange(
-        "accounts/" + context.getAccountId() + "/transactions/" + queryParams,
+        "accounts/" + context.getAccountId() + "/transactions" + queryParams,
         HttpMethod.GET,
         request.toHttpEntity(),
         TransactionsResponse200Json.class);
@@ -389,12 +389,12 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   @Then("an error-message (.*) is received")
   public void receiveErrorMessageAndCode(String errorMessage) {
-    ResponseEntity<TppMessage403AIS[]> actualResponse = context.getActualResponse();
+    ResponseEntity<JsonNode> actualResponse = context.getActualResponse();
+    JsonNode err = actualResponse.getBody().get("tppMessages").get(0);
 
-    assertThat(actualResponse.getBody()[0].getCategory(), equalTo(TppMessageCategory.ERROR));
-    assertThat(actualResponse.getBody()[0].getCode(), equalTo(errorMessage));
-    assertThat(actualResponse.getBody()[0].getText(),
-        containsString("channel independent blocking"));
+    assertThat(err.get("category").asText(), equalTo(TppMessageCategory.ERROR.toString()));
+    assertThat(err.get("code").asText(), equalTo(errorMessage));
+    assertThat(err.get("text").asText(), containsString("channel independent blocking"));
   }
 
   private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,
