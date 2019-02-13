@@ -109,7 +109,8 @@ public class RedirectService {
 
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
 
-    if (psu.isPresent()) {
+    // TODO clean up optional handling (rat iio)
+    if (isPsuAllowedToAccessPayment(psu, pisPaymentData.getDebtorAccount().getIban())) {
       if (scaOperation == ScaOperation.CANCEL) {
         TransactionStatus newTxStatus = TransactionStatus.getByValue(
             psu.get().getTransactionStatusAfterCancellation().xs2aValue()
@@ -149,6 +150,14 @@ public class RedirectService {
       paymentAuth.setScaStatus(ScaStatus.FAILED);
     }
     pisAuthorizationRepository.save(paymentAuth);
+  }
+
+  private boolean isPsuAllowedToAccessPayment(Optional<TestPsu> scaPsu, String debtorIban) {
+    Optional<TestPsu> accPsu = testDataService.getPsuByIban(debtorIban);
+    if (!accPsu.isPresent() || !scaPsu.isPresent()) {
+      return false;
+    }
+    return scaPsu.equals(accPsu);
   }
 
   /**
