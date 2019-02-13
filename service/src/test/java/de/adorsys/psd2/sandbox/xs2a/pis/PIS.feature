@@ -45,10 +45,13 @@ Feature: PIS
     When PSU tries to authorise the payment with his <psu-id> and <password>
     When PSU requests the payment status
     Then the transaction status <status> is received
+
     Examples:
-      | payment-type | iban                   | payment-product       | psu-id       | password | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown  | 12345    | RJCT   |
-      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Rejected | 12345    | RJCT   |
+      | payment-type | iban                   | payment-product       | psu-id         | password | status |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown    | 12345    | RJCT   |
+      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Rejected   | 12345    | RJCT   |
+      | single       | DE06760365689827461249 | sepa-credit-transfers | PSU-Successful | 12345    | RJCT   |
+
 
     ################################################################################################
     #                                                                                              #
