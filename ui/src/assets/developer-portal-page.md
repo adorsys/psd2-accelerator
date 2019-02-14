@@ -16,7 +16,7 @@ March 2019.
 
 Central component of the PSD2 Accelerator is the XS2A interface which
 meets the requirements of the [Berlin Group](https://www.berlin-group.org/)
-(Version 1.2) and is based on test data. Besides the actual interface,
+(Version 1.3) and is based on test data. Besides the actual interface,
 PSD2 instructs banks to offer a technical documentation free of charge containing
 amongst others, information about supported payment products and payment
 services.
