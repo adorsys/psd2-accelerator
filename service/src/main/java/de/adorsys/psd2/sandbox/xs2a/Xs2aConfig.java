@@ -128,12 +128,6 @@ public class Xs2aConfig {
   @Configuration
   static class SandboxObjectMapperConfig extends ObjectMapperConfig {
 
-    private ObjectMapperConfig original;
-
-    public SandboxObjectMapperConfig(ObjectMapperConfig original) {
-      this.original = original;
-    }
-
     @Bean
     @Primary
     ObjectMapper sandboxObjectMapper() {
