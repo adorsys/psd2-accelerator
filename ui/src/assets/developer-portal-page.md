@@ -326,7 +326,7 @@ Consent Endpoint.
 | PSU-ID            | Iban                   | Consent Status                  |
 | :---------------- | :--------------------- | :------------------------------ |
 | PSU-Successful    | DE11760365688833114935 | terminatedByTpp                 |
-| PSU-Rejected      | DE06760365689827461249 | _(no Consent Status available)_ |
+| PSU-Rejected      | DE06760365689827461249 | rejected                        |
 | PSU-Blocked       | DE13760365681209386222 | _(no Consent Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | terminatedByTpp                 |
 
