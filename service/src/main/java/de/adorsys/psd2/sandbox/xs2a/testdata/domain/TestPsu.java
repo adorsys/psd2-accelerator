@@ -4,6 +4,7 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus;
 import de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,7 +15,7 @@ public class TestPsu {
   private String psuId;
   private String password;
   private String tan;
-  private HashMap<String, Account> accounts;
+  private LinkedHashMap<String, Account> accounts;
   private TransactionStatus transactionStatusAfterSca;
   private ConsentStatus consentStatusAfterSca;
   private ScaStatus initiationScaStatus;

@@ -41,18 +41,19 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       SpiAccountConsent spiAccountConsent,
       AspspConsentData aspspConsentData) {
 
-    // TODO potential bug - we need to check ALL IBANs here? (rat)
-    Optional<TestPsu> psuId = testDataService
-        .getPsuByIban(spiAccountConsent.getAccess().getAccounts().get(0).getIban());
+    if (!spiAccountConsent.getAccess().getAccounts().isEmpty()) {
+      // TODO potential bug - we need to check ALL IBANs here? (rat)
+      Optional<TestPsu> psuId = testDataService
+          .getPsuByIban(spiAccountConsent.getAccess().getAccounts().get(0).getIban());
 
-    // TODO what's the right error here? (rat)
-    TestPsu knownPsuId = psuId
-        .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+      // TODO what's the right error here? (rat)
+      TestPsu knownPsuId = psuId
+          .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
 
-    if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
-      throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
+      if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
+        throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
+      }
     }
-
     return new SpiResponse<>(new SpiInitiateAisConsentResponse(), aspspConsentData);
   }
 

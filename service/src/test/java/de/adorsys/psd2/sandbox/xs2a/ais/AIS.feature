@@ -2,7 +2,7 @@ Feature: AIS
 
     ################################################################################################
     #                                                                                              #
-    # Dedicated Consent Creation                                                                   #
+    # Consent Creation                                                                             #
     #                                                                                              #
     ################################################################################################
   Scenario Outline: Dedicated Consent Creation
@@ -16,6 +16,15 @@ Feature: AIS
       | DE11760365688833114935                        | null                   | null                   |
       | null                                          | DE11760365688833114935 | null                   |
       | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | null                   |
+
+  Scenario Outline: Bank Offered Consent Creation
+    Given PSU created a bank offered consent
+    And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    When PSU accesses the consent data
+    Then the bank offered consent data are received
+    Examples:
+      | psu-id         | password | sca-method | tan   |
+      | PSU-Successful | 12345    | SMS_OTP    | 54321 |
 
     ################################################################################################
     #                                                                                              #
@@ -39,6 +48,7 @@ Feature: AIS
       | accounts               | balances               | transactions           | psu-id            | password | sca-method | tan   | status |
       | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful    | 12345    | SMS_OTP    | 54321 | valid  |
       | DE91760365683491763002 | DE91760365683491763002 | DE91760365683491763002 | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | valid  |
+
 
   Scenario Outline: Consent Status Rejected
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>

@@ -15,7 +15,6 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.AccountAccess;
-import de.adorsys.psd2.model.AccountDetails;
 import de.adorsys.psd2.model.AccountList;
 import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.BalanceType;
@@ -151,6 +150,43 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     context.setActualResponse(response);
   }
 
+  @Given("PSU created a bank offered consent")
+  public void createBankOfferedConsent() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Consents consent = new Consents();
+
+    AccountAccess accountAccess = new AccountAccess();
+
+    accountAccess.setAccounts(new ArrayList<>());
+    accountAccess.setBalances(new ArrayList<>());
+    accountAccess.setTransactions(new ArrayList<>());
+
+    context.setConsentAccountAccess(accountAccess);
+
+    consent.setAccess(accountAccess);
+    consent.setRecurringIndicator(true);
+    consent.setValidUntil(LocalDate.now().plusDays(30));
+    consent.setFrequencyPerDay(5);
+
+    Request<Consents> request = new Request<>(consent, headers);
+
+    ResponseEntity<ConsentsResponse201> response = template.exchange(
+        "consents",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        ConsentsResponse201.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    if (scaApproach.equalsIgnoreCase("redirect")) {
+      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+    }
+
+    context.setConsentId(response.getBody().getConsentId());
+  }
+
   @When("PSU accesses the consent data")
   public void accessConsentData() {
     HashMap<String, String> headers = TestUtils.createSession();
@@ -206,6 +242,19 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     }
 
     assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.RECEIVED));
+    assertThat(actualResponse.getBody().getFrequencyPerDay(), equalTo(5));
+    assertThat(actualResponse.getBody().getRecurringIndicator(), equalTo(true));
+  }
+
+  @Then("the bank offered consent data are received")
+  public void receiveBankOfferedConsentData() {
+    ResponseEntity<ConsentInformationResponse200Json> actualResponse = context.getActualResponse();
+    AccountAccess actualAccess = actualResponse.getBody().getAccess();
+
+    assertThat(actualAccess.getAccounts().size(),equalTo(2));
+    assertThat(actualAccess.getBalances().size(),equalTo(2));
+    assertThat(actualAccess.getTransactions().size(),equalTo(2));
+    assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.VALID));
     assertThat(actualResponse.getBody().getFrequencyPerDay(), equalTo(5));
     assertThat(actualResponse.getBody().getRecurringIndicator(), equalTo(true));
   }
@@ -557,7 +606,8 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
         .forEach(account -> assertNotNull(account.getBalances()));
   }
 
-  private void assertEveryAccountNotInConsentHasNoBalance(ResponseEntity<AccountList> actualResponse,
+  private void assertEveryAccountNotInConsentHasNoBalance(
+      ResponseEntity<AccountList> actualResponse,
       List<AccountReference> balances) {
     actualResponse.getBody().getAccounts().stream().filter(accountDetails -> balances.stream()
         .noneMatch(balance -> balance.getIban().equals(accountDetails.getIban())))

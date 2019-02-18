@@ -1,9 +1,11 @@
 package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
+import de.adorsys.psd2.consent.api.TypeAccess;
 import de.adorsys.psd2.consent.domain.PsuData;
 import de.adorsys.psd2.consent.domain.TppInfoEntity;
 import de.adorsys.psd2.consent.domain.account.AisConsent;
 import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
+import de.adorsys.psd2.consent.domain.account.TppAccountAccess;
 import de.adorsys.psd2.consent.domain.payment.PisAuthorization;
 import de.adorsys.psd2.consent.domain.payment.PisCommonPaymentData;
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
@@ -15,10 +17,13 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
+import de.adorsys.psd2.xs2a.core.consent.AisConsentRequestType;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.core.profile.AccountReferenceType;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +79,10 @@ public class RedirectService {
     Optional<ConsentStatus> consentStatus;
     ScaStatus newScaStatus;
     if (psu.isPresent()) {
+      if (consent.getAisConsentRequestType().equals(AisConsentRequestType.BANK_OFFERED)
+          && testDataService.isSucccessfulPsu(psuId)) {
+        consent.setAccesses(fillAccountAccesses());
+      }
       consentStatus = ConsentStatus.fromValue(psu.get().getConsentStatusAfterSca().xs2aValue());
       newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
     } else {
@@ -83,6 +92,26 @@ public class RedirectService {
     consentStatus.ifPresent(consent::setConsentStatus);
     aisConsentAuth.setScaStatus(newScaStatus);
     aisConsentAuthorizationRepository.save(aisConsentAuth);
+  }
+
+  private TppAccountAccess getTppAccountAccess(Account account, TypeAccess typeAccess) {
+    TppAccountAccess accountAccess = new TppAccountAccess();
+    accountAccess.setAccountIdentifier(account.getIban());
+    accountAccess.setCurrency(account.getCurrency());
+    accountAccess.setTypeAccess(typeAccess);
+    accountAccess.setAccountReferenceType(AccountReferenceType.IBAN);
+    return accountAccess;
+  }
+
+  private List<TppAccountAccess> fillAccountAccesses() {
+    List<Account> accountList = testDataService.getAccountsForBankOfferedConsent();
+    List<TppAccountAccess> accountAccessList = new ArrayList<>();
+    accountList.forEach(account -> {
+      accountAccessList.add(getTppAccountAccess(account, TypeAccess.ACCOUNT));
+      accountAccessList.add(getTppAccountAccess(account, TypeAccess.BALANCE));
+      accountAccessList.add(getTppAccountAccess(account, TypeAccess.TRANSACTION));
+    });
+    return accountAccessList;
   }
 
   /**
