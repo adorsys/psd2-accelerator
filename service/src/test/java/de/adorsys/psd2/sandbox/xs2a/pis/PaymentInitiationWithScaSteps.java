@@ -99,6 +99,33 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     context.setPaymentId(response.getBody().getPaymentId());
   }
 
+  @Given("^PSU initiated a single payment with iban (.*) and the exceeding amount (.*)$")
+  public void initiatePaymentWithExceedingAmount(String debtorIban, String amount) {
+    context.setPaymentProduct("sepa-credit-transfers");
+
+    HashMap<String, String> headers = TestUtils.createSession();
+    Request<?> request;
+
+    request = getSinglePayment(headers, false, debtorIban, amount);
+
+    ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct(),
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        PaymentInitationRequestResponse201.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    if (scaApproach.equalsIgnoreCase("redirect")) {
+      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
+      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+    }
+
+    context.setPaymentId(response.getBody().getPaymentId());
+  }
+
+
   @When("PSU tries to initiate a payment (.*) with iban (.*) using the payment product (.*)")
   public void tryToInitiatePayment(String paymentService, String iban, String paymentProduct) {
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
@@ -259,6 +286,11 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
       boolean isFutureDated, String debtorIban) {
+    return getSinglePayment(headers, isFutureDated, debtorIban, "520");
+  }
+
+  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
+      boolean isFutureDated, String debtorIban, String amount) {
     context.setPaymentService("payments");
 
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
@@ -266,7 +298,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
     payment.setDebtorAccount(createAccount(debtorIban, "EUR"));
 
     Amount instructedAmount = new Amount();
-    instructedAmount.setAmount("520");
+    instructedAmount.setAmount(amount);
     instructedAmount.setCurrency("EUR");
     payment.setInstructedAmount(instructedAmount);
 

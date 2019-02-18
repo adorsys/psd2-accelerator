@@ -45,7 +45,6 @@ Feature: PIS
     When PSU tries to authorise the payment with his <psu-id> and <password>
     When PSU requests the payment status
     Then the transaction status <status> is received
-
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | status |
       | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Unknown    | 12345    | RJCT   |
@@ -117,3 +116,13 @@ Feature: PIS
       | payment-service | iban                   | payment-product       | code            | category | text                                                              |
       | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
       | payments        | DE13760365681209386223 | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
+
+  Scenario Outline: Initiation of a Single Payment Exceeding the Available Balance
+    Given PSU initiated a single payment with iban <iban> and the exceeding amount <amount>
+    When PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
+    When PSU requests the payment status
+    Then the transaction status <status> is received
+    Examples:
+      | iban                   | amount  | psu-id         | password | sca-method | tan   | status |
+      | DE11760365688833114935 | 1500.00 | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
+      | DE11760365688833114935 | 1500.01 | PSU-Successful | 12345    | SMS_OTP    | 54321 | RJCT   |
