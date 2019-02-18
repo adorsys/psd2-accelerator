@@ -64,7 +64,7 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
   @Before
   public void setScaApproach() {
-    scaApproach = aspspProfileService.getScaApproach().toString();
+    scaApproach = aspspProfileService.getScaApproaches().get(0).toString();
   }
 
   @Given("PSU created a consent on dedicated accounts for account information (.*), balances (.*) and transactions (.*)")

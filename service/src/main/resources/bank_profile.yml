@@ -2,7 +2,8 @@
 setting:
   frequencyPerDay: 5
   combinedServiceIndicator: false
-  scaApproach: REDIRECT
+  scaApproaches:
+    - REDIRECT
   tppSignatureRequired: false
   bankOfferedConsentSupport: false
   pisRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/init/pis/{redirect-id}

@@ -3,11 +3,11 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
-import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPeriodicPaymentInitiationResponse;
@@ -72,7 +72,7 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
     }
 
     SpiPeriodicPaymentInitiationResponse response = new SpiPeriodicPaymentInitiationResponse();
-    response.setTransactionStatus(SpiTransactionStatus.RCVD);
+    response.setTransactionStatus(TransactionStatus.RCVD);
     String paymentId = UUID.randomUUID().toString();
     payment.setPaymentId(paymentId);
     response.setPaymentId(paymentId);
@@ -81,7 +81,7 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
   }
 
   @Override
-  public @NotNull SpiResponse<SpiTransactionStatus> getPaymentStatusById(
+  public @NotNull SpiResponse<TransactionStatus> getPaymentStatusById(
       @NotNull SpiContextData contextData,
       @NotNull SpiPeriodicPayment payment,
       @NotNull AspspConsentData aspspConsentData) {

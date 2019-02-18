@@ -6,6 +6,7 @@ import de.adorsys.psd2.xs2a.core.profile.ScaApproach;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class AspspProfileController {
   @GetMapping(path = "/sca-approach")
   @ApiOperation(value = "Reads sca approach value")
   @ApiResponse(code = 200, message = "Ok", response = ScaApproach.class)
-  public ResponseEntity<ScaApproach> getScaApproach() {
-    return new ResponseEntity<>(aspspProfileService.getScaApproach(), HttpStatus.OK);
+  public ResponseEntity<List<ScaApproach>> getScaApproach() {
+    return new ResponseEntity<>(aspspProfileService.getScaApproaches(), HttpStatus.OK);
   }
 }
