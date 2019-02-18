@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.testdata;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Amount;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
@@ -81,28 +82,28 @@ public class TestDataMapper {
   public SpiTransaction mapTransactionToSpiTransaction(Transaction transaction) {
     return new SpiTransaction(
         transaction.getTransactionId(),
-        null,
-        null,
-        null,
-        null,
-        null,
+        transaction.getEntryReference(),
+        transaction.getEndToEndId(),
+        transaction.getMandateId(),
+        transaction.getCheckId(),
+        transaction.getCreditorId(),
         transaction.getBookingDate(),
-        null,
-        new SpiAmount(transaction.getCurrency(), transaction.getAmount()),
+        transaction.getValueDate(),
+        this.mapAmountToSpiAmount(transaction.getAmount()),
         null,
         transaction.getCreditorName(),
         new SpiAccountReference(
-            this.mapAccountToSpiAccount(this.getAccountData(transaction.getCreditorAccount()))),
-        null,
-        null,
+            this.mapAccountToSpiAccount(getAccountData(transaction.getCreditorIban()))),
+        transaction.getUltimateCreditor(),
+        transaction.getDebtorName(),
         new SpiAccountReference(
-            this.mapAccountToSpiAccount(getAccountData(transaction.getDebtorAccount()))),
+            this.mapAccountToSpiAccount(getAccountData(transaction.getDebtorIban()))),
         transaction.getDebtorName(),
         transaction.getRemittanceInfo(),
         transaction.getRemittanceInfo(),
-        null,
-        null,
-        null
+        transaction.getPurposeCode(),
+        transaction.getBankTransactionCode(),
+        transaction.getProprietaryBankTransactionCode()
     );
   }
 
@@ -131,6 +132,16 @@ public class TestDataMapper {
       spiAccountBalances.add(spiBalance);
     }
     return spiAccountBalances;
+  }
+
+  /**
+   * Maps TestData Amount to SpiAmount.
+   *
+   * @param amount amount object to be mapped
+   * @return SpiAmount
+   */
+  public SpiAmount mapAmountToSpiAmount(Amount amount) {
+    return new SpiAmount(amount.getCurrency(), amount.getAmount());
   }
 
   private boolean isBalanceAccessAllowed(Account account,

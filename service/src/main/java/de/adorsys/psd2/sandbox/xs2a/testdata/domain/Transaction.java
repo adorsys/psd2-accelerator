@@ -1,8 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.testdata.domain;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Currency;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,12 +11,25 @@ import lombok.Getter;
 public class Transaction {
 
   private String transactionId;
-  private BigDecimal amount;
-  private Currency currency;
+  private String entryReference;
+  private Amount amount;
   private LocalDate bookingDate;
+  private LocalDate valueDate;
   private String debtorName;
-  private String debtorAccount;
+  private String debtorIban;
   private String creditorName;
-  private String creditorAccount;
+  private String creditorIban;
+  private String endToEndId;
+  private String mandateId;
+  private String checkId;
+  private String creditorId;
+  private String ultimateCreditor;
   private String remittanceInfo;
+  private String purposeCode;
+  private String bankTransactionCode;
+  private String proprietaryBankTransactionCode;
+
+  public void setDebtorIban(String debtorIban) {
+    this.debtorIban = debtorIban;
+  }
 }
