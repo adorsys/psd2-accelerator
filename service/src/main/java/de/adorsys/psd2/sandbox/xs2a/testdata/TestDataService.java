@@ -43,13 +43,17 @@ public class TestDataService {
   private Map<String, TestPsu> psuMap;
   private TestDataConfiguration testDataConfiguration;
 
+  private TestDataFileReader testDataFileReader;
+
   /**
    * Creates a new TestDataService and inits its data depending on the given configuration.
    *
    * @param testDataConfiguration externalized testdata configuration, see testdata.yml
    */
-  public TestDataService(TestDataConfiguration testDataConfiguration) {
+  public TestDataService(TestDataConfiguration testDataConfiguration,
+      TestDataFileReader testDataFileReader) {
     this.testDataConfiguration = testDataConfiguration;
+    this.testDataFileReader = testDataFileReader;
 
     HashMap<String, TestPsu> map = new HashMap<>();
 
@@ -217,77 +221,14 @@ public class TestDataService {
   private TestPsu initPsuSuccessfull() {
     String psuId = "PSU-Successful";
     String ibanGiro = testDataConfiguration.getIbanForPsu(psuId, 0);
-    String accountOwner = "Isabella Ionescu";
+    String debtorName = "Isabella Ionescu";
     String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
 
-    Transaction giroTransaction1 = new Transaction(
-        "b2789674-1ea8-4a0d-a9e3-01319bd72d2e",
-        BigDecimal.valueOf(-52.12),
-        EUR,
-        LocalDate.parse("2018-07-22"),
-        accountOwner,
-        ibanGiro,
-        "Tankstelle Weyarn Munchener Strase 32//Weyarn/DE",
-        "DE48500105171923711479",
-        "2018-07-20T15:08 Debitk.3 2019-03"
-    );
-
-    Transaction giroTransaction2 = new Transaction(
-        "22ab6547-aa75-4a8c-977c-b3bf50fc6f88",
-        BigDecimal.valueOf(-67.00),
-        EUR,
-        LocalDate.parse("2018-08-01"),
-        accountOwner,
-        ibanGiro,
-        "Strom-Gesellschaft Nürnberg",
-        "DE74500105175899176762",
-        "KTO 84633821 Abschlag 67,00 EUR faellig 01.08.18 Moritz-Str. 12"
-    );
-
-    Transaction giroTransaction3 = new Transaction(
-        "8ddd6465-4e07-4b35-9e85-7fe63a13fbc9",
-        BigDecimal.valueOf(2500),
-        EUR,
-        LocalDate.parse("2018-09-04"),
-        "Felix Borchert & Söhne GmbH",
-        "DE94500105176912986937",
-        accountOwner,
-        ibanGiro,
-        "Gehalt September 2018"
-    );
-
-    Transaction giroTransaction4 = new Transaction(
-        "a65e8d54-708b-4f8d-bb8c-aa0b089fd273",
-        BigDecimal.valueOf(-17.50),
-        EUR,
-        LocalDate.parse("2018-10-08"),
-        accountOwner,
-        ibanGiro,
-        "CLIMBING-SOLUTIONS GMBH//Stuttgart/DE",
-        "DE94500105176912986937",
-        "2018-10-08T11:05 Debitk.3 2029-03"
-    );
-
-    Transaction giroTransaction5 = new Transaction(
-        "f75f20a2-402f-4922-9423-3c8dacd7b373",
-        BigDecimal.valueOf(-830),
-        EUR,
-        LocalDate.parse("2018-11-03"),
-        accountOwner,
-        ibanGiro,
-        "Hans Schlegl",
-        "DE74500105175899176762",
-        "Miete, Grünwälderstr. 49, 2.OG rechts"
-    );
-
-    HashMap<String, Transaction> giroMap = new HashMap<>();
-    giroMap.put(giroTransaction1.getTransactionId(), giroTransaction1);
-    giroMap.put(giroTransaction2.getTransactionId(), giroTransaction2);
-    giroMap.put(giroTransaction3.getTransactionId(), giroTransaction3);
-    giroMap.put(giroTransaction4.getTransactionId(), giroTransaction4);
-    giroMap.put(giroTransaction5.getTransactionId(), giroTransaction5);
-
     LinkedHashMap<String, Account> accounts = new LinkedHashMap<>();
+
+    HashMap<String, Transaction> transactionsFromFile = this.testDataFileReader
+        .readTransactionsFromFile();
+    replaceDebtorIbans(transactionsFromFile, ibanGiro);
 
     Account giroAccount = new Account(
         accountIdGiro,
@@ -298,79 +239,37 @@ public class TestDataService {
         Arrays.asList(
             new Balance(new Amount(EUR, BigDecimal.valueOf(1500)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(1500)), BalanceType.CLOSING_BOOKED)),
-        giroMap
+        transactionsFromFile
     );
 
     accounts.put(giroAccount.getAccountId(), giroAccount);
 
     String ibanSavings = testDataConfiguration.getIbanForPsu(psuId, 1);
     String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
-
-    Transaction savingsTransaction1 = new Transaction(
-        "8508921e-2cd4-43e8-ba1e-26b143307927",
-        BigDecimal.valueOf(400),
-        EUR,
-        LocalDate.parse("2018-08-12"),
-        accountOwner,
-        ibanGiro,
-        accountOwner,
-        ibanSavings,
-        "Sparen"
-    );
-
-    Transaction savingsTransaction2 = new Transaction(
-        "2957e38f-d75c-4da4-8e07-dfb5e5778946",
-        BigDecimal.valueOf(-270),
-        EUR,
-        LocalDate.parse("2018-08-17"),
-        accountOwner,
-        ibanSavings,
-        accountOwner,
-        ibanGiro,
-        "Kundendienst Auto"
-    );
-
-    Transaction savingsTransaction3 = new Transaction("18d86109-846c-4077-84fb-0282ccff8734",
-        BigDecimal.valueOf(-350),
-        EUR,
-        LocalDate.parse("2018-09-02"),
-        accountOwner,
-        ibanSavings,
-        accountOwner,
-        ibanGiro,
-        "Reparatur Heizung"
-    );
-
-    Transaction savingsTransaction4 = new Transaction(
-        "ca82742c-749a-44c1-8855-6db0100ddbcb",
-        BigDecimal.valueOf(-1050),
-        EUR,
-        LocalDate.parse("2018-09-22"),
-        accountOwner,
-        ibanSavings,
-        accountOwner,
-        ibanGiro,
-        "Anschaffung Sofa"
-    );
-
-    Transaction savingsTransaction5 = new Transaction(
-        "b90b3cd0-f94f-434c-a09b-c9d62f6f09d5",
-        BigDecimal.valueOf(400),
-        EUR,
-        LocalDate.parse("2018-10-12"),
-        accountOwner,
-        ibanGiro,
-        accountOwner,
-        ibanSavings,
-        "Sparen"
-    );
-
     HashMap<String, Transaction> savingsMap = new HashMap<>();
-    savingsMap.put(savingsTransaction1.getTransactionId(), savingsTransaction1);
-    savingsMap.put(savingsTransaction2.getTransactionId(), savingsTransaction2);
-    savingsMap.put(savingsTransaction3.getTransactionId(), savingsTransaction3);
-    savingsMap.put(savingsTransaction4.getTransactionId(), savingsTransaction4);
-    savingsMap.put(savingsTransaction5.getTransactionId(), savingsTransaction5);
+
+    Transaction transaction = new Transaction(
+        "8508921e-2cd4-43e8-ba1e-26b143307927",
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-100)),
+        LocalDate.parse("2019-02-04"),
+        LocalDate.parse("2019-02-04"),
+        debtorName,
+        ibanSavings,
+        "Robert Betzel",
+        "DE74500105175899176762",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Alles Gute zum Geburstag DATUM 04.02.2018, 21.21 UHR1.TAN 598233",
+        "",
+        "",
+        ""
+    );
+
+    savingsMap.put(transaction.getTransactionId(), transaction);
 
     Account savingsAccount = new Account(
         accountIdSavings,
@@ -381,8 +280,7 @@ public class TestDataService {
         Arrays.asList(
             new Balance(new Amount(EUR, BigDecimal.valueOf(2300)), BalanceType.INTERIM_AVAILABLE),
             new Balance(new Amount(EUR, BigDecimal.valueOf(2300)), BalanceType.CLOSING_BOOKED)),
-        savingsMap
-    );
+        savingsMap);
 
     accounts.put(savingsAccount.getAccountId(), savingsAccount);
 
@@ -408,14 +306,23 @@ public class TestDataService {
 
     Transaction transactionNegativeBookedBalance = new Transaction(
         "87218af6-db8f-4a6e-8192-470c25fca309",
-        BigDecimal.valueOf(-69.95),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-69.95)),
         LocalDate.parse("2019-02-03"),
-        accountOwner,
+        LocalDate.parse("2019-02-03"),
+        debtorName,
         ibanNegativeBookedBalance,
         "Lokale Versicherungs AG",
         "DE74500105175899176762",
-        "Vertrags-Nr. 7621239960 EUV 01.01.2019-01.01.2020"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Vertrags-Nr. 7621239960 EUV 01.01.2019-01.01.2020",
+        "",
+        "",
+        ""
     );
 
     HashMap<String, Transaction> negativeBookedBalanceMap = new HashMap<>();
@@ -442,14 +349,23 @@ public class TestDataService {
 
     Transaction transactionLowerAvailableBalance = new Transaction(
         "248173d1-a788-4bcf-b158-ca2b2b921cb7",
-        BigDecimal.valueOf(-115.95),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-115.95)),
         LocalDate.parse("2019-02-04"),
-        accountOwner,
+        LocalDate.parse("2019-02-04"),
+        debtorName,
         ibanLowerAvailableBalance,
         "Lokale Versicherungs AG",
         "DE74500105175899176762",
-        "Vertrags-Nr. 4621265960 EUV 01.01.2019-01.01.2020"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Vertrags-Nr. 4621265960 EUV 01.01.2019-01.01.2020",
+        "",
+        "",
+        ""
     );
 
     HashMap<String, Transaction> lowerAvailableBalanceMap = new HashMap<>();
@@ -475,14 +391,23 @@ public class TestDataService {
 
     Transaction giroUsdTransaction = new Transaction(
         "6058dcd0-6f2a-4f8c-b329-b1d99b5fdf6c",
-        BigDecimal.valueOf(-50.00),
-        USD,
+        "",
+        new Amount(USD, BigDecimal.valueOf(-50.00)),
         LocalDate.parse("2018-12-01"),
-        accountOwner,
+        LocalDate.parse("2018-12-01"),
+        debtorName,
         ibanGiroUsd,
         "BORIC SOMMER",
         "DE56121432771174003957",
-        "Happy Birthday Boric DATUM 01.12.2018, 21.04 UHR1.TAN 633209"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Happy Birthday Boric DATUM 01.12.2018, 21.04 UHR1.TAN 633209",
+        "",
+        "",
+        ""
     );
 
     HashMap<String, Transaction> giroUsdMap = new HashMap<>();
@@ -518,6 +443,10 @@ public class TestDataService {
     );
   }
 
+  private void replaceDebtorIbans(HashMap<String, Transaction> transactions, String iban) {
+    transactions.values().forEach(transaction -> transaction.setDebtorIban(iban));
+  }
+
   private TestPsu initPsuRejected() {
     String psuId = "PSU-Rejected";
     String iban = testDataConfiguration.getIbanForPsu(psuId);
@@ -526,14 +455,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "2b968e08-c3d4-4270-9acc-eb8ef92a79d1",
-        BigDecimal.valueOf(-20.00),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-20.00)),
+        LocalDate.parse("2018-11-01"),
         LocalDate.parse("2018-11-01"),
         accountOwner,
         iban,
         "Maria Singer",
         "DE74500105175899176762",
-        "Geburtstagsgeschenk Mona DATUM 01.11.2018, 21.21 UHR1.TAN 673209"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Geburtstagsgeschenk Mona DATUM 01.11.2018, 21.21 UHR1.TAN 673209",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(
@@ -559,15 +497,24 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "ed821677-edc8-4263-a3c9-e154a8ae9749",
-        BigDecimal.valueOf(-52.50),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-52.50)),
+        LocalDate.parse("2018-12-01"),
         LocalDate.parse("2018-12-01"),
         accountOwner,
         iban,
         "ARD ZDF DRadio Beitragsservice",
         "DE74500105175899176762",
+        "",
+        "",
+        "",
+        "",
+        "",
         "Rundfunk 12.2018 - 02.2019 Beitragsnr. 591091003 Aenderungen ganz bequem: +"
-            + "www.rundfunkbeitrag.de"
+            + "www.rundfunkbeitrag.de",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(
@@ -593,14 +540,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "5c58560a-0ee8-4c2d-8e39-0aa967ae7784",
-        BigDecimal.valueOf(-59.78),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-59.78)),
+        LocalDate.parse("2019-01-04"),
         LocalDate.parse("2019-01-04"),
         accountOwner,
         iban,
         "Lokale Versicherungs AG",
         "DE74500105175899176762",
-        "Vertrags-Nr. 8100230560 EUV 01.01.2019-01.01.2020"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Vertrags-Nr. 8100230560 EUV 01.01.2019-01.01.2020",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(
@@ -626,14 +582,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "a4f08d5b-fcc6-445d-b422-0971b4c3b0e2",
-        BigDecimal.valueOf(-89.99),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-89.99)),
+        LocalDate.parse("2019-02-02"),
         LocalDate.parse("2019-02-02"),
         accountOwner,
         iban,
         "KREDITKARTENABRECHNUNG",
         "DE74500105175899176762",
-        "VISA-ABR. 820779XXXXXX2508"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "VISA-ABR. 820779XXXXXX2508",
+        "",
+        "",
+        ""
     );
 
     // TODO clarify which transaction status should be returned after SCA
@@ -660,14 +625,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "14b5da2e-a07c-4f81-be24-fe23e0f98673",
-        BigDecimal.valueOf(100.00),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(100.00)),
+        LocalDate.parse("2018-12-20"),
         LocalDate.parse("2018-12-20"),
         accountOwner,
         iban,
         "Lisa Wartburg",
         "DE74500105175899176762",
-        "Weihnachten DATUM 20.12.2018, 11.21 UHR1.TAN 611099"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Weihnachten DATUM 20.12.2018, 11.21 UHR1.TAN 611099",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(
@@ -693,14 +667,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "70fd6b74-bbaa-4c65-920b-8a71c01c3f46",
-        BigDecimal.valueOf(-400.00),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-400.00)),
+        LocalDate.parse("2018-09-20"),
         LocalDate.parse("2018-09-20"),
         accountOwner,
         iban,
         "Markus Holzer",
         "DE74500105175899176762",
-        "Auslagen Urlaub DATUM 20.09.2018, 17.40 UHR1.TAN 553289"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Auslagen Urlaub DATUM 20.09.2018, 17.40 UHR1.TAN 553289",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(
@@ -726,14 +709,23 @@ public class TestDataService {
 
     Transaction transaction = new Transaction(
         "3bf5b19b-12e9-4ab4-bdac-a5c7695ae4b9",
-        BigDecimal.valueOf(-100),
-        EUR,
+        "",
+        new Amount(EUR, BigDecimal.valueOf(-100)),
+        LocalDate.parse("2019-02-04"),
         LocalDate.parse("2019-02-04"),
         accountOwner,
         iban,
         "Robert Betzel",
         "DE74500105175899176762",
-        "Alles Gute zum Geburstag DATUM 04.02.2018, 21.21 UHR1.TAN 598233"
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Alles Gute zum Geburstag DATUM 04.02.2018, 21.21 UHR1.TAN 598233",
+        "",
+        "",
+        ""
     );
 
     return new TestPsu(

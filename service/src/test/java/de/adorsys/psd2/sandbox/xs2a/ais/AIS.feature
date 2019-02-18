@@ -111,9 +111,8 @@ Feature: AIS
     When PSU accesses the transaction list
     Then the transaction list data are received
     Examples:
-      | accounts                                      | balances               | transactions           | psu-id         | password | sca-method | tan   | withBalance |
-      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
-      | DE11760365688833114935                        | null                   | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
+      | accounts               | balances               | transactions           | psu-id         | password | sca-method | tan   | withBalance |
+      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
 
   Scenario Outline: Get Single Transaction
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>

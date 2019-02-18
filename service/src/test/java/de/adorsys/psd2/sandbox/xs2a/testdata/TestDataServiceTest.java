@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -12,19 +14,30 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.yaml.snakeyaml.Yaml;
 
+@RunWith(SpringRunner.class)
 public class TestDataServiceTest {
 
   private static TestDataConfiguration testDataConfiguration = new TestDataConfiguration();
+
   private TestDataService testDataService;
+
+  @Mock
+  private TestDataFileReader testDataFileReader;
 
   @SuppressWarnings("unchecked")
   @BeforeClass
@@ -41,7 +54,13 @@ public class TestDataServiceTest {
 
   @Before
   public void initService() {
-    testDataService = new TestDataService(testDataConfiguration);
+    HashMap<String, Transaction> transactionMap = new HashMap<>();
+    for (int i = 0; i < 5; i++) {
+      transactionMap.put(UUID.randomUUID().toString(), mock(Transaction.class));
+    }
+    when(testDataFileReader.readTransactionsFromFile()).thenReturn(transactionMap);
+
+    testDataService = new TestDataService(testDataConfiguration, testDataFileReader);
   }
 
   @Test
@@ -200,12 +219,7 @@ public class TestDataServiceTest {
     }
 
     assertEquals(accounts.get().size(), 6);
-    assertNotNull(accounts.get().get(0));
-    assertNotNull(accounts.get().get(1));
-    assertNotNull(accounts.get().get(2));
-    assertNotNull(accounts.get().get(3));
-    assertNotNull(accounts.get().get(4));
-    assertNotNull(accounts.get().get(5));
+    accounts.get().forEach(Assert::assertNotNull);
   }
 
 
@@ -240,11 +254,11 @@ public class TestDataServiceTest {
   @Test
   public void getTransactionsTestSuccessful() {
     final String psuId = "PSU-Successful";
-    final String accountIdGrio = "9b86539d-589b-4082-90c2-d725c019777f";
+    final String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";
     final String accountIdSavings = "d460057b-053a-490a-a36e-c0c8afb735e9";
 
     Optional<List<Transaction>> giroTransactions = testDataService
-        .getTransactions(psuId, accountIdGrio);
+        .getTransactions(psuId, accountIdGiro);
     Optional<List<Transaction>> accountTransactions = testDataService
         .getTransactions(psuId, accountIdSavings);
 
@@ -252,8 +266,8 @@ public class TestDataServiceTest {
       fail();
     }
 
-    assertEquals(giroTransactions.get().size(), 5);
-    assertEquals(accountTransactions.get().size(), 5);
+    assertEquals(5, giroTransactions.get().size());
+    assertEquals(1, accountTransactions.get().size());
     for (Transaction transaction : giroTransactions.get()) {
       assertNotNull(transaction);
     }
