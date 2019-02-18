@@ -5,8 +5,17 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Amount;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
+import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountDetails;
+import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Currency;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -63,5 +72,72 @@ public class TestDataMapperTest {
         equalTo(account.getCashAccountType().value()));
     assertThat(spiAccountDetails.getCurrency(), equalTo(account.getCurrency()));
     assertNull(spiAccountDetails.getBalances());
+  }
+
+  @Test
+  public void mapBalanceListToSpiBalanceListTest() {
+    Balance availableBalance = new Balance(
+        new Amount(Currency.getInstance("EUR"), new BigDecimal("320.03")),
+        BalanceType.INTERIM_AVAILABLE);
+    Balance closingBookedBalance = new Balance(
+        new Amount(Currency.getInstance("EUR"), new BigDecimal("100.00")),
+        BalanceType.CLOSING_BOOKED);
+
+    Account account = new Account(
+        "accountid",
+        "iban1",
+        Currency.getInstance("EUR"),
+        "Cash Account",
+        CashAccountType.CACC,
+        Arrays.asList(availableBalance, closingBookedBalance),
+        null
+    );
+
+    List<SpiAccountReference> consentBalances = new ArrayList<>();
+    consentBalances
+        .add(new SpiAccountReference("", "iban1", "", "", "", "", Currency.getInstance("EUR")));
+
+    List<SpiAccountBalance> spiAccountBalances = testDataMapper
+        .mapBalanceListToSpiBalanceList(account, consentBalances);
+
+    assertThat(spiAccountBalances.size(), equalTo(2));
+    assertThat(spiAccountBalances.get(0).getSpiBalanceAmount().getAmount(),
+        equalTo(new BigDecimal("320.03")));
+    assertThat(spiAccountBalances.get(0).getSpiBalanceType().toString(),
+        equalTo(BalanceType.INTERIM_AVAILABLE.toString()));
+
+    assertThat(spiAccountBalances.get(1).getSpiBalanceAmount().getAmount(),
+        equalTo(new BigDecimal("100.00")));
+    assertThat(spiAccountBalances.get(1).getSpiBalanceType().toString(),
+        equalTo(BalanceType.CLOSING_BOOKED.toString()));
+  }
+
+  @Test
+  public void mapBalanceListToSpiBalanceListNoConsentTest() {
+    Balance availableBalance = new Balance(
+        new Amount(Currency.getInstance("EUR"), new BigDecimal("320.03")),
+        BalanceType.INTERIM_AVAILABLE);
+    Balance closingBookedBalance = new Balance(
+        new Amount(Currency.getInstance("EUR"), new BigDecimal("100.00")),
+        BalanceType.CLOSING_BOOKED);
+
+    Account account = new Account(
+        "accountid",
+        "iban1",
+        Currency.getInstance("EUR"),
+        "Cash Account",
+        CashAccountType.CACC,
+        Arrays.asList(availableBalance, closingBookedBalance),
+        null
+    );
+
+    List<SpiAccountReference> consentBalances = new ArrayList<>();
+    consentBalances
+        .add(new SpiAccountReference("", "iban2", "", "", "", "", Currency.getInstance("EUR")));
+
+    List<SpiAccountBalance> spiAccountBalances = testDataMapper
+        .mapBalanceListToSpiBalanceList(account, consentBalances);
+
+    assertThat(spiAccountBalances.size(), equalTo(0));
   }
 }
