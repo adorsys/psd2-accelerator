@@ -169,5 +169,6 @@ In such a case you should receive the following error:
 }
 ```
 
-Solution: Ask the PSU to create a new consent allowing you access the
-appropriate endpoints.
+Solution: Either create a new certificate containing the role AIS and
+embed this certificate in your request or decode your certificate and
+check the qcStatement which should contain "PSP_AI" in this case.
