@@ -11,10 +11,15 @@ import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
@@ -128,6 +133,12 @@ public class RedirectService {
             && isFutureOrPeriodicPayment(pisPaymentData)) {
           newTxStatus = TransactionStatus.ACTC;
         }
+
+        if (!isPaymentAmountCoveredByBalance(pisPaymentData.getAmount(), psuId,
+            pisPaymentData.getDebtorAccount().getIban())) {
+          newTxStatus = TransactionStatus.RJCT;
+        }
+
         pisPaymentData.setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
 
@@ -150,6 +161,16 @@ public class RedirectService {
       paymentAuth.setScaStatus(ScaStatus.FAILED);
     }
     pisAuthorizationRepository.save(paymentAuth);
+  }
+
+  private boolean isPaymentAmountCoveredByBalance(BigDecimal amount, String psuId, String iban) {
+    Account account = testDataService.getRequestedAccounts(psuId, Arrays.asList(iban)).get().get(0);
+
+    Balance accountBalance = account.getBalances().stream()
+        .filter(balance -> balance.getBalanceType().equals(BalanceType.INTERIM_AVAILABLE))
+        .findFirst().get();
+
+    return accountBalance.getBalanceAmount().getAmount().compareTo(amount) >= 0;
   }
 
   private boolean isPsuAllowedToAccessPayment(Optional<TestPsu> scaPsu, String debtorIban) {
