@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
@@ -214,6 +216,25 @@ public class TestDataServiceTest {
     Optional<List<Account>> account = testDataService.getAccounts(psuId);
 
     assertEquals(account, Optional.empty());
+  }
+
+  @Test
+  public void getAccountsForBankOfferedConsentTestSuccessful() {
+    final String giroAccountId = "9b86539d-589b-4082-90c2-d725c019777f";
+    final String savingsAccountId = "d460057b-053a-490a-a36e-c0c8afb735e9";
+
+    List<Account> accounts = testDataService.getAccountsForBankOfferedConsent();
+
+    if (accounts.isEmpty()) {
+      fail();
+    }
+
+    assertThat(accounts.size(), equalTo(2));
+    assertNotNull(accounts.get(0));
+    assertNotNull(accounts.get(1));
+    assertTrue(accounts.stream().anyMatch(account -> account.getAccountId().equals(giroAccountId)));
+    assertTrue(accounts.stream()
+        .anyMatch(account -> account.getAccountId().equals(savingsAccountId)));
   }
 
   @Test

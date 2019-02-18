@@ -260,16 +260,16 @@ Payment Status Endpoint.
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
 
-### Consent Creation
+### Dedicated Consent Creation
 
-In order to create a consent, replace the Iban in your request with the
+In order to create a dedicated consent, replace the Iban in your request with the
 one of your favored PSU. To legitimate the consent creation, use the SCA
 Redirect described in the previous section.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
 The following code snippet is an example cURL command which creates a
-consent for PSU "PSU-Successful":
+dedicated consent for PSU "PSU-Successful":
 
 ```
 curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
@@ -315,6 +315,43 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-Blocked             | DE13760365681209386222 | _(no SCA Status available)_ | _(no Consent Status available)_ |
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |
+
+### Bank Offered Consent Creation
+
+In order to create a bank offered consent, replace the Iban in your request with the
+one of your favored PSU. To legitimate the consent creation, use the SCA
+Redirect described in the previous section.
+
+`POST https://sandbox-api.dev.adorsys.de/v1/consents`
+
+The following code snippet is an example cURL command which creates a
+bank offered consent for PSU "PSU-Successful":
+
+```
+curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
+  `# get these two files from the PSD2 Accelerator certificate generator` \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{
+  "access": {
+    "accounts": [],
+    "balances": [],
+    "transactions": []
+},
+  "recurringIndicator": true,
+  "validUntil": "2020-12-31",
+  "frequencyPerDay": 4,
+  "combinedServiceIndicator": true
+}'
+```
+
+Bank offered consent works only for PSU-Successful. The Post Consent for bank offered consent creates a consentId,
+which you can use to access the first two accounts of PSU-Successful with the Get Account Data Endpoint.
+Compare your consent response with the table in the previous section "Dedicated Consent Creation".
 
 ### Consent Deletion
 

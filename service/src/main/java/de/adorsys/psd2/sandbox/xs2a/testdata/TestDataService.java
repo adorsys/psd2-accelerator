@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Currency;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +99,10 @@ public class TestDataService {
     return psuId.equals("PSU-Blocked");
   }
 
+  public boolean isSucccessfulPsu(String psuId) {
+    return psuId.equals("PSU-Successful");
+  }
+
   /**
    * Returns Identification Number of an Account that matches the passed IBAN.
    *
@@ -158,6 +163,20 @@ public class TestDataService {
     return Optional.of(allAccounts.stream()
         .filter(account -> ibans.contains(account.getIban()))
         .collect(Collectors.toList()));
+  }
+
+  /**
+   * Returns List of two Accounts of the Psu Successful.
+   *
+   * @return List of Accounts
+   */
+  public List<Account> getAccountsForBankOfferedConsent() {
+    if (!psuMap.containsKey("PSU-Successful")) {
+      throw new IllegalStateException("PSU-Successful not found");
+    }
+
+    return psuMap.get("PSU-Successful").getAccounts().values().stream().limit(2)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -268,7 +287,7 @@ public class TestDataService {
     giroMap.put(giroTransaction4.getTransactionId(), giroTransaction4);
     giroMap.put(giroTransaction5.getTransactionId(), giroTransaction5);
 
-    HashMap<String, Account> accounts = new HashMap<>();
+    LinkedHashMap<String, Account> accounts = new LinkedHashMap<>();
 
     Account giroAccount = new Account(
         accountIdGiro,
@@ -732,9 +751,9 @@ public class TestDataService {
     );
   }
 
-  private HashMap<String, Account> initSingleAccount(String accountId, String iban,
+  private LinkedHashMap<String, Account> initSingleAccount(String accountId, String iban,
       BigDecimal bookedAmount, BigDecimal availableAmount, Transaction transaction) {
-    HashMap<String, Account> accounts = new HashMap<>();
+    LinkedHashMap<String, Account> accounts = new LinkedHashMap<>();
 
     HashMap<String, Transaction> transactions = new HashMap<>();
     transactions.put(transaction.getTransactionId(), transaction);
