@@ -58,7 +58,7 @@ public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
 
   @Before
   public void setScaApproach() {
-    scaApproach = aspspProfileService.getScaApproach().toString();
+    scaApproach = aspspProfileService.getScaApproaches().get(0).toString();
   }
 
   @Given("^PSU initiated a (.*) payment with iban (.*) using the payment product (.*)$")

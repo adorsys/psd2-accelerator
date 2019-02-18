@@ -6,7 +6,6 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
-import de.adorsys.psd2.xs2a.spi.domain.common.SpiTransactionStatus;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
@@ -24,19 +23,19 @@ class AbstractPaymentSpiImpl {
   @Autowired
   PisPaymentDataRepository paymentDataRepository;
 
-  SpiResponse<SpiTransactionStatus> getPaymentStatusById(
+  SpiResponse<TransactionStatus> getPaymentStatusById(
       SpiSinglePayment payment,
       AspspConsentData aspspConsentData) {
 
-    Optional<SpiTransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
+    Optional<TransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
     if (paymentStatus.isPresent()) {
       payment.setPaymentStatus(paymentStatus.get());
-      return SpiResponse.<SpiTransactionStatus>builder()
+      return SpiResponse.<TransactionStatus>builder()
           .aspspConsentData(aspspConsentData)
           .payload(payment.getPaymentStatus())
           .success();
     }
-    return SpiResponse.<SpiTransactionStatus>builder()
+    return SpiResponse.<TransactionStatus>builder()
         .fail(SpiResponseStatus.LOGICAL_FAILURE);
   }
 
@@ -44,7 +43,7 @@ class AbstractPaymentSpiImpl {
       SpiPsuData psuData,
       T payment,
       AspspConsentData aspspConsentData) {
-    Optional<SpiTransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
+    Optional<TransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
     if (paymentStatus.isPresent()) {
       payment.setPaymentStatus(paymentStatus.get());
       return SpiResponse.<T>builder()
@@ -70,7 +69,7 @@ class AbstractPaymentSpiImpl {
         paymentDataRepository.save(payment);
         return SpiResponse.<SpiPaymentExecutionResponse>builder()
             .aspspConsentData(aspspConsentData)
-            .payload(new SpiPaymentExecutionResponse(SpiTransactionStatus.ACCP))
+            .payload(new SpiPaymentExecutionResponse(TransactionStatus.ACCP))
             .success();
       }
 
@@ -86,11 +85,11 @@ class AbstractPaymentSpiImpl {
         .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
   }
 
-  private Optional<SpiTransactionStatus> getPaymentStatusFromRepo(String paymentId) {
+  private Optional<TransactionStatus> getPaymentStatusFromRepo(String paymentId) {
     Optional<List<PisPaymentData>> paymentData = paymentDataRepository
         .findByPaymentId(paymentId);
 
-    return paymentData.map(pisPaymentData -> SpiTransactionStatus
+    return paymentData.map(pisPaymentData -> TransactionStatus
         .valueOf(pisPaymentData.get(0).getTransactionStatus().name()));
   }
 }
