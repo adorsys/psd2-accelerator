@@ -29,7 +29,7 @@ public class Transaction {
   private String bankTransactionCode;
   private String proprietaryBankTransactionCode;
 
-  public void setDebtorIban(String debtorIban) {
+  public void overrideDebtorIban(String debtorIban) {
     this.debtorIban = debtorIban;
   }
 }
