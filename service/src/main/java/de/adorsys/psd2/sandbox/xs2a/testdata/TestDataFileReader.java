@@ -1,10 +1,12 @@
 package de.adorsys.psd2.sandbox.xs2a.testdata;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Amount;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import java.io.BufferedReader;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Currency;
 import java.util.HashMap;
@@ -12,48 +14,68 @@ import java.util.UUID;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.testcontainers.shaded.com.google.common.io.Files;
 
 @Component
 class TestDataFileReader {
 
-  private static final String FILE_NAME = "classpath:transactions_dump.csv";
+  private static final String EXPECTED_HEADER = "bookingStatus|endToEndId|mandateId|creditorId|"
+      + "bookingDate|valueDate|currency|amount|creditorName|creditorIban|creditorAccountCurrency|"
+      + "ultimateCreditor|debtorName|debtorIban|debtorAccountCurrency|ultimateDebtor|"
+      + "remittanceInformationUnstructured|remittanceInformationStructured|purposeCode|"
+      + "bankTransactionCode|proprietaryBankTransactionCode";
+  private static final int EXPECTED_NUMBER_COLUMNS = 21;
+  private static final String EXPECTED_PATH_OR_DEFAULT = "${sandbox.testdata.transactions.path:"
+      + "classpath:transactions_dump.csv}";
 
   private ResourceLoader resourceLoader;
+  private String fileName;
 
-  @Autowired
-  public TestDataFileReader(ResourceLoader resourceLoader) {
+  public TestDataFileReader(ResourceLoader resourceLoader,
+      @Value(EXPECTED_PATH_OR_DEFAULT) String fileName) {
     this.resourceLoader = resourceLoader;
+    this.fileName = fileName;
   }
 
   HashMap<String, Transaction> readTransactionsFromFile() {
 
-    BufferedReader reader;
-    CSVParser csvParser;
-    try {
-      reader = Files
-          .newReader(resourceLoader.getResource(FILE_NAME).getFile(), Charset.defaultCharset());
-      reader.readLine(); // skip Header
-      csvParser = new CSVParser(reader, CSVFormat.newFormat('|'));
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    if (!fileName.contains("classpath:")) {
+      fileName = "file:" + fileName;
     }
 
+    BufferedReader reader;
+    CSVParser csvParser;
     HashMap<String, Transaction> transactionMap = new HashMap<>();
-    Transaction transaction;
+    try {
+      reader = Files
+          .newReader(resourceLoader.getResource(fileName).getFile(), Charsets.UTF_8);
+      if (!reader.readLine().equals(EXPECTED_HEADER)) {
+        throw new ParseException("Error while reading transaction file \n"
+            + "Header does not match the following format: \n"
+            + EXPECTED_HEADER, 0);
+      }
+      csvParser = new CSVParser(reader, CSVFormat.newFormat('|'));
 
-    for (CSVRecord csvRecord : csvParser) {
-      transaction = mapTransactionFromFile(csvRecord);
-      transactionMap.put(transaction.getTransactionId(), transaction);
+      Transaction transaction;
+
+      for (CSVRecord csvRecord : csvParser) {
+        transaction = mapTransactionFromFile(csvRecord);
+        transactionMap.put(transaction.getTransactionId(), transaction);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
 
     return transactionMap;
   }
 
-  private Transaction mapTransactionFromFile(CSVRecord csvRecord) {
+  private Transaction mapTransactionFromFile(CSVRecord csvRecord) throws ParseException {
+    if (csvRecord.size() != EXPECTED_NUMBER_COLUMNS) {
+      throw new ParseException(
+          "Error while parsing transaction in row " + csvRecord.getRecordNumber(), 0);
+    }
     String bookingStatus = csvRecord.get(0);
     String endToEndId = csvRecord.get(1);
     String mandateId = csvRecord.get(2);
@@ -76,10 +98,20 @@ class TestDataFileReader {
     String bankTransactionCode = csvRecord.get(19);
     String proprietaryBankTransactionCode = csvRecord.get(20);
 
+    Amount transactionAmount;
+
+    try {
+      BigDecimal amountValue = new BigDecimal(amount);
+      transactionAmount = new Amount(Currency.getInstance(currency), amountValue);
+    } catch (Exception e) {
+      throw new ParseException(
+          "Format of transaction amount in row " + csvRecord.getRecordNumber() + " incorrect", 0);
+    }
+
     return new Transaction(
         UUID.randomUUID().toString(),
         null,
-        new Amount(Currency.getInstance(currency), new BigDecimal(amount)),
+        transactionAmount,
         LocalDate.parse(bookingDate),
         LocalDate.parse(valueDate),
         debtorIban,
@@ -94,7 +126,6 @@ class TestDataFileReader {
         remittanceInformationUnstructured,
         purposeCode,
         bankTransactionCode,
-        proprietaryBankTransactionCode
-    );
+        proprietaryBankTransactionCode);
   }
 }

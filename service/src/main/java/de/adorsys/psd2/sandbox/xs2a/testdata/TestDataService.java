@@ -444,7 +444,7 @@ public class TestDataService {
   }
 
   private void replaceDebtorIbans(HashMap<String, Transaction> transactions, String iban) {
-    transactions.values().forEach(transaction -> transaction.setDebtorIban(iban));
+    transactions.values().forEach(transaction -> transaction.overrideDebtorIban(iban));
   }
 
   private TestPsu initPsuRejected() {
