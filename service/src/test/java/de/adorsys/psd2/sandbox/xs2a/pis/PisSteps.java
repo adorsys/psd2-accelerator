@@ -45,7 +45,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 @Ignore("without this ignore intellij tries to run the step files")
-public class PaymentInitiationWithScaSteps extends SpringCucumberTestBase {
+public class PisSteps extends SpringCucumberTestBase {
 
   private static final String CANCELLATION_AUTHORISATIONS = "cancellation-authorisations";
   private static final String AUTHORISATIONS = "authorisations";

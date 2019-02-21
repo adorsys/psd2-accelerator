@@ -210,19 +210,49 @@ public class RedirectService {
     return scaPsu.equals(accPsu);
   }
 
+  private boolean isFutureOrPeriodicPayment(PisPaymentData pisPaymentData) {
+    return pisPaymentData.getRequestedExecutionDate() != null
+        || pisPaymentData.getStartDate() != null;
+  }
+
   /**
-   * Returns the tppRedirectUri for a specific payment.
+   * Returns Object which contains the necessary Consent Information for OnlineBanking Website.
    *
-   * @param externalId External payment Id
-   * @return tppRedirectUri
+   * @param externalId externalId
+   * @return OnlineBankingData
    */
-  public String getRedirectToTppUriFromPaymentRepo(String externalId) {
+  public OnlineBankingData getOnlineBankingDataForConsent(String externalId) {
+    Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
+        .findByExternalId(externalId);
+    if (!aisAuthorisation.isPresent()) {
+      //TODO handle error case
+      return null;
+    }
+
+    ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
+
+    TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
+    String tppRedirectUri = getRedirectUri(tppInfo, aisAuthorisation.get().getScaStatus());
+
+    return new OnlineBankingData(tppRedirectUri, consentStatus.getValue());
+  }
+
+  /**
+   * Returns Object which contains the necessary Payment Information for OnlineBanking Website.
+   *
+   * @param externalId externalId
+   * @return OnlineBankingData
+   */
+  public OnlineBankingData getOnlineBankingData(String externalId) {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
     if (!pisAuthorization.isPresent()) {
       //TODO handle error case
       return null;
     }
+
+    TransactionStatus transactionStatus = pisAuthorization.get().getPaymentData()
+        .getTransactionStatus();
 
     Optional<PisCommonPaymentData> commonPaymentData = pisCommonPaymentDataRepository
         .findByPaymentId(pisAuthorization.get().getPaymentData().getPaymentId());
@@ -233,81 +263,17 @@ public class RedirectService {
 
     TppInfoEntity tppInfo = commonPaymentData.get().getAuthorizations().get(0).getPaymentData()
         .getTppInfo();
-
     ScaStatus scaStatus = commonPaymentData.get().getAuthorizations().get(0).getScaStatus();
+    String tppRedirectUri = getRedirectUri(tppInfo, scaStatus);
 
-    if (scaStatus.equals(ScaStatus.FAILED)) {
-      String nokRedirectUri = tppInfo.getNokRedirectUri();
-      return nokRedirectUri == null ? tppInfo.getRedirectUri() : nokRedirectUri;
-    }
-    return tppInfo.getRedirectUri();
+    return new OnlineBankingData(tppRedirectUri, transactionStatus.getTransactionStatus());
   }
 
-  /**
-   * Returns the tppRedirectUri for a specific consent.
-   *
-   * @param externalId External consent Id
-   * @return tppRedirectUri
-   */
-  public String getRedirectToTppUriFromAccountRepo(String externalId) {
-    Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
-        .findByExternalId(externalId);
-    if (!aisAuthorisation.isPresent()) {
-      //TODO handle error case
-      return null;
+  private String getRedirectUri(TppInfoEntity tppInfo, ScaStatus scaStatus) {
+    String tppRedirectUri = tppInfo.getRedirectUri();
+    if (scaStatus.equals(ScaStatus.FAILED) && tppInfo.getNokRedirectUri() != null) {
+      tppRedirectUri = tppInfo.getNokRedirectUri();
     }
-
-    TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
-
-    if (aisAuthorisation.get().getScaStatus().equals(ScaStatus.FAILED)) {
-      String nokRedirectUri = tppInfo.getNokRedirectUri();
-      return nokRedirectUri == null ? tppInfo.getRedirectUri() : nokRedirectUri;
-    }
-
-    return tppInfo.getRedirectUri();
-  }
-
-  /**
-   * Returns the payment status to a specific payment.
-   *
-   * @param externalId External payment Id
-   * @return payment status
-   */
-  public String getPaymentStatusFromRepo(String externalId) {
-    Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
-        .findByExternalId(externalId);
-    if (!pisAuthorization.isPresent()) {
-      //TODO handle error case
-      return null;
-    }
-
-    TransactionStatus transactionStatus = pisAuthorizationRepository.findByExternalId(externalId)
-        .get().getPaymentData().getTransactionStatus();
-
-    return transactionStatus.getTransactionStatus();
-  }
-
-  /**
-   * Returns the consent status after SCA to a specific consent.
-   *
-   * @param externalId External consent Id
-   * @return consent status
-   */
-  public String getConsentStatusFromRepo(String externalId) {
-    Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
-        .findByExternalId(externalId);
-    if (!aisAuthorisation.isPresent()) {
-      //TODO handle error case
-      return null;
-    }
-
-    ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
-
-    return consentStatus.getValue();
-  }
-
-  private boolean isFutureOrPeriodicPayment(PisPaymentData pisPaymentData) {
-    return pisPaymentData.getRequestedExecutionDate() != null
-        || pisPaymentData.getStartDate() != null;
+    return tppRedirectUri;
   }
 }

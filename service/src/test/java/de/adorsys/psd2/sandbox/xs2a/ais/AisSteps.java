@@ -53,7 +53,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 @Ignore("without this ignore intellij tries to run the step files")
-public class AisConsentCreationSteps extends SpringCucumberTestBase {
+public class AisSteps extends SpringCucumberTestBase {
 
   @Autowired
   AspspProfileService aspspProfileService;
@@ -251,9 +251,9 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
     ResponseEntity<ConsentInformationResponse200Json> actualResponse = context.getActualResponse();
     AccountAccess actualAccess = actualResponse.getBody().getAccess();
 
-    assertThat(actualAccess.getAccounts().size(),equalTo(2));
-    assertThat(actualAccess.getBalances().size(),equalTo(2));
-    assertThat(actualAccess.getTransactions().size(),equalTo(2));
+    assertThat(actualAccess.getAccounts().size(), equalTo(2));
+    assertThat(actualAccess.getBalances().size(), equalTo(2));
+    assertThat(actualAccess.getTransactions().size(), equalTo(2));
     assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.VALID));
     assertThat(actualResponse.getBody().getFrequencyPerDay(), equalTo(5));
     assertThat(actualResponse.getBody().getRecurringIndicator(), equalTo(true));
@@ -498,9 +498,11 @@ public class AisConsentCreationSteps extends SpringCucumberTestBase {
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
-    ResponseEntity<ScaStatusResponse> scaStatusResponse = template
-        .exchange(context.getScaStatusUrl(), HttpMethod.GET, request.toHttpEntity(),
-            ScaStatusResponse.class);
+    ResponseEntity<ScaStatusResponse> scaStatusResponse = template.exchange(
+        context.getScaStatusUrl(),
+        HttpMethod.GET,
+        request.toHttpEntity(),
+        ScaStatusResponse.class);
 
     assertTrue(scaStatusResponse.getStatusCode().is2xxSuccessful());
 
