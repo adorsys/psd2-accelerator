@@ -63,6 +63,7 @@ NOTE: Spring Boot automatically translates properties to environment variables. 
 ==== sandbox
 
 .Required Properties for sandbox
+[[propertyTable]]
 [options="header"]
 |=======
 | Property                   | Description        | Default
@@ -76,6 +77,7 @@ This is the actual business configuration reflecting the PSD2 features your bank
 For an example and the actual default values used in the sandbox see the <<sample-bank-profile>> below.
 
 | Points to the default `bank_profile.yml` YML embedded in the application
+| SANDBOX_TESTDATA_TRANSACTIONS_PATH | Path and filename of the custom transaction data | Points to the default `transactions_dump.csv` CSV embedded in the application
 | CERTIFICATE_FILTER
 a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` header. This value depends on your SSL-Proxy configuration. Possible values are:
 
@@ -115,6 +117,24 @@ include::../../service/src/main/resources/testdata.yml[]
 Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the configuration by placing an edited copy in `$CWD/config` next to the JAR.
 
 WARNING: Make sure that every IBAN you use is valid. We do not check externally set IBANs for correctness. If you use invalid IBANs, you might encounter problems when interacting with the XS2A API or with external systems. If a PSU has more than one IBAN, you need to supply all of them or the application won't start. To help with configuration and debugging, the effective `TestDataConfiguration` is logged (`INFO`) to the console at startup.
+
+Besides the IBANs it is also possible to import transaction data using a CSV file (see <<propertyTable>>). The data will then replace the transactions of the giro account of the `PSU_Successful`.
+
+The format of the CSV file must match the following example:
+
+.Default Transaction Data
+[source,csv]
+----
+include::../../service/src/main/resources/transactions_dump.csv[]
+----
+
+The CSV must comply with the following restrictions:
+
+- The columns must be separated by `|`
+- A header line is mandatory and must match the example
+- Dates must be in the ISO format (YYYY-MM-DD)
+- Payment amounts must use `.` instead of `,` as floating point separator
+
 
 See <<Configuration>> for more information about the Spring Boot configuration mechanism.
 
