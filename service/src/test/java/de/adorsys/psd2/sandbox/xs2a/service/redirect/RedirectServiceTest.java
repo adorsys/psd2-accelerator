@@ -15,6 +15,8 @@ import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
+import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import java.util.Collections;
 import java.util.List;
@@ -35,20 +37,19 @@ public class RedirectServiceTest {
   private PisAuthorization pisAuth;
   private AisConsentAuthorization aisAuth;
   private TppInfoEntity tppInfo;
-
   private RedirectService redirectService;
 
   @Mock
-  PisAuthorisationRepository pisAuthorizationRepository;
+  private PisAuthorisationRepository pisAuthorizationRepository;
 
   @Mock
-  AisConsentAuthorisationRepository aisConsentAuthorizationRepository;
+  private AisConsentAuthorisationRepository aisConsentAuthorizationRepository;
 
   @Mock
-  PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
+  private PisCommonPaymentDataRepository pisCommonPaymentDataRepository;
 
   @Mock
-  TestDataService testDataService;
+  private TestDataService testDataService;
 
   @Before
   public void setup() {
@@ -68,6 +69,7 @@ public class RedirectServiceTest {
     public void setup() {
       aisAuth = mock(AisConsentAuthorization.class);
       AisConsent consent = mock(AisConsent.class);
+
       when(aisAuth.getConsent()).thenReturn(consent);
       when(consent.getTppInfo()).thenReturn(tppInfo);
       when(aisConsentAuthorizationRepository.findByExternalId(anyString()))
@@ -77,31 +79,37 @@ public class RedirectServiceTest {
     @Test
     public void shouldReturnUnsuccessfulScaUri() {
       when(aisAuth.getScaStatus()).thenReturn(ScaStatus.FAILED);
+      when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.REJECTED);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromAccountRepo(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/unsuccessfulsca");
+      assertEquals("http://tpp.de/unsuccessfulsca", data.getTppRedirectUri());
+      assertEquals("rejected", data.getResourceStatus());
     }
 
     @Test
     public void shouldReturnSuccessfulScaUri() {
       when(aisAuth.getScaStatus()).thenReturn(ScaStatus.FINALISED);
+      when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.VALID);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromAccountRepo(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/success");
+      assertEquals("http://tpp.de/success", data.getTppRedirectUri());
+      assertEquals("valid", data.getResourceStatus());
     }
 
     @Test
     public void shouldReturnSuccessfulUriWhenNokNotUriSet() {
       when(aisAuth.getScaStatus()).thenReturn(ScaStatus.FAILED);
+      when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.REJECTED);
       when(tppInfo.getNokRedirectUri()).thenReturn(null);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromAccountRepo(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/success");
+      assertEquals("http://tpp.de/success", data.getTppRedirectUri());
+      assertEquals("rejected", data.getResourceStatus());
     }
   }
 
@@ -109,9 +117,10 @@ public class RedirectServiceTest {
 
     @Before
     public void setup() {
-      PisCommonPaymentData payment = mock(PisCommonPaymentData.class);
       pisAuth = mock(PisAuthorization.class);
+      PisCommonPaymentData payment = mock(PisCommonPaymentData.class);
       List<PisAuthorization> authList = Collections.singletonList(pisAuth);
+
       when(pisAuth.getPaymentData()).thenReturn(payment);
       when(payment.getPaymentId()).thenReturn("1234");
       when(payment.getAuthorizations()).thenReturn(authList);
@@ -125,31 +134,38 @@ public class RedirectServiceTest {
     @Test
     public void shouldReturnUnsuccessfulScaUri() {
       when(pisAuth.getScaStatus()).thenReturn(ScaStatus.FAILED);
+      when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.RJCT);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromPaymentRepo(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/unsuccessfulsca");
+      assertEquals("http://tpp.de/unsuccessfulsca", data.getTppRedirectUri());
+      assertEquals("Rejected", data.getResourceStatus());
     }
 
     @Test
     public void shouldReturnSuccessfulScaUri() {
       when(pisAuth.getScaStatus()).thenReturn(ScaStatus.FINALISED);
+      when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.ACSC);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromPaymentRepo(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/success");
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
+
+      assertEquals("http://tpp.de/success", data.getTppRedirectUri());
+      assertEquals("AcceptedSettlementCompleted", data.getResourceStatus());
     }
 
     @Test
     public void shouldReturnSuccessfulUriWhenNokNotUriSet() {
       when(pisAuth.getScaStatus()).thenReturn(ScaStatus.FAILED);
+      when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.RJCT);
       when(tppInfo.getNokRedirectUri()).thenReturn(null);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      String url = redirectService.getRedirectToTppUriFromPaymentRepo(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
 
-      assertEquals(url, "http://tpp.de/success");
+      assertEquals("http://tpp.de/success", data.getTppRedirectUri());
+      assertEquals("Rejected", data.getResourceStatus());
     }
   }
 }

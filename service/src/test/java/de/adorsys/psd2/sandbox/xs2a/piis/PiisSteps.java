@@ -20,7 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 @Ignore("Cucumber steps")
-public class ConfirmationOfFundsSteps extends SpringCucumberTestBase {
+public class PiisSteps extends SpringCucumberTestBase {
 
   private Context context = new Context();
 

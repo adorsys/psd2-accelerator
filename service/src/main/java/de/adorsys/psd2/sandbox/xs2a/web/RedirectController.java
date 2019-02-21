@@ -2,7 +2,6 @@ package de.adorsys.psd2.sandbox.xs2a.web;
 
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.RedirectService;
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.ScaOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +14,6 @@ public class RedirectController {
 
   private RedirectService redirectService;
 
-  @Autowired
   public RedirectController(RedirectService redirectService) {
     this.redirectService = redirectService;
   }
@@ -39,33 +37,7 @@ public class RedirectController {
     redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.INIT);
 
     model.addAttribute("resourceType", "payment");
-    model.addAttribute("status", redirectService.getPaymentStatusFromRepo(externalId));
-    model.addAttribute("redirectUri",
-        redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
-
-    return targetHtmlFile;
-  }
-
-  /**
-   * Sets status of consent resource to value depending on PSU-ID.
-   *
-   * @param externalId Consent Id
-   * @param psuId      Psu Id
-   * @param model      data model for thymeleaf
-   * @return name of destination html file
-   */
-  @RequestMapping(value = "/init/ais/{external-id}", params = "psu-id")
-  public String handleConsentCreationRedirectRequest(
-      @PathVariable("external-id") String externalId,
-      @RequestParam("psu-id") String psuId,
-      Model model) {
-
-    redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
-
-    model.addAttribute("resourceType", "consent");
-    model.addAttribute("status", redirectService.getConsentStatusFromRepo(externalId));
-    model.addAttribute("redirectUri",
-        redirectService.getRedirectToTppUriFromAccountRepo(externalId));
+    model.addAttribute("onlineBankingData", redirectService.getOnlineBankingData(externalId));
 
     return targetHtmlFile;
   }
@@ -87,9 +59,30 @@ public class RedirectController {
     redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.CANCEL);
 
     model.addAttribute("resourceType", "payment");
-    model.addAttribute("status", redirectService.getPaymentStatusFromRepo(externalId));
-    model.addAttribute("redirectUri",
-        redirectService.getRedirectToTppUriFromPaymentRepo(externalId));
+    model.addAttribute("onlineBankingData", redirectService.getOnlineBankingData(externalId));
+
+    return targetHtmlFile;
+  }
+
+  /**
+   * Sets status of consent resource to value depending on PSU-ID.
+   *
+   * @param externalId Consent Id
+   * @param psuId      Psu Id
+   * @param model      data model for thymeleaf
+   * @return name of destination html file
+   */
+  @RequestMapping(value = "/init/ais/{external-id}", params = "psu-id")
+  public String handleConsentCreationRedirectRequest(
+      @PathVariable("external-id") String externalId,
+      @RequestParam("psu-id") String psuId,
+      Model model) {
+
+    redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
+
+    model.addAttribute("resourceType", "consent");
+    model.addAttribute("onlineBankingData",
+        redirectService.getOnlineBankingDataForConsent(externalId));
 
     return targetHtmlFile;
   }

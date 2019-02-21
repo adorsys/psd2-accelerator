@@ -26,17 +26,17 @@
 
   <div class="starter-template">
     <h2>
-      <span th:text="'The ' + ${resourceType} + ' status has changed to: ' + ${status}"></span>
+      <span th:text="'The ' + ${resourceType} + ' status has changed to: ' + ${onlineBankingData.resourceStatus}"></span>
     </h2>
     <p>You will be automatically redirected back to the TPP within 3 seconds. Otherwise, click
-      <a th:href="${redirectUri}">here</a>.</p>
+      <a th:href="${onlineBankingData.tppRedirectUri}">here</a>.</p>
   </div>
 
 </div>
 <!-- /.container -->
 
 <script th:inline="javascript">
-  const redirectUri = /*[[${redirectUri}]]*/ '';
+  const redirectUri = /*[[${onlineBankingData.tppRedirectUri}]]*/ '';
   window.setTimeout(redirectToTpp, 3000);
 
   function redirectToTpp() {
