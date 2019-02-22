@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { LanguageService } from '../../language.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'sb-developer-portal-page',
@@ -6,7 +9,13 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./developer-portal-page.component.scss'],
 })
 export class DeveloperPortalPageComponent implements OnInit {
-  constructor() {}
+  public localizedContent$: Observable<string>;
 
-  ngOnInit() {}
+  constructor(private languageService: LanguageService) {}
+
+  ngOnInit() {
+    this.localizedContent$ = this.languageService
+      .getLanguage$()
+      .pipe(map(lang => `assets/docs/${lang}/developer-portal-page.md`));
+  }
 }

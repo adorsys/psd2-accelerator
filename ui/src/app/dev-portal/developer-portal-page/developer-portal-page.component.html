@@ -2,6 +2,6 @@
   <sb-header></sb-header>
 
   <div class="container">
-    <markdown [src]="'assets/docs/en/developer-portal-page.md'"></markdown>
+    <markdown [src]="localizedContent$ | async"></markdown>
   </div>
 </div>
