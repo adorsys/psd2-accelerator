@@ -1,7 +1,7 @@
 <div class="page">
   <sb-header></sb-header>
   <div class="container">
-    <markdown [src]="'assets/docs/en/create-cert-page.md'"></markdown>
+    <markdown [src]="localizedContent$ | async"></markdown>
     <form #certForm="ngForm" (ngSubmit)="createAndDownloadCert()">
       <div *ngIf="errors">
         <ul class="alert alert-danger">

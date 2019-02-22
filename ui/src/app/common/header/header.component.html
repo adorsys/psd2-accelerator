@@ -33,6 +33,48 @@
         <li class="nav-item">
           <a class="nav-link" href="mailto:psd2@adorsys.de">Contact</a>
         </li>
+
+        <li>
+          <div
+            class="btn-group btn-group-toggle language-switcher"
+            data-toggle="buttons"
+          >
+            <label
+              class="btn btn-secondary"
+              for="de"
+              [ngClass]="{
+                active: (selectedLanguage$ | async) == languages.de
+              }"
+              >DE
+              <input
+                name="state-d"
+                type="radio"
+                id="de"
+                autocomplete="off"
+                (change)="onSelectLanguage(languages.de)"
+                [checked]="(selectedLanguage$ | async) == languages.de"
+              />
+            </label>
+
+            <label
+              class="btn btn-secondary"
+              for="en"
+              [ngClass]="{
+                active: (selectedLanguage$ | async) == languages.en
+              }"
+              >EN
+              <input
+                name="state-d"
+                type="radio"
+                id="en"
+                autocomplete="off"
+                checked
+                (change)="onSelectLanguage(languages.en)"
+                [checked]="(selectedLanguage$ | async) == languages.en"
+              />
+            </label>
+          </div>
+        </li>
       </ul>
     </div>
   </div>

@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CertificateService } from '../certificate.service';
 import { CertificateRequest } from '../../../models/certificateRequest';
 import { PspRole } from '../../../models/pspRole';
@@ -7,6 +6,9 @@ import { CertificateResponse } from '../../../models/certificateResponse';
 import JSZip from 'jszip';
 import { ErrorHandler } from '../../common/error-handler';
 import { HttpError } from '../../../models/httpError';
+import { LanguageService } from '../../language.service';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'sb-generate-certificate-page',
@@ -19,6 +21,7 @@ export class CreateCertPageComponent implements OnInit {
   pspRolesKeys = Object.keys(PspRole);
   errors: Array<HttpError>;
   certResponse: CertificateResponse;
+  public localizedContent$: Observable<string>;
 
   static generateZipFile(certBlob, keyBlob): Promise<any> {
     const zip = new JSZip();
@@ -28,9 +31,8 @@ export class CreateCertPageComponent implements OnInit {
   }
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private certService: CertificateService
+    private certService: CertificateService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit() {
@@ -45,6 +47,10 @@ export class CreateCertPageComponent implements OnInit {
       stateOrProvinceName: 'Bayern',
       validity: 365,
     };
+
+    this.localizedContent$ = this.languageService
+      .getLanguage$()
+      .pipe(map(lang => `assets/docs/${lang}/create-cert-page.md`));
   }
 
   createAndDownloadCert() {
