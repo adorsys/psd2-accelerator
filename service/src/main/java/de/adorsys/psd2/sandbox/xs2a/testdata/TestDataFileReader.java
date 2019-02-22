@@ -1,10 +1,10 @@
 package de.adorsys.psd2.sandbox.xs2a.testdata;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Amount;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -14,12 +14,16 @@ import java.util.UUID;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 @Component
 class TestDataFileReader {
+
+  private static Logger log = LoggerFactory.getLogger(TestDataFileReader.class);
 
   private static final String EXPECTED_HEADER = "bookingStatus|endToEndId|mandateId|creditorId|"
       + "bookingDate|valueDate|currency|amount|creditorName|creditorIban|creditorAccountCurrency|"
@@ -28,7 +32,7 @@ class TestDataFileReader {
       + "bankTransactionCode|proprietaryBankTransactionCode";
   private static final int EXPECTED_NUMBER_COLUMNS = 21;
   private static final String EXPECTED_PATH_OR_DEFAULT = "${sandbox.testdata.transactions.path:"
-      + "classpath:transactions_dump.csv}";
+      + "classpath:/transactions_dump.csv}";
 
   private ResourceLoader resourceLoader;
   private String fileName;
@@ -45,12 +49,13 @@ class TestDataFileReader {
       fileName = "file:" + fileName;
     }
 
-    BufferedReader reader;
+    log.info("Import transactions for giro account of PSU-Successful from {}", fileName);
+
     CSVParser csvParser;
     HashMap<String, Transaction> transactionMap = new HashMap<>();
-    try {
-      reader = Files
-          .newReader(resourceLoader.getResource(fileName).getFile(), Charsets.UTF_8);
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+        resourceLoader.getResource(fileName).getInputStream(), Charsets.UTF_8)
+    )) {
       if (!reader.readLine().equals(EXPECTED_HEADER)) {
         throw new ParseException("Error while reading transaction file \n"
             + "Header does not match the following format: \n"
