@@ -219,14 +219,13 @@ public class RedirectService {
    * Returns Object which contains the necessary Consent Information for OnlineBanking Website.
    *
    * @param externalId externalId
-   * @return OnlineBankingData
+   * @return OnlineBankingData or Optional.empty()
    */
-  public OnlineBankingData getOnlineBankingDataForConsent(String externalId) {
+  public Optional<OnlineBankingData> getOnlineBankingDataForConsent(String externalId) {
     Optional<AisConsentAuthorization> aisAuthorisation = aisConsentAuthorizationRepository
         .findByExternalId(externalId);
     if (!aisAuthorisation.isPresent()) {
-      //TODO handle error case
-      return null;
+      return Optional.empty();
     }
 
     ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
@@ -234,21 +233,20 @@ public class RedirectService {
     TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
     String tppRedirectUri = getRedirectUri(tppInfo, aisAuthorisation.get().getScaStatus());
 
-    return new OnlineBankingData(tppRedirectUri, consentStatus.getValue());
+    return Optional.of(new OnlineBankingData(tppRedirectUri, consentStatus.getValue()));
   }
 
   /**
    * Returns Object which contains the necessary Payment Information for OnlineBanking Website.
    *
    * @param externalId externalId
-   * @return OnlineBankingData
+   * @return OnlineBankingData or Optional.empty()
    */
-  public OnlineBankingData getOnlineBankingData(String externalId) {
+  public Optional<OnlineBankingData> getOnlineBankingData(String externalId) {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
     if (!pisAuthorization.isPresent()) {
-      //TODO handle error case
-      return null;
+      return Optional.empty();
     }
 
     TransactionStatus transactionStatus = pisAuthorization.get().getPaymentData()
@@ -266,7 +264,8 @@ public class RedirectService {
     ScaStatus scaStatus = commonPaymentData.get().getAuthorizations().get(0).getScaStatus();
     String tppRedirectUri = getRedirectUri(tppInfo, scaStatus);
 
-    return new OnlineBankingData(tppRedirectUri, transactionStatus.getTransactionStatus());
+    return Optional
+        .of(new OnlineBankingData(tppRedirectUri, transactionStatus.getTransactionStatus()));
   }
 
   private String getRedirectUri(TppInfoEntity tppInfo, ScaStatus scaStatus) {

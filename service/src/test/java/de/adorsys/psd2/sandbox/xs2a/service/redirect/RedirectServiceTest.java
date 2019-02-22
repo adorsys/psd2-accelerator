@@ -82,7 +82,7 @@ public class RedirectServiceTest {
       when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.REJECTED);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/unsuccessfulsca", data.getTppRedirectUri());
       assertEquals("rejected", data.getResourceStatus());
@@ -94,7 +94,7 @@ public class RedirectServiceTest {
       when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.VALID);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("valid", data.getResourceStatus());
@@ -106,7 +106,7 @@ public class RedirectServiceTest {
       when(aisAuth.getConsent().getConsentStatus()).thenReturn(ConsentStatus.REJECTED);
       when(tppInfo.getNokRedirectUri()).thenReturn(null);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingDataForConsent(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("rejected", data.getResourceStatus());
@@ -137,7 +137,7 @@ public class RedirectServiceTest {
       when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.RJCT);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/unsuccessfulsca", data.getTppRedirectUri());
       assertEquals("Rejected", data.getResourceStatus());
@@ -150,7 +150,7 @@ public class RedirectServiceTest {
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
 
-      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("AcceptedSettlementCompleted", data.getResourceStatus());
@@ -162,7 +162,7 @@ public class RedirectServiceTest {
       when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.RJCT);
       when(tppInfo.getNokRedirectUri()).thenReturn(null);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
-      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID);
+      OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("Rejected", data.getResourceStatus());
