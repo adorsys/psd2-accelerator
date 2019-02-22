@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Error Page</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+      align-items: center;
+    }
+
+    .starter-template {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  </style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <div class="starter-template">
+    <h2>
+      <span th:text="'ERROR: externalId not found!'"></span>
+    </h2>
+    <p th:text="'The externalId ' + ${externalId} + ' within your scaRedirectUrl can not be matched internally'"></p>
+  </div>
+
+</div>
+<!-- /.container -->
+
+</body>
+
+</html>
