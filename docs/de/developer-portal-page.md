@@ -5,7 +5,7 @@
 ## Einleitung
 
 Die [Payment Service Directive 2 (PSD2)](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32015L2366&from=EN)
-schreibt Banken einen einheitlichen Standard für eine Account-Schnittstelle erreichbar für Drittanbieter vor. Im weiteren Text wird diese Account-Schnittstelle als "XS2A" bezeichnet, was für Access-to-Account steht.
+schreibt Banken vor eine standardisierte Account-Schnittstelle für Drittanbieter (TPPs) bereitzustellen. Im weiteren Text wird diese Account-Schnittstelle als "XS2A" bezeichnet, was für Access-to-Account steht.
 Der Produktivgang dieser Live-Schnittstelle ist für September 2019 vorgeschrieben. XS2A
 setzt sich aus folgende Banking-Funktionalitäten: Zahlungsinitiierung (PIS = Payment Initiation Service), Kontodatenabfrage (AIS = Account Information Service) und Abfrage von Zahlungsfähigkeit (FCS = Funds Confirmation Service).
 Um die Einhaltung der Frist zu gewährleisten und Fehlerbehebungen und Anpassungen berücksichtigen zu können, verpflichtet PSD2 die Banken eine Testversion der Schnittstelle bereits im März 2019 zur Verfügung zu stellen.
@@ -93,7 +93,7 @@ Ein Beispiel dafür wäre:`?psu-id=PSU-Successful`.
 
 ### Zahlungsinitiierung
 
-Um ein Payment zu initiieren, ersetzen Sie die Debitor-IBAN in Ihrem Request mit der gewünschten IBAN von einem der definierten PSUs. Um das Payment zu authorisieren, benutzen Sie den Redirect-Link, wie im vorherigen Absatz beschrieben.
+Um ein Payment zu initiieren, ersetzen Sie die Debitor-IBAN in Ihrem Request mit der gewünschten IBAN von einem der definierten PSUs. Um das Payment zu authorisieren, benutzen Sie den SCA Redirect-Link, wie im vorherigen Absatz beschrieben.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers`
 
@@ -184,7 +184,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 
 ### Löschen eines Payments
 
-Um ein Payment zu löschen, fügen Sie Ihre Payment-Id in den Delete Payment Endpoint ein. Um die Authorisierung der Löschung durchzuführen, benutzen Sie den Redirect-Link, wie im vorherigen Absatz beschrieben.
+Um ein Payment zu löschen, fügen Sie Ihre Payment-Id in den Delete Payment Endpoint ein. Um die Authorisierung der Löschung durchzuführen, benutzen Sie den SCA Redirect-Link, wie im vorherigen Absatz beschrieben.
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/paymentId`
 
@@ -209,14 +209,15 @@ Um den Transaction Status eines Payments abzufragen, fügen Sie Ihre Payment-Id 
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACCP               |
 
-### Consent Anlage
+### Erstellung eines Dedicated Consent
 
-Um Kontodaten abfragen zu können, ist es voarb notwendig einen sogenannten Consent anzulegen. Dabei handelt es sich um eine Art Einverständniserklärung mit einer definierten Gültigkeit, die es erlaubt je nach Art des Consents Kontodaten für einen festgelegten Gültigkeitszeitraum abzufragen.
-Um einen Consent anzulegen, ersetzen Sie die IBAN in Ihrem Request mit Ihrer gewünschten IBAN von einem der definierten PSUs. Um die Authorisierung der Löschung durchzuführen, benutzen Sie den Redirect-Link, wie im vorherigen Absatz beschrieben.
+Um Accounts abfragen zu können, ist es vorab notwendig einen sogenannten Dedicated Consent anzulegen. Dabei handelt es sich um eine Art Einverständniserklärung mit einer definierten Gültigkeit, 
+die es erlaubt je nach Art des Consents Accounts für einen festgelegten Gültigkeitszeitraum abzufragen. Um einen Dedicated Consent anzulegen, ersetzen Sie die IBAN in Ihrem Request mit der IBAN 
+Ihres gewünschten PSU. Den Consent können Sie, wie im vorherigen Absatz beschrieben, mit dem SCA Redirect-Link authorisieren.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
-Der nachfolgende Code beschreibt einen beispielhaften cURL command, der einen consent für PSU "PSU-Successful" anlegt:
+Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der einen Dedicated Consent für PSU "PSU-Successful" anlegt:
 
 ```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
@@ -262,10 +263,44 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |
 
+
+### Erstellung eines Bank Offered Consent
+
+Um einen Bank Offered Consent anzulegen, ersetzen Sie die Iban in Ihrem Request mit der Ihres gewünschten PSU. Um den Consent zu authorisieren, benutzen Sie bitte den SCA Redirect-Link, wie im vorherigen Absatz beschrieben. 
+
+`POST https://sandbox-api.dev.adorsys.de/v1/consents`
+
+Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der einen Bank Offered Consent für PSU "PSU-Successful" anlegt:
+
+```
+curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
+  `# get these two files from the PSD2 Accelerator certificate generator` \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{
+  "access": {
+    "accounts": [],
+    "balances": [],
+    "transactions": []
+},
+  "recurringIndicator": true,
+  "validUntil": "2020-12-31",
+  "frequencyPerDay": 4,
+  "combinedServiceIndicator": true
+}'
+```
+
+Die Anlage eines Bank Offered Consent, funktioniert nur für den PSU-Successful. Mit der ConsentId, die bei der Erstellung eines Bank Offered Consent generiert wird, 
+können Sie über den GET Accounts Endpunkt die ersten beiden Accounts des PSU-Successful abfragen. Die Response Ihres Bank Offered Consent können Sie mit der Tabelle 
+im vorherigen Abschnitt "Erstellung eines Dedicated Consent" abgleichen.
+
 ### Consent Löschung
 
-Um einen Consent zu löschen, fügen Sie Ihre Consent-ID in den Delete
-Consent Endpoint ein.
+Um einen Consent zu löschen, fügen Sie Ihre Consent-ID in den Delete Consent Endpoint ein. Um die Authorisierung der Löschung durchzuführen, benutzen Sie den SCA Redirect-Link wie im vorherigen Absatz beschrieben.
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/consents/consentId`
 
@@ -276,13 +311,13 @@ Consent Endpoint ein.
 | PSU-Blocked       | DE13760365681209386222 | _(no Consent Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | terminatedByTpp                 |
 
-### Abfragen von Kontodaten
+### Abfragen von Accounts
 
-Um Kontodaten abzufragen, ersetzen Sie die IBAN in Ihrem Request mit der gewünschten IBAN von einem der definierten PSUs.
+Um Accounts abzufragen, ersetzen Sie die IBAN in Ihrem Request mit der gewünschten IBAN von einem der definierten PSUs.
 
 `GET https://sandbox-api.dev.adorsys.de/v1/accounts`
 
-Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der alle Kontodaten des PSU "PSU-Successful" abfragt:
+Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der alle Accounts des PSU "PSU-Successful" abfragt:
 
 ```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
@@ -295,7 +330,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
   --key private.key \
 ```
 
-Der nachfolgende Code beschreibt eine beispielhafte Response für eine erfolgreiche Abfrage der Kontodaten:
+Der nachfolgende Code beschreibt eine beispielhafte Response für eine erfolgreiche Abfrage der Accounts:
 
 ```json
 {
