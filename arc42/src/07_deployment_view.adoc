@@ -134,6 +134,7 @@ The CSV must comply with the following restrictions:
 - A header line is mandatory and must match the example
 - Dates must be in the ISO format (YYYY-MM-DD)
 - Payment amounts must use `.` instead of `,` as floating point separator
+- Empty lines will be skipped
 
 
 See <<Configuration>> for more information about the Spring Boot configuration mechanism.

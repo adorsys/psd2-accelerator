@@ -66,14 +66,20 @@ class TestDataFileReader {
       Transaction transaction;
 
       for (CSVRecord csvRecord : csvParser) {
-        transaction = mapTransactionFromFile(csvRecord);
-        transactionMap.put(transaction.getTransactionId(), transaction);
+        if (!isEmptyLine(csvRecord)) {
+          transaction = mapTransactionFromFile(csvRecord);
+          transactionMap.put(transaction.getTransactionId(), transaction);
+        }
       }
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
 
     return transactionMap;
+  }
+
+  private boolean isEmptyLine(CSVRecord csvRecord) {
+    return csvRecord.size() == 1;
   }
 
   private Transaction mapTransactionFromFile(CSVRecord csvRecord) throws ParseException {

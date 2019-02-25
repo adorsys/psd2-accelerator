@@ -81,4 +81,18 @@ public class TestDataFileReaderTest {
           e.getMessage());
     }
   }
+
+  @Test
+  public void readFileWithWrongEmptyLine() {
+    when(resourceLoader.getResource(anyString()))
+        .thenReturn(new ClassPathResource("/testData/transactions_dump_empty_line.csv"));
+
+    HashMap<String, Transaction> transactions = testDataFileReader.readTransactionsFromFile();
+
+    transactions.forEach((key, value) -> {
+      assertThat(false, equalTo(value.getRemittanceInfo().isEmpty()));
+      assertThat(BigDecimal.class, equalTo(value.getAmount().getAmount().getClass()));
+    });
+    assertThat(transactions.size(), equalTo(5));
+  }
 }
