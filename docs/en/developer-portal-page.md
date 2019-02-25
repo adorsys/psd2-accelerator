@@ -46,7 +46,7 @@ _Figure 1.1: Components of the PSD2 Accelerator_
 
 ### Active XS2A Configuration (Bank Profile)
 
-```
+```yaml
         ---
         setting:
           frequencyPerDay: 5
@@ -82,8 +82,6 @@ _Figure 1.1: Components of the PSD2 Accelerator_
           paymentCancellationRedirectUrlExpirationTimeMs: 600000
 ```
 
-## &nbsp;
-
 ## Getting started
 
 In order to test the services of XS2A you need to execute the following
@@ -108,7 +106,6 @@ Each use case contains a table with the fitting PSU-IDs, the Iban and
 the expected status. Therefore, you can check if your outcome is
 correct. Furthermore, some use cases contain an example request and its
 response.
-&nbsp;
 
 ### Simulation of SCA
 
@@ -137,14 +134,13 @@ Redirect described in the previous section.
 The following code snippet is an example cURL command which initiates a
 single payment for PSU "PSU-Successful":
 
-```
+```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "PSU-IP-Address: 192.168.8.78" \
   -H "Content-Type: application/json" \
   -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
   -d '{
@@ -159,7 +155,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     },
     "creditorAccount":{
       "currency": "EUR",
-      "iban": "DE31760365686202206855"
+      "iban": "DE15500105172295759744"
     },
     "creditorName": "WBG",
     "creditorAddress": {
@@ -176,14 +172,13 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 The following code snippet is an example response for a successful
 payment:
 
-```
+```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "PSU-IP-Address: 192.168.8.78" \
   -H "Content-Type: application/json" \
   -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
   -d '{
@@ -198,7 +193,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     },
     "creditorAccount":{
       "currency": "EUR",
-      "iban": "DE31760365686202206855"
+      "iban": "DE15500105172295759744"
     },
     "creditorName": "WBG",
     "creditorAddress": {
@@ -260,24 +255,23 @@ Payment Status Endpoint.
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
 
-### Dedicated Consent Creation
+### Consent Creation
 
-In order to create a dedicated consent, replace the Iban in your request with the
+In order to create a consent, replace the Iban in your request with the
 one of your favored PSU. To legitimate the consent creation, use the SCA
 Redirect described in the previous section.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
 The following code snippet is an example cURL command which creates a
-dedicated consent for PSU "PSU-Successful":
+consent for PSU "PSU-Successful":
 
-```
+```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "Content-Type: application/json" \
   -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
   -d '{
@@ -316,43 +310,6 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |
 
-### Bank Offered Consent Creation
-
-In order to create a bank offered consent, replace the Iban in your request with the
-one of your favored PSU. To legitimate the consent creation, use the SCA
-Redirect described in the previous section.
-
-`POST https://sandbox-api.dev.adorsys.de/v1/consents`
-
-The following code snippet is an example cURL command which creates a
-bank offered consent for PSU "PSU-Successful":
-
-```
-curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
-  -H "accept: application/json" \
-  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
-  -H "Content-Type: application/json" \
-  -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
-  --cert certificate.pem \
-  --key private.key \
-  -d '{
-  "access": {
-    "accounts": [],
-    "balances": [],
-    "transactions": []
-},
-  "recurringIndicator": true,
-  "validUntil": "2020-12-31",
-  "frequencyPerDay": 4,
-  "combinedServiceIndicator": true
-}'
-```
-
-Bank offered consent works only for PSU-Successful. The Post Consent for bank offered consent creates a consentId,
-which you can use to access the first two accounts of PSU-Successful with the Get Account Data Endpoint.
-Compare your consent response with the table in the previous section "Dedicated Consent Creation".
-
 ### Consent Deletion
 
 In order to delete a consent, insert your consentId in the Delete
@@ -377,14 +334,13 @@ the one of your favored PSU.
 The following code snippet is an example cURL command which gets all the
 account data from PSU "PSU-Successful":
 
-```
+```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "Content-Type: application/json" \
   -H "consent-id: I58hV2nWPJVJEvuw0dzl8qBkGcz40Qo_BCd_CjnTf_vsx7DeU-pL5sFaqwNUzbAThuXzrcFlVLs6eEVHdoFgKQ==_=_bS6p6XvTWI" \
   -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
 ```
@@ -392,27 +348,38 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
 The following code snippet is an example response for successful GET
 Account Data:
 
-```
+```json
 {
   "accounts": [
-      {
-          "resourceId": "8660d175-2c79-4b68-a175-93b1866dc7e3",
-          "iban": "DE11760365688833114935",
-          "bban": "",
-          "msisdn": "",
-          "currency": "EUR",
-          "name": "",
-          "product": "Current Account",
-          "cashAccountType": "CACC",
-          "status": null,
-          "bic": "",
-          "linkedAccounts": "",
-          "usage": null,
-          "details": "",
-          "balances": null,
-          "_links":  {
-              "viewTransactions": "https://sandbox-api.dev.adorsys.de/v1/accounts/8660d175-2c79-4b68-a175-93b1866dc7e3/transactions"
-       }
+    {
+      "resourceId": "8660d175-2c79-4b68-a175-93b1866dc7e3",
+      "iban": "DE11760365688833114935",
+      "bban": "",
+      "msisdn": "",
+      "currency": "EUR",
+      "name": "",
+      "product": "Current Account",
+      "cashAccountType": "CACC",
+      "status": null,
+      "bic": "",
+      "linkedAccounts": "",
+      "usage": null,
+      "details": "",
+      "balances": [
+        {
+          "balanceAmount": {
+            "currency": "EUR",
+            "amount": "1500"
+          },
+          "balanceType": null,
+          "lastChangeDateTime": null,
+          "referenceDate": null,
+          "lastCommittedTransaction": null
+        }
+      ],
+      "_links": {
+        "viewTransactions": "https://sandbox-api.dev.adorsys.de/v1/accounts/8660d175-2c79-4b68-a175-93b1866dc7e3/transactions"
+      }
     }
   ]
 }
@@ -433,5 +400,3 @@ Account Data:
 - an account has a lower available balance than accounting balance
   (DE71760365681257681381)
 - the currency of an account is USD (DE56760365681650680255)
-
-../../../../../docs/en/developer-portal-page.md

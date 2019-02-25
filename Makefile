@@ -10,7 +10,7 @@
 # use jq or node to get the version
 ACCELERATOR_VERSION=$(shell jq -r .version ui/package.json)
 JAVA_SRC = $(shell find service/src)
-TS_SRC = $(shell find ui/src)
+TS_SRC = $(shell find ui/src -type f)
 ARC42_SRC = $(shell find arc42/src)
 PLANTUML_SRC = $(shell find arc42/diagrams -type f -name '*.puml')
 DEPENDENCIES = jq npm plantuml asciidoctor docker-compose mvn
