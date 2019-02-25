@@ -94,8 +94,8 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    Optional<OnlineBankingData> data = redirectService.getOnlineBankingDataForConsent(externalId);
     redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
+    Optional<OnlineBankingData> data = redirectService.getOnlineBankingDataForConsent(externalId);
 
     if (!data.isPresent()) {
       return "error-page";

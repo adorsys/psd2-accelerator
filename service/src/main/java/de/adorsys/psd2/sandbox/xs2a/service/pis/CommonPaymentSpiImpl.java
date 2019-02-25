@@ -5,7 +5,6 @@ import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPaymentInfo;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
-import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.CommonPaymentSpi;
 import org.jetbrains.annotations.NotNull;
@@ -13,14 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CommonPaymentSpiImpl implements CommonPaymentSpi {
-
-  @Override
-  public @NotNull SpiResponse<SpiPaymentInitiationResponse> initiatePayment(
-      @NotNull SpiContextData contextData,
-      @NotNull SpiPaymentInfo payment,
-      @NotNull AspspConsentData initialAspspConsentData) {
-    return null;
-  }
 
   @Override
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
