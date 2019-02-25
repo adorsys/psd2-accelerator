@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.com/adorsys/psd2-accelerator.svg?branch=master)](https://travis-ci.com/adorsys/psd2-accelerator)
 
-
 <img src="arc42/images/accelerator.png" width="50%" align="center">
 
 _Figure 1.1:_ Components of the PSD2 Accelerator
