@@ -1,0 +1,9 @@
+bookingStatus|endToEndId|mandateId|creditorId|bookingDate|valueDate|currency|amount|creditorName|creditorIban|creditorAccountCurrency|ultimateCreditor|debtorName|debtorIban|debtorAccountCurrency|ultimateDebtor|remittanceInformationUnstructured|remittanceInformationStructured|purposeCode|bankTransactionCode|proprietaryBankTransactionCode
+
+booked||||2018-08-12|2018-08-12|EUR|-52.93|Tankstelle Weyarn Munchener Strase 32//Weyarn/DE|DE13760365681209386222|EUR||Isabella Ionescu|DE13760365689669622432|EUR||2018-07-20T15:08 Debitk.3 2019-03|2018-07-20T15:08 Debitk.3 2019-03|OTHR|5|5
+
+booked||||2018-08-01|2018-08-01|EUR|2500|Felix Borchert & Söhne GmbH|DE68760365687914626923|EUR||Isabella Ionescu|DE13760365689669622432|EUR||Gehalt August 2018|Gehalt August 2018|OTHR|5|5
+
+booked||||2018-02-01|2018-02-01|EUR|-17.50|CLIMBING-SOLUTIONS GMBH//Stuttgart/DE|DE68760365687914626923|EUR||Isabella Ionescu|DE13760365689669622432|EUR||2018-10-08T11:05 Debitk.3 2029-03|2018-10-08T11:05 Debitk.3 2029-03|OTHR|5|5
+booked||||2018-08-18|2018-08-18|EUR|-830|Hans Schlegl|DE68760365687914626923|EUR||Isabella Ionescu|DE13760365689669622432|EUR||Miete, Grünwälderstr. 49, 2.OG rechts|Miete, Grünwälderstr. 49, 2.OG rechts|OTHR|5|5
+booked||||2019-02-01|2019-02-01|EUR|-67.50|Strom-Gesellschaft Nürnberg|DE68760365687914626923|EUR||Isabella Ionescu|DE13760365689669622432|EUR||KTO 84633821 Abschlag 67,00 EUR faellig 01.08.18 Moritz-Str. 12|KTO 84633821 Abschlag 67,00 EUR faellig 01.08.18 Moritz-Str. 12|OTHR|5|5
