@@ -114,7 +114,7 @@ The IBANs of the different PSUs we provide are configurable. There is a default 
 include::../../service/src/main/resources/testdata.yml[]
 ----
 
-Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the configuration by placing an edited copy in `$CWD/config` next to the JAR.
+Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the configuration by placing an edited copy in `$CWD/config/testdata.yml` next to the JAR.
 
 WARNING: Make sure that every IBAN you use is valid. We do not check externally set IBANs for correctness. If you use invalid IBANs, you might encounter problems when interacting with the XS2A API or with external systems. If a PSU has more than one IBAN, you need to supply all of them or the application won't start. To help with configuration and debugging, the effective `TestDataConfiguration` is logged (`INFO`) to the console at startup.
 
