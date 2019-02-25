@@ -159,7 +159,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     },
     "creditorAccount":{
       "currency": "EUR",
-      "iban": "DE15500105172295759744"
+      "iban": "DE31760365686202206855"
     },
     "creditorName": "WBG",
     "creditorAddress": {
@@ -198,7 +198,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
     },
     "creditorAccount":{
       "currency": "EUR",
-      "iban": "DE15500105172295759744"
+      "iban": "DE31760365686202206855"
     },
     "creditorName": "WBG",
     "creditorAddress": {
@@ -409,18 +409,7 @@ Account Data:
           "linkedAccounts": "",
           "usage": null,
           "details": "",
-          "balances": [
-              {
-                  "balanceAmount":  {
-                      "currency": "EUR",
-                      "amount": "1500"
-                  },
-                  "balanceType": null,
-                  "lastChangeDateTime": null,
-                  "referenceDate": null,
-                  "lastCommittedTransaction": null
-             }
-          ],
+          "balances": null,
           "_links":  {
               "viewTransactions": "https://sandbox-api.dev.adorsys.de/v1/accounts/8660d175-2c79-4b68-a175-93b1866dc7e3/transactions"
        }
