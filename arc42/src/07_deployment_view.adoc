@@ -93,8 +93,20 @@ a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` heade
 | SPRING_DATASOURCE_URL                          | JDBC URL                            | _(not set)_
 | SPRING_DATASOURCE_USERNAME                     | DB username                         | _(not set)_
 | SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA
-| DB schema name (depends on used DB and configuration)
-| _(not set)_
+| DB schema name (depends on used DB and configuration)                                | _(not set)_
+| SANDBOX_FEATURE_UI_CERTPAGE_ENABLED            | Enables/Disables the certificate page in the ui
+
+Possible values are: _true_ or _false_            | _true_
+| SANDBOX_UI_CONTACT_MAILTO                       | Contact email address
+
+ Format: _mailto:YOUR@MAILADRESS.DE_ | psd2@adorsys.de
+| SANDBOX_UI_LOGO                                | URL to customized ui logo           | Points to the default psd2-accelerator logo embedded in the application
+| SANDBOX_UI_CONTENT_URLS_DE_CERT                        | URL to customized german markdown file for certificate page | Points to the default german `create-cert-page.md` embedded in the application
+| SANDBOX_UI_CONTENT_URLS_DE_FAQ                        | URL to customized german markdown file for faq page | Points to the default german `faq-page.md` embedded in the application
+| SANDBOX_UI_CONTENT_URLS_DE_PORTAL                        | URL to customized german markdown file for portal page | Points to the default german `developer-portal-page.md` embedded in the application
+| SANDBOX_UI_CONTENT_URLS_EN_CERT                        | URL to customized english markdown file for certificate page | Points to the default english `create-cert-page.md` embedded in the application
+| SANDBOX_UI_CONTENT_URLS_EN_FAQ                        | URL to customized english markdown file for faq page | Points to the default english `faq-page.md` embedded in the application
+| SANDBOX_UI_CONTENT_URLS_EN_PORTAL                        | URL to customized english markdown file for portal page | Points to the default english `developer-portal-page.md` embedded in the application
 |=======
 
 [[sample-bank-profile]]

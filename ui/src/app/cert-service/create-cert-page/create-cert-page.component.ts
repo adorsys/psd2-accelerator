@@ -6,9 +6,12 @@ import { CertificateResponse } from '../../../models/certificateResponse';
 import JSZip from 'jszip';
 import { ErrorHandler } from '../../common/error-handler';
 import { HttpError } from '../../../models/httpError';
-import { LanguageService } from '../../language.service';
+import { LanguageService } from '../../common/services/language.service';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Config } from '../../../models/config';
+import { ConfigService } from '../../common/services/config.service';
+import { Language } from '../../../models/language';
 
 @Component({
   selector: 'sb-generate-certificate-page',
@@ -22,6 +25,7 @@ export class CreateCertPageComponent implements OnInit {
   errors: Array<HttpError>;
   certResponse: CertificateResponse;
   public localizedContent$: Observable<string>;
+  public config: Config;
 
   static generateZipFile(certBlob, keyBlob): Promise<any> {
     const zip = new JSZip();
@@ -32,8 +36,11 @@ export class CreateCertPageComponent implements OnInit {
 
   constructor(
     private certService: CertificateService,
-    private languageService: LanguageService
-  ) {}
+    private languageService: LanguageService,
+    private configService: ConfigService
+  ) {
+    this.config = this.configService.getConfig();
+  }
 
   ngOnInit() {
     this.certData = {
@@ -50,7 +57,14 @@ export class CreateCertPageComponent implements OnInit {
 
     this.localizedContent$ = this.languageService
       .getLanguage$()
-      .pipe(map(lang => `assets/docs/${lang}/create-cert-page.md`));
+      .pipe(map(lang => this.getMarkdownFiles(lang)));
+  }
+
+  getMarkdownFiles(lang: Language): string {
+    if (lang === Language.de) {
+      return this.config.contentUrlsDe.cert;
+    }
+    return this.config.contentUrlsEn.cert;
   }
 
   createAndDownloadCert() {

@@ -1,6 +1,6 @@
 import { Component, NgModule } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LanguageService } from './language.service';
+import { LanguageService } from './common/services/language.service';
 
 @Component({
   selector: 'sb-root',
