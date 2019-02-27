@@ -2,7 +2,7 @@
   <div class="header container-fluid">
     <a class="navbar-brand" href="#"></a>
     <span class="header__logo">
-      <img src="assets/logo-accelerator.svg" alt="adorsys logo" />
+      <img [src]="config.logoUrl" alt="adorsys logo" />
     </span>
     <button
       class="navbar-toggler"
@@ -22,7 +22,11 @@
             >Developer Portal <span class="sr-only">(current)</span>
           </a>
         </li>
-        <li class="nav-item" routerLinkActive="active">
+        <li
+          class="nav-item"
+          routerLinkActive="active"
+          *ngIf="config.certPageEnabled"
+        >
           <a class="nav-link" routerLink="/certificate-service"
             >Certificate Service</a
           >
@@ -31,7 +35,7 @@
           <a class="nav-link" routerLink="/faqs">FAQs</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="mailto:psd2@adorsys.de">Contact</a>
+          <a class="nav-link" [href]="config.contactMailto">Contact</a>
         </li>
 
         <li>
