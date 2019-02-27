@@ -152,6 +152,6 @@ Don't. Fail forward, create a new release and tell everybody you messed up. Won'
 - [Spring Boot 1.5.x](https://projects.spring.io/spring-boot/)
 - [Angular CLI 7.x.x](https://github.com/angular/angular-cli)
 
-## License
+## LicenseTESTDONOTMERGE
 
 This project is licensed under the Apache License version 2.0 - see the LICENSE.md file for details.
