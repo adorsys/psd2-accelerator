@@ -172,39 +172,24 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
 The following code snippet is an example response for a successful
 payment:
 
-```sh
-curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
-  -H "accept: application/json" \
-  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
-  -H "PSU-IP-Address: 192.168.8.78" \
-  -H "Content-Type: application/json" \
-  -H "tpp-redirect-uri: https://adorsys.de/" \
-  --cert certificate.pem \
-  --key private.key \
-  -d '{
-    "endToEndIdentification": "WBG-123456789",
-    "debtorAccount": {
-      "currency": "EUR",
-      "iban": "DE11760365688833114935"
+```json
+{
+    "transactionStatus": "RCVD",
+    "paymentId": "FHQ0W-JVRLEuMwDXAYnRaRiEY5gFzU333uIo9CrgAxU6bEHR4m6hs_rkUaqcWwJqfPlpOwr468RhuFoTl0Y5Kg==_=_bS6p6XvTWI",
+    "transactionFees": null,
+    "transactionFeeIndicator": false,
+    "scaMethods": null,
+    "chosenScaMethod": null,
+    "challengeData": null,
+    "_links": {
+        "scaRedirect": "https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/65458d7e-2181-4e28-83cc-2a1900d1f727",
+        "self": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/FHQ0W-JVRLEuMwDXAYnRaRiEY5gFzU333uIo9CrgAxU6bEHR4m6hs_rkUaqcWwJqfPlpOwr468RhuFoTl0Y5Kg==_=_bS6p6XvTWI",
+        "status": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/FHQ0W-JVRLEuMwDXAYnRaRiEY5gFzU333uIo9CrgAxU6bEHR4m6hs_rkUaqcWwJqfPlpOwr468RhuFoTl0Y5Kg==_=_bS6p6XvTWI/status",
+        "scaStatus": "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/FHQ0W-JVRLEuMwDXAYnRaRiEY5gFzU333uIo9CrgAxU6bEHR4m6hs_rkUaqcWwJqfPlpOwr468RhuFoTl0Y5Kg==_=_bS6p6XvTWI/authorisations/65458d7e-2181-4e28-83cc-2a1900d1f727"
     },
-    "instructedAmount": {
-      "currency": "EUR",
-      "amount": "520.00"
-    },
-    "creditorAccount":{
-      "currency": "EUR",
-      "iban": "DE15500105172295759744"
-    },
-    "creditorName": "WBG",
-    "creditorAddress": {
-      "buildingNumber": "56",
-      "city": "Nürnberg",
-      "country": "DE",
-      "postalCode": "90543",
-      "street": "WBG Straße"
-    },
-    "remittanceInformationUnstructured": "Ref. Number WBG-1222"
-  }'
+    "psuMessage": null,
+    "tppMessages": null
+}
 ```
 
 | PSU-ID            | Iban                   | SCA Status                  | Transaction Status                  |
