@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- get back the spring default logging configuration instead of the XS2A one -->
-<configuration>
-  <include resource="org/springframework/boot/logging/logback/base.xml"/>
-</configuration>

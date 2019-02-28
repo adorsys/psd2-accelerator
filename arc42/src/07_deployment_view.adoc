@@ -60,10 +60,8 @@ Configuration is done via https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE
 
 NOTE: Spring Boot automatically translates properties to environment variables. The environment variable `SPRING_DATASOURCE_URL` sets the property `spring.datasource.url`. Consult the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/htmlsingle/#boot-features-external-config-application-property-files[Spring Boot documentation] for more information.
 
-==== sandbox
+==== Sandbox
 
-.Required Properties for sandbox
-[[propertyTable]]
 [options="header"]
 |=======
 | Property                   | Description        | Default
@@ -107,6 +105,8 @@ Possible values are: _true_ or _false_            | _true_
 | SANDBOX_UI_CONTENT_URLS_EN_CERT                        | URL to customized english markdown file for certificate page | Points to the default english `create-cert-page.md` embedded in the application
 | SANDBOX_UI_CONTENT_URLS_EN_FAQ                        | URL to customized english markdown file for faq page | Points to the default english `faq-page.md` embedded in the application
 | SANDBOX_UI_CONTENT_URLS_EN_PORTAL                        | URL to customized english markdown file for portal page | Points to the default english `developer-portal-page.md` embedded in the application
+| LOGGING_CONFIG                                 | Location of the logback configuration  | _classpath:sandbox-logback.xml_
+| CONSOLE_LOG_PATTERN                            | Sandbox log pattern (note: `logging.pattern.console` if not as ENV) | _[%-5level][%d{HH:mm:ss.SSS}] - %logger: %message%n%xException_
 |=======
 
 WARNING: It is required to enable CORS in the service which serves the customized markdown files for the UI. Otherwise the content can't be loaded and stays empty.
@@ -176,12 +176,6 @@ See <<Configuration>> for more information about the Spring Boot configuration m
 
 NOTE: The PSD2 Accelerator CA certificate (ca.crt) is already embedded in the _ssl-proxy_. If you supply your own instance of this component you need to configure the proper SSL and CA certificates there. You can get the PSD2 Accelerator CA certificate by extracting it from the _ssl-proxy_ image. See <<Deploy on Your Own Infrastructure>> for more details.
 
-==== Logging
-
-We use the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration] and log everything to stdout.
-
-The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=WARN` (global) or with `LOGGING_LEVEL_de.adorsys.psd2=WARN` (for everything below `de.adorsys.psd2`; please note the casing).
-
 === Deploy on Your Own Infrastructure
 
 The PSD2 Accelerator deployment is quite flexible. The only required component is the _sandbox_ and its DB.
@@ -217,6 +211,26 @@ See <<NGINX SSL Configuration>> for an actual sample of our NGINX configuration.
 - 2-4 GiB RAM per _sandbox_ deployment is a good starting point for prod *(monitor this!)*
 - _ssl-proxy_ needs 128 - 512 MiB RAM *(don't use in prod!)*
 - the DB schema needs enough disk space because consents are persisted here (grows over time) *(monitor this!)*
+
+==== Logging
+
+We use a modified https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration] with logback and log everything to stdout.
+
+* `FILE` appender is disabled
+* additional `access-log` logger which logs TPP access
+* default configuration parameters for the `CONSOLE` are supported
+
+The default log level is `INFO`. Set a different level with `LOGGING_LEVEL_ROOT=WARN` (global) or with `LOGGING_LEVEL_de.adorsys.psd2=WARN` (for everything below `de.adorsys.psd2`; please note the casing).
+
+To use a custom log configuration start the PSD2 Accelerator with `-Dlogging.config=my-logging-config.xml` to use your file at `$CWD/my-logging-config.xml`. See <<Configuration>>
+
+.Default Logging Configuration
+[source,yaml]
+----
+include::../../service/src/main/resources/sandbox-logback.xml[]
+----
+
+WARNING: If you use your own `logback.xml` we can't guarantee that the default Spring Boot configuration properties still work. Please check the docs thoroughly. Have a look at the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration], the https://logback.qos.ch/manual/configuration.html[Logback Documentation] and our `sandbox-logback.xml` to see whats possible.
 
 ==== Production Ready Features
 
