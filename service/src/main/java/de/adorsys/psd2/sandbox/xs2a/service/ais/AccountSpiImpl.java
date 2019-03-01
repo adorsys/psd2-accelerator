@@ -5,6 +5,7 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
+import de.adorsys.psd2.xs2a.core.ais.BookingStatus;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
@@ -82,11 +83,12 @@ public class AccountSpiImpl implements AccountSpi {
 
   @Override
   public SpiResponse<SpiTransactionReport> requestTransactionsForAccount(
-      @NotNull SpiContextData ctx,
+      @NotNull SpiContextData spiContextData,
       String acceptHeader,
       boolean withBalance,
-      @NotNull LocalDate localDate,
-      @NotNull LocalDate localDate1,
+      @NotNull LocalDate dateFrom,
+      @NotNull LocalDate dateTo,
+      @NotNull BookingStatus bookingStatus,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {

@@ -46,7 +46,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
     cancellationResponse.setCancellationAuthorisationMandated(true);
     cancellationResponse.setTransactionStatus(TransactionStatus.valueOf(
         paymentDataRepository.findByPaymentId(spiPayment.getPaymentId()).get().get(0)
-            .getTransactionStatus().name()));
+            .getPaymentData().getTransactionStatus().name()));
     return new SpiResponse<>(cancellationResponse, aspspConsentData);
   }
 
@@ -71,7 +71,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
 
       if (paymentDataList.isPresent()) {
         PisPaymentData payment = paymentDataList.get().get(0);
-        payment.setTransactionStatus(TransactionStatus.CANC);
+        payment.getPaymentData().setTransactionStatus(TransactionStatus.CANC);
         paymentDataRepository.save(payment);
         return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
       }

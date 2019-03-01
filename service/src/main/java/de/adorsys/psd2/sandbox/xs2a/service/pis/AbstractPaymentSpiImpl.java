@@ -65,7 +65,7 @@ class AbstractPaymentSpiImpl {
 
       if (paymentDataList.isPresent()) {
         PisPaymentData payment = paymentDataList.get().get(0);
-        payment.setTransactionStatus(TransactionStatus.ACCP);
+        payment.getPaymentData().setTransactionStatus(TransactionStatus.ACCP);
         paymentDataRepository.save(payment);
         return SpiResponse.<SpiPaymentExecutionResponse>builder()
             .aspspConsentData(aspspConsentData)
@@ -90,6 +90,6 @@ class AbstractPaymentSpiImpl {
         .findByPaymentId(paymentId);
 
     return paymentData.map(pisPaymentData -> TransactionStatus
-        .valueOf(pisPaymentData.get(0).getTransactionStatus().name()));
+        .valueOf(pisPaymentData.get(0).getPaymentData().getTransactionStatus().name()));
   }
 }
