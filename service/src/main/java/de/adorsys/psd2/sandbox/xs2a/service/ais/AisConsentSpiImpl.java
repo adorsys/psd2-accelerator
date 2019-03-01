@@ -13,6 +13,7 @@ import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.consent.SpiInitiateAisConsentResponse;
+import de.adorsys.psd2.xs2a.spi.domain.consent.SpiVerifyScaAuthorisationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.AisConsentSpi;
@@ -66,12 +67,14 @@ public class AisConsentSpiImpl implements AisConsentSpi {
   }
 
   @Override
-  public @NotNull SpiResponse<SpiResponse.VoidResponse> verifyScaAuthorisation(
+  public @NotNull SpiResponse<SpiVerifyScaAuthorisationResponse> verifyScaAuthorisation(
       @NotNull SpiContextData spiContextData,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
-    return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+    return new SpiResponse<>(
+        new SpiVerifyScaAuthorisationResponse(spiAccountConsent.getConsentStatus()),
+        aspspConsentData);
   }
 
   @Override

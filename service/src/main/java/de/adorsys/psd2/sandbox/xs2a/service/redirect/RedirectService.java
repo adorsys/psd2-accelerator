@@ -149,7 +149,7 @@ public class RedirectService {
         TransactionStatus newTxStatus = TransactionStatus.getByValue(
             psu.get().getTransactionStatusAfterCancellation().xs2aValue()
         );
-        pisPaymentData.setTransactionStatus(newTxStatus);
+        pisPaymentData.getPaymentData().setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
         ScaStatus newScaStatus = ScaStatus
             .fromValue(psu.get().getCancellationScaStatus().xs2aValue());
@@ -168,7 +168,7 @@ public class RedirectService {
           newTxStatus = TransactionStatus.RJCT;
         }
 
-        pisPaymentData.setTransactionStatus(newTxStatus);
+        pisPaymentData.getPaymentData().setTransactionStatus(newTxStatus);
         paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
 
         ScaStatus newScaStatus = ScaStatus
@@ -178,14 +178,14 @@ public class RedirectService {
           // automatically in the embedded approach (rat).
           PsuData psuData = new PsuData();
           psuData.setPsuId(psuId);
-          pisPaymentData.getPaymentData().getPsuData().add(psuData);
+          pisPaymentData.getPaymentData().getPsuDataList().add(psuData);
         }
 
         paymentAuth.setScaStatus(newScaStatus);
       }
     } else {
       TransactionStatus newTxStatus = TransactionStatus.RJCT;
-      pisPaymentData.setTransactionStatus(newTxStatus);
+      pisPaymentData.getPaymentData().setTransactionStatus(newTxStatus);
       paymentAuth.getPaymentData().setTransactionStatus(newTxStatus);
       paymentAuth.setScaStatus(ScaStatus.FAILED);
     }
