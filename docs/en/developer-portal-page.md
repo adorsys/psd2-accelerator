@@ -209,9 +209,12 @@ the "endDate".
 
 ### Payment Cancellation
 
-In order to cancel a payment, insert your Payment-Id in the Delete
-Payment Endpoint. To legitimate the payment cancellation, use the SCA
-Redirect described in the previous section.
+In order to cancel a payment, insert your Payment-Id in the Delete Payment
+Endpoint. Payment Cancellation requires an _explicit start of the
+authorisation process_, which means you need to follow the `startAuthorisation`
+link in the response (see the [XS2A Swagger UI](/swagger-ui.html)). From then on
+you can legitimate the payment cancellation by using the [SCA Redirect described
+in the previous section](developer-portal#simulation-of-sca).
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/paymentId`
 
