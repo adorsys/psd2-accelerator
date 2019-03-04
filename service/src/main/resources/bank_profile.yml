@@ -14,7 +14,7 @@ setting:
     - BOOKED
     - PENDING
   supportedAccountReferenceFields:
-    - MSISDN
+    - IBAN
   consentLifetime: 0
   transactionLifetime: 0
   allPsd2Support: false
@@ -32,3 +32,6 @@ setting:
     PERIODIC:
       - sepa-credit-transfers
   paymentCancellationRedirectUrlExpirationTimeMs: 600000
+  availableAccountsConsentSupported: false
+  scaByOneTimeAvailableAccountsConsentRequired: true
+  psuInInitialRequestMandated: false
