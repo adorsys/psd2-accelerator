@@ -52,4 +52,11 @@ describe('Certificate Service UI', () => {
         expect(file).toContain('-----BEGIN CERTIFICATE-----');
       });
   });
+
+  it('should change language of content', () => {
+    page.navigateTo('app/certificate-service');
+    expect(page.getDescriptionTitle()).toEqual('Certificate Service');
+    page.clickLanguageSwitcher();
+    expect(page.getDescriptionTitle()).toEqual('Zertifikatsservice');
+  });
 });

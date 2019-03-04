@@ -16,4 +16,8 @@ export class AppPage {
   clickDownloadButton() {
     element(by.css('.btn-primary')).click();
   }
+
+  clickLanguageSwitcher() {
+    element(by.css('.language-switcher')).click();
+  }
 }
