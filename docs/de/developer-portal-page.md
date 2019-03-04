@@ -20,47 +20,75 @@ Zertifikat bezeichnet. Für PSD2-Zwecke wird das Zertfikat anhand des QcStatemen
 Nach der Einbindung des QWAC in einem XS2A Request werdem Rolle und Signatur an einem zentralen Reverse Proxy validiert, bevor die Anfrage an die XS2A-Schnittstelle weitergeleitet wird, wo sich die Bankenlogik abspielt. Unsere Dokumentation finden Sie hier: [XS2A Swagger UI](/swagger-ui.html).
 
 Die beschriebenen Komponenten und das Zusammenspiel dieser, werden in Abbildung 1.1 dargestellt:
-displayed in Figure 1.1:
 
 ![PSD2 Accelerator](assets/accelerator.svg 'Figure 1.1: Components of the PSD2 Accelerator')
 _Figure 1.1: Components of the PSD2 Accelerator_
 
-### Aktuelle XS2A Konfiguration (Bank Profil)
+### Aktive XS2A Konfiguration (Bank Profil)
+
+- SCA-Approach: Redirect
+- Payment-Types
+  - Single (sepa-credit-transfers)
+  - Future-Dated (sepa-credit-transfers)
+  - Periodic (sepa-credit-transfers)
+- Confirmation of Funds: Ja
+- Redirect-URLs
+  - PIS Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/:redirect-id_
+  - PIS Cancellation Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/cancel/pis/:redirect-id_
+  - AIS Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/init/ais/:redirect-id_
+- Unterstützte Consents
+  - Dedicated: Ja
+  - Bank-Offered: Ja
+  - Global: Nein
+  - Available Accounts: Nein
+
+Deaktivierte Features:
+
+- Signing Basket
+- Bulk Payments
+- Delta-Reports
+- Multi-Level SCA
+
+Technische Konfiguration der XS2A API:
 
 ```yaml
-        ---
-        setting:
-          frequencyPerDay: 5
-          combinedServiceIndicator: false
-          scaApproach: REDIRECT
-          tppSignatureRequired: false
-          bankOfferedConsentSupport: false
-          pisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/:redirect-id
-          pisPaymentCancellationRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/cancel/pis/:redirect-id
-          aisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/ais/:redirect-id
-          multicurrencyAccountLevel: SUBACCOUNT
-          availableBookingStatuses:
-            - BOOKED
-            - PENDING
-          supportedAccountReferenceFields:
-            - MSISDN
-          consentLifetime: 0
-          transactionLifetime: 0
-          allPsd2Support: false
-          transactionsWithoutBalancesSupported: false
-          signingBasketSupported: false
-          paymentCancellationAuthorizationMandated: true
-          piisConsentSupported: false
-          deltaReportSupported: false
-          redirectUrlExpirationTimeMs: 600000
-          notConfirmedConsentExpirationPeriodMs: 86400000
-          notConfirmedPaymentExpirationPeriodMs: 86400000
-          supportedPaymentTypeAndProductMatrix:
-            SINGLE:
-              - sepa-credit-transfers
-            PERIODIC:
-              - sepa-credit-transfers
-          paymentCancellationRedirectUrlExpirationTimeMs: 600000
+---
+setting:
+  frequencyPerDay: 5
+  combinedServiceIndicator: false
+  scaApproaches:
+    - REDIRECT
+  tppSignatureRequired: false
+  bankOfferedConsentSupport: true
+  pisRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/init/pis/{redirect-id}
+  pisPaymentCancellationRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/cancel/pis/{redirect-id}
+  aisRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/init/ais/{redirect-id}
+  multicurrencyAccountLevel: SUBACCOUNT
+  availableBookingStatuses:
+    - BOOKED
+    - PENDING
+  supportedAccountReferenceFields:
+    - IBAN
+  consentLifetime: 0
+  transactionLifetime: 0
+  allPsd2Support: false
+  transactionsWithoutBalancesSupported: false
+  signingBasketSupported: false
+  paymentCancellationAuthorizationMandated: true
+  piisConsentSupported: false
+  deltaReportSupported: false
+  redirectUrlExpirationTimeMs: 600000
+  notConfirmedConsentExpirationPeriodMs: 86400000
+  notConfirmedPaymentExpirationPeriodMs: 86400000
+  supportedPaymentTypeAndProductMatrix:
+    SINGLE:
+      - sepa-credit-transfers
+    PERIODIC:
+      - sepa-credit-transfers
+  paymentCancellationRedirectUrlExpirationTimeMs: 600000
+  availableAccountsConsentSupported: false
+  scaByOneTimeAvailableAccountsConsentRequired: true
+  psuInInitialRequestMandated: false
 ```
 
 ## Erste Schritte
