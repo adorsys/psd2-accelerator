@@ -46,6 +46,31 @@ _Figure 1.1: Components of the PSD2 Accelerator_
 
 ### Active XS2A Configuration (Bank Profile)
 
+- SCA-Approach: Redirect
+- Payment-Types
+  - Single (sepa-credit-transfers)
+  - Future-Dated (sepa-credit-transfers)
+  - Periodic (sepa-credit-transfers)
+- Confirmation of Funds: Yes
+- Redirect-URLs
+  - PIS Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/:redirect-id_
+  - PIS Cancellation Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/cancel/pis/:redirect-id_
+  - AIS Redirect-URL: _https://sandbox-api.dev.adorsys.de/v1/online-banking/init/ais/:redirect-id_
+- Supported Consents
+  - Dedicated: Yes
+  - Bank-Offered: Yes
+  - Global: No
+  - Available Accounts: No
+
+Disabled features:
+
+- Signing Basket
+- Bulk Payments
+- Delta-Reports
+- Multi-Level SCA
+
+Technical configuration of the XS2A API:
+
 ```yaml
         ---
         setting:
