@@ -72,39 +72,43 @@ Disabled features:
 Technical configuration of the XS2A API:
 
 ```yaml
-        ---
-        setting:
-          frequencyPerDay: 5
-          combinedServiceIndicator: false
-          scaApproach: REDIRECT
-          tppSignatureRequired: false
-          bankOfferedConsentSupport: false
-          pisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/pis/:redirect-id
-          pisPaymentCancellationRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/cancel/pis/:redirect-id
-          aisRedirectUrlToAspsp: https://sandbox-api.dev.adorsys.de/v1/online-banking/init/ais/:redirect-id
-          multicurrencyAccountLevel: SUBACCOUNT
-          availableBookingStatuses:
-            - BOOKED
-            - PENDING
-          supportedAccountReferenceFields:
-            - MSISDN
-          consentLifetime: 0
-          transactionLifetime: 0
-          allPsd2Support: false
-          transactionsWithoutBalancesSupported: false
-          signingBasketSupported: false
-          paymentCancellationAuthorizationMandated: true
-          piisConsentSupported: false
-          deltaReportSupported: false
-          redirectUrlExpirationTimeMs: 600000
-          notConfirmedConsentExpirationPeriodMs: 86400000
-          notConfirmedPaymentExpirationPeriodMs: 86400000
-          supportedPaymentTypeAndProductMatrix:
-            SINGLE:
-              - sepa-credit-transfers
-            PERIODIC:
-              - sepa-credit-transfers
-          paymentCancellationRedirectUrlExpirationTimeMs: 600000
+---
+setting:
+  frequencyPerDay: 5
+  combinedServiceIndicator: false
+  scaApproaches:
+    - REDIRECT
+  tppSignatureRequired: false
+  bankOfferedConsentSupport: true
+  pisRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/init/pis/{redirect-id}
+  pisPaymentCancellationRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/cancel/pis/{redirect-id}
+  aisRedirectUrlToAspsp: http://localhost:8080/v1/online-banking/init/ais/{redirect-id}
+  multicurrencyAccountLevel: SUBACCOUNT
+  availableBookingStatuses:
+    - BOOKED
+    - PENDING
+  supportedAccountReferenceFields:
+    - IBAN
+  consentLifetime: 0
+  transactionLifetime: 0
+  allPsd2Support: false
+  transactionsWithoutBalancesSupported: false
+  signingBasketSupported: false
+  paymentCancellationAuthorizationMandated: true
+  piisConsentSupported: false
+  deltaReportSupported: false
+  redirectUrlExpirationTimeMs: 600000
+  notConfirmedConsentExpirationPeriodMs: 86400000
+  notConfirmedPaymentExpirationPeriodMs: 86400000
+  supportedPaymentTypeAndProductMatrix:
+    SINGLE:
+      - sepa-credit-transfers
+    PERIODIC:
+      - sepa-credit-transfers
+  paymentCancellationRedirectUrlExpirationTimeMs: 600000
+  availableAccountsConsentSupported: false
+  scaByOneTimeAvailableAccountsConsentRequired: true
+  psuInInitialRequestMandated: false
 ```
 
 ## Getting started

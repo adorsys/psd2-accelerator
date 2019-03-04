@@ -227,9 +227,7 @@ Um den Transaction Status eines Payments abzufragen, fügen Sie Ihre Payment-Id 
 
 ### Erstellung eines Dedicated Consent
 
-Um Accounts abfragen zu können, ist es vorab notwendig einen sogenannten Dedicated Consent anzulegen. Dabei handelt es sich um eine Art Einverständniserklärung mit einer definierten Gültigkeit, 
-die es erlaubt je nach Art des Consents Accounts für einen festgelegten Gültigkeitszeitraum abzufragen. Um einen Dedicated Consent anzulegen, ersetzen Sie die IBAN in Ihrem Request mit der IBAN 
-Ihres gewünschten PSU. Den Consent können Sie, wie im vorherigen Absatz beschrieben, mit dem SCA Redirect-Link authorisieren.
+Um Accounts abfragen zu können, ist es vorab notwendig einen sogenannten Dedicated Consent anzulegen. Dabei handelt es sich um eine Art Einverständniserklärung mit einer definierten Gültigkeit, die es erlaubt je nach Art des Consents Accounts für einen festgelegten Gültigkeitszeitraum abzufragen. Um einen Dedicated Consent anzulegen, ersetzen Sie die IBAN in Ihrem Request mit der IBAN.Ihres gewünschten PSU. Den Consent können Sie, wie im vorherigen Absatz beschrieben, mit dem SCA Redirect-Link authorisieren.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
@@ -279,22 +277,20 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |
 
-
 ### Erstellung eines Bank Offered Consent
 
-Um einen Bank Offered Consent anzulegen, ersetzen Sie die Iban in Ihrem Request mit der Ihres gewünschten PSU. Um den Consent zu authorisieren, benutzen Sie bitte den SCA Redirect-Link, wie im vorherigen Absatz beschrieben. 
+Um einen Bank Offered Consent anzulegen, ersetzen Sie die Iban in Ihrem Request mit der Ihres gewünschten PSU. Um den Consent zu authorisieren, benutzen Sie bitte den SCA Redirect-Link, wie im vorherigen Absatz beschrieben.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
 Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der einen Bank Offered Consent für PSU "PSU-Successful" anlegt:
 
-```
+```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
   -H "accept: application/json" \
   -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
   -H "Content-Type: application/json" \
   -H "tpp-redirect-uri: https://adorsys.de/" \
-  `# get these two files from the PSD2 Accelerator certificate generator` \
   --cert certificate.pem \
   --key private.key \
   -d '{
@@ -310,9 +306,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 }'
 ```
 
-Die Anlage eines Bank Offered Consent, funktioniert nur für den PSU-Successful. Mit der ConsentId, die bei der Erstellung eines Bank Offered Consent generiert wird, 
-können Sie über den GET Accounts Endpunkt die ersten beiden Accounts des PSU-Successful abfragen. Die Response Ihres Bank Offered Consent können Sie mit der Tabelle 
-im vorherigen Abschnitt "Erstellung eines Dedicated Consent" abgleichen.
+Die Anlage eines Bank Offered Consent, funktioniert nur für den PSU-Successful. Mit der ConsentId, die bei der Erstellung eines Bank Offered Consent generiert wird, können Sie über den GET Accounts Endpunkt die ersten beiden Accounts des PSU-Successful abfragen. Die Response Ihres Bank Offered Consent können Sie mit der Tabelle im vorherigen Abschnitt "Erstellung eines Dedicated Consent" abgleichen.
 
 ### Consent Löschung
 
