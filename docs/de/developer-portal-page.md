@@ -200,7 +200,7 @@ Der nachfolgende Code stellt eine beispielhafte Antwort für eine erfolgreiche Z
 Um ein Payment zu löschen, fügen Sie Ihre Payment-Id in den Delete Payment Endpoint ein. Das Löschen eines Payments
 benötigt den _expliziten Start des Authorisierungsvorgangs_. Das bedeutet, dass dem `startAuthorisation` Link in der
 Response gefolgt werden muss, um die Authorisierung zu starten. Benutzen Sie danach den
-[SCA Redirect-Link wie im vorherigen Absatz beschrieben](developer-portal#löschen-eines-payments).
+[SCA Redirect-Link wie im vorherigen Absatz beschrieben](developer-portal#simulation-der-nutzerauthentifizierung-sca).
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers/paymentId`
 
