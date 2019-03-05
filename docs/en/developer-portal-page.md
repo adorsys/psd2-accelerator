@@ -198,8 +198,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
   }'
 ```
 
-The following code snippet is an example response for a successful
-payment:
+The following code snippet is an example response for a successful payment:
 
 ```json
 {
@@ -250,7 +249,7 @@ in the previous section](developer-portal#simulation-of-sca).
 | PSU-ID                    | Iban                   | SCA Status | Transaction Status |
 | :------------------------ | :--------------------- | :--------- | :----------------- |
 | PSU-Successful            | DE11760365688833114935 | finalised  | CANC\*             |
-| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | RJCT               |
+| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | ACTC               |
 
 (\*) It is only possible to cancel payments which are not yet executed.
 Since our mocked backend "executes" single payments directly, only
@@ -272,16 +271,16 @@ Payment Status Endpoint.
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
 
-### Consent Creation
+### Dedicated Consent Creation
 
-In order to create a consent, replace the Iban in your request with the
+In order to create a dedicated consent, replace the Iban in your request with the
 one of your favored PSU. To legitimate the consent creation, use the SCA
 Redirect described in the previous section.
 
 `POST https://sandbox-api.dev.adorsys.de/v1/consents`
 
 The following code snippet is an example cURL command which creates a
-consent for PSU "PSU-Successful":
+dedicated consent for PSU "PSU-Successful":
 
 ```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
@@ -327,29 +326,62 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
 | PSU-ConsentExpired      | DE12760365687895439876 | finalised                   | expired                         |
 | PSU-ConsentRevokedByPsu | DE89760365681729983660 | finalised                   | revokedByPsu                    |
 
+### Bank Offered Consent Creation
+
+In order to create a bank offered consent, replace the Iban in your request with the
+one of your favored PSU. To legitimate the consent creation, use the SCA
+Redirect link described in the previous section.
+
+`POST https://sandbox-api.dev.adorsys.de/v1/consents`
+
+The following code snippet is an example cURL command which creates a
+bank offered consent for PSU "PSU-Successful":
+
+```
+curl -v "https://sandbox-api.dev.adorsys.de/v1/consents" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  -H "tpp-redirect-uri: https://adorsys.de/" \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{
+  "access": {
+    "accounts": [],
+    "balances": [],
+    "transactions": []
+},
+  "recurringIndicator": true,
+  "validUntil": "2020-12-31",
+  "frequencyPerDay": 4,
+  "combinedServiceIndicator": true
+}'
+```
+
+Bank offered consent works only for PSU-Successful. The Post Consent for bank offered consent creates a consentId,
+which you can use to access the first two accounts of PSU-Successful with the Get Account Data Endpoint.
+Compare your consent response with the table in the previous section "Dedicated Consent Creation".
+
 ### Consent Deletion
 
-In order to delete a consent, insert your consentId in the Delete
-Consent Endpoint.
+In order to delete a consent, insert your consentId in the Delete Consent Endpoint. To legitimate the deletion, use the SCA Redirect link described in the previous section.
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/consents/consentId`
 
 | PSU-ID            | Iban                   | Consent Status                  |
 | :---------------- | :--------------------- | :------------------------------ |
 | PSU-Successful    | DE11760365688833114935 | terminatedByTpp                 |
-| PSU-Rejected      | DE06760365689827461249 | rejected                        |
+| PSU-Rejected      | DE06760365689827461249 | _(no Consent Status available)_ |
 | PSU-Blocked       | DE13760365681209386222 | _(no Consent Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | terminatedByTpp                 |
 
 ### Get Account Data
 
-In order to get the Account Data, replace the Iban in your request with
-the one of your favored PSU.
+In order to get the Account Data, replace the Iban in your request with the one of your favored PSU.
 
 `GET https://sandbox-api.dev.adorsys.de/v1/accounts`
 
-The following code snippet is an example cURL command which gets all the
-account data from PSU "PSU-Successful":
+The following code snippet is an example cURL command which gets all the account data from PSU "PSU-Successful":
 
 ```sh
 curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
@@ -362,8 +394,7 @@ curl -v "https://sandbox-api.dev.adorsys.de/v1/accounts" \
   --key private.key \
 ```
 
-The following code snippet is an example response for successful GET
-Account Data:
+The following code snippet is an example response for successful GET Account Data:
 
 ```json
 {
