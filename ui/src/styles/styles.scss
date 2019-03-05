@@ -52,14 +52,15 @@ $adorsys-blue: #054f72;
         background-color: $light-blue;
       }
     }
+
     h2 {
       font-size: 26px;
-      margin-top: 1%;
+      margin-top: 10%;
     }
 
     h3 {
       font-size: 21px;
-      margin-top: 13%;
+      margin-top: 10%;
     }
 
     img {
@@ -84,8 +85,12 @@ $adorsys-blue: #054f72;
       margin-top: 0;
     }
 
+    hr + h2 {
+      margin-top: 0;
+    }
+
     hr {
-      margin-top: 13%;
+      margin-top: 10%;
     }
 
     .description {
