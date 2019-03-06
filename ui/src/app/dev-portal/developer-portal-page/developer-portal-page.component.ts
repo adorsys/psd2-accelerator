@@ -11,8 +11,8 @@ import { Language } from '../../../models/language';
   styleUrls: ['./developer-portal-page.component.scss'],
 })
 export class DeveloperPortalPageComponent implements OnInit {
-  public localizedContent$: Observable<string>;
-  private config;
+  localizedContent$: Observable<string>;
+  config;
 
   constructor(
     private languageService: LanguageService,

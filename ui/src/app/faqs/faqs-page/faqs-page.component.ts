@@ -12,7 +12,7 @@ import { Language } from '../../../models/language';
   styleUrls: ['./faqs-page.component.scss'],
 })
 export class FaqsPageComponent implements OnInit {
-  public localizedContent$: Observable<string>;
+  localizedContent$: Observable<string>;
   private config;
 
   constructor(
