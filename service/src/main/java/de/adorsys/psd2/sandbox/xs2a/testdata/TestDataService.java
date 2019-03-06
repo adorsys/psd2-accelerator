@@ -6,7 +6,7 @@ import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.TerminatedByTp
 import static de.adorsys.psd2.sandbox.xs2a.testdata.ConsentStatus.Valid;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus.Failed;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.ScaStatus.Finalised;
-import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedSettlementCompleted;
+import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedSettlementInProcess;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.AcceptedTechnicalValidation;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Canceled;
 import static de.adorsys.psd2.sandbox.xs2a.testdata.TransactionStatus.Pending;
@@ -434,7 +434,7 @@ public class TestDataService {
         GLOBAL_PASSWORD,
         GLOBAL_TAN,
         accounts,
-        AcceptedSettlementCompleted,
+        AcceptedSettlementInProcess,
         Valid,
         Finalised,
         Canceled,
@@ -523,7 +523,7 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(592.59), BigDecimal.valueOf(592.59),
             transaction),
-        AcceptedSettlementCompleted,
+        AcceptedSettlementInProcess,
         Valid,
         Finalised,
         AcceptedTechnicalValidation,
@@ -692,7 +692,7 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
             transaction),
-        AcceptedSettlementCompleted,
+        AcceptedSettlementInProcess,
         Expired,
         Finalised,
         Canceled,
@@ -734,7 +734,7 @@ public class TestDataService {
         GLOBAL_TAN,
         initSingleAccount(accountId, iban, BigDecimal.valueOf(9.21), BigDecimal.valueOf(9.21),
             transaction),
-        AcceptedSettlementCompleted,
+        AcceptedSettlementInProcess,
         RevokedByPsu,
         Finalised,
         Canceled,

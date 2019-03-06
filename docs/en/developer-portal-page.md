@@ -222,7 +222,7 @@ The following code snippet is an example response for a successful payment:
 
 | PSU-ID            | Iban                   | SCA Status                  | Transaction Status                  |
 | :---------------- | :--------------------- | :-------------------------- | :---------------------------------- |
-| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACSC\*                         |
+| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACSP\*                         |
 | PSU-Rejected\*\*  | DE06760365689827461249 | failed                      | RJCT                                |
 | PSU-Blocked       | DE13760365681209386222 | _(no SCA Status available)_ | _(no Transaction Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | finalised                   | RJCT                                |
@@ -249,7 +249,7 @@ in the previous section](developer-portal#simulation-of-sca).
 | PSU-ID                    | Iban                   | SCA Status | Transaction Status |
 | :------------------------ | :--------------------- | :--------- | :----------------- |
 | PSU-Successful            | DE11760365688833114935 | finalised  | CANC\*             |
-| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | ACTC               |
+| PSU-Cancellation-Rejected | DE68760365687914626923 | failed     | ACTC _(no change)_ |
 
 (\*) It is only possible to cancel payments which are not yet executed.
 Since our mocked backend "executes" single payments directly, only
@@ -269,7 +269,7 @@ Payment Status Endpoint.
 
 | PSU-ID         | Iban                   | SCA Status | Transaction Status |
 | :------------- | :--------------------- | :--------- | :----------------- |
-| PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
+| PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSP          |
 
 ### Dedicated Consent Creation
 
@@ -364,15 +364,13 @@ Compare your consent response with the table in the previous section "Dedicated 
 
 ### Consent Deletion
 
-In order to delete a consent, insert your consentId in the Delete Consent Endpoint. To legitimate the deletion, use the SCA Redirect link described in the previous section.
+In order to delete a consent, insert your consentId in the Delete Consent Endpoint. SCA is not needed in order to delete a consent.
 
 `DELETE https://sandbox-api.dev.adorsys.de/v1/consents/consentId`
 
 | PSU-ID            | Iban                   | Consent Status                  |
 | :---------------- | :--------------------- | :------------------------------ |
 | PSU-Successful    | DE11760365688833114935 | terminatedByTpp                 |
-| PSU-Rejected      | DE06760365689827461249 | _(no Consent Status available)_ |
-| PSU-Blocked       | DE13760365681209386222 | _(no Consent Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | terminatedByTpp                 |
 
 ### Get Account Data
