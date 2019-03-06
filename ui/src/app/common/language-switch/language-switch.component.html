@@ -1,0 +1,33 @@
+<div class="btn-group btn-group-toggle language-switcher" data-toggle="buttons">
+  <label
+    class="btn btn-secondary"
+    for="language-switcher-de"
+    [ngClass]="{
+      active: selectedLanguage == languages.de
+    }"
+    >DE
+    <input
+      name="language-switcher"
+      type="radio"
+      id="language-switcher-de"
+      autocomplete="off"
+      [checked]="selectedLanguage == languages.de"
+      (change)="onLanguageChange(languages.de)"
+    />
+  </label>
+
+  <label
+    class="btn btn-secondary"
+    for="language-switcher-en"
+    [ngClass]="{ active: selectedLanguage == languages.en }"
+    >EN
+    <input
+      name="language-switcher"
+      type="radio"
+      id="language-switcher-en"
+      autocomplete="off"
+      [checked]="selectedLanguage == languages.en"
+      (change)="onLanguageChange(languages.en)"
+    />
+  </label>
+</div>

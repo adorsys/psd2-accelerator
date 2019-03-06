@@ -11,21 +11,20 @@ import { Config } from '../../../models/config';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  public selectedLanguage$: Observable<Language>;
-  public languages = Language;
-  public config: Config;
+  language$: Observable<Language>;
+  config: Config;
 
   constructor(
     private languageService: LanguageService,
     private configService: ConfigService
   ) {
-    this.selectedLanguage$ = languageService.getLanguage$();
+    this.language$ = this.languageService.getLanguage$();
     this.config = configService.getConfig();
   }
 
   ngOnInit() {}
 
-  onSelectLanguage(selectedLanguage: Language) {
-    this.languageService.setLanguage(selectedLanguage);
+  updateLanguage(language: Language) {
+    this.languageService.setLanguage(language);
   }
 }

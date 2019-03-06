@@ -24,8 +24,8 @@ export class CreateCertPageComponent implements OnInit {
   pspRolesKeys = Object.keys(PspRole);
   errors: Array<HttpError>;
   certResponse: CertificateResponse;
-  public localizedContent$: Observable<string>;
-  public config: Config;
+  localizedContent$: Observable<string>;
+  config: Config;
 
   static generateZipFile(certBlob, keyBlob): Promise<any> {
     const zip = new JSZip();
