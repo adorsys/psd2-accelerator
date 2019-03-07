@@ -117,7 +117,7 @@ Feature: PIS
     Examples:
       | payment-service | iban                   | payment-product       | code            | category | text                                                              |
       | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
-      | payments        | DE13760365681209386223 | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
+      | payments        | DE89370400440532013000 | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
 
   Scenario Outline: Initiation of a Single Payment Exceeding the Available Balance
     Given PSU initiated a single payment with iban <iban> and the exceeding amount <amount>
