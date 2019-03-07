@@ -105,6 +105,7 @@ public class AccountSpiImpl implements AccountSpi {
     }
 
     List<SpiTransaction> spiTransactions = transactions.get().stream()
+        .filter(t -> this.dateIsInDateRange(t.getBookingDate(), dateFrom, dateTo))
         .map(testDataMapper::mapTransactionToSpiTransaction)
         .collect(Collectors.toList());
 
@@ -260,5 +261,9 @@ public class AccountSpiImpl implements AccountSpi {
         ),
         null
     );
+  }
+
+  boolean dateIsInDateRange(LocalDate date, LocalDate from, LocalDate to) {
+    return date.isAfter(from) && date.isBefore(to) || date.isEqual(from) || date.isEqual(to);
   }
 }

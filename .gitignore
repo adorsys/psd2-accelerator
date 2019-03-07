@@ -4,6 +4,7 @@ database-migration.sql
 
 ### Services ###
 target
+service/logs
 .service
 
 ### UI ###
