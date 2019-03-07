@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -107,9 +108,22 @@ public class AccountSpiImpl implements AccountSpi {
         .map(testDataMapper::mapTransactionToSpiTransaction)
         .collect(Collectors.toList());
 
+    List<SpiAccountBalance> balances = null;
+    if (withBalance) {
+      Pair<List<SpiAccountBalance>, SpiResponse<SpiTransactionReport>> rslt = getBalancesForAccount(
+          spiAccountReference,
+          spiAccountConsent,
+          aspspConsentData
+      );
+      if (rslt.getRight() != null) {
+        return rslt.getRight();
+      }
+      balances = rslt.getLeft();
+    }
+
     SpiTransactionReport spiTransactionReport = new SpiTransactionReport(
         spiTransactions,
-        null,
+        balances,
         SpiTransactionReport.RESPONSE_TYPE_JSON,
         null);
 
@@ -156,30 +170,18 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiAccountConsent spiAccountConsent,
       @NotNull AspspConsentData aspspConsentData) {
 
-    Optional<TestPsu> psu = testDataService.getPsuByIban(spiAccountReference.getIban());
-
-    if (!psu.isPresent()) {
-      return SpiResponse.<List<SpiAccountBalance>>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+    Pair<List<SpiAccountBalance>, SpiResponse<List<SpiAccountBalance>>> res = getBalancesForAccount(
+        spiAccountReference,
+        spiAccountConsent,
+        aspspConsentData
+    );
+    if (res.getRight() != null) {
+      return res.getRight();
     }
-
-    Optional<Account> account = testDataService.getDistinctAccount(
-        psu.get().getPsuId(),
-        spiAccountReference.getResourceId());
-
-    if (!account.isPresent()) {
-      return SpiResponse.<List<SpiAccountBalance>>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
-    }
-
-    List<SpiAccountBalance> balances = testDataMapper
-        .mapBalanceListToSpiBalanceList(account.get(), spiAccountConsent.getAccess().getBalances());
 
     return SpiResponse.<List<SpiAccountBalance>>builder()
         .aspspConsentData(aspspConsentData)
-        .payload(balances)
+        .payload(res.getLeft())
         .success();
   }
 
@@ -223,5 +225,40 @@ public class AccountSpiImpl implements AccountSpi {
 
     return testDataService
         .getTransactions(psu.get().getPsuId(), accountId);
+  }
+
+  /*
+   * @return Pair<Result, Error> with either Result or Error set
+   */
+  private <T> Pair<List<SpiAccountBalance>, SpiResponse<T>> getBalancesForAccount(
+      SpiAccountReference accountReference, SpiAccountConsent spiAccountConsent,
+      AspspConsentData aspspConsentData
+  ) {
+    Optional<TestPsu> psu = testDataService.getPsuByIban(accountReference.getIban());
+
+    if (!psu.isPresent()) {
+      return Pair.of(null, SpiResponse.<T>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE)
+      );
+    }
+
+    Optional<Account> account = testDataService.getDistinctAccount(
+        psu.get().getPsuId(),
+        accountReference.getResourceId()
+    );
+
+    if (!account.isPresent()) {
+      return Pair.of(null, SpiResponse.<T>builder()
+          .aspspConsentData(aspspConsentData)
+          .fail(SpiResponseStatus.TECHNICAL_FAILURE));
+    }
+
+    return Pair.of(
+        testDataMapper.mapBalanceListToSpiBalanceList(
+            account.get(), spiAccountConsent.getAccess().getBalances()
+        ),
+        null
+    );
   }
 }
