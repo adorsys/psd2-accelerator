@@ -4,7 +4,8 @@ database-migration.sql
 
 ### Services ###
 target
-service/logs
+# current bug: tests create log files here :(
+service/logs/
 .service
 
 ### UI ###

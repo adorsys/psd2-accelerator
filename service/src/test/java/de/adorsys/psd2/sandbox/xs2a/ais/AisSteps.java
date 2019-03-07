@@ -1,5 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.ais;
 
+import static de.adorsys.psd2.xs2a.domain.MessageErrorCode.CONSENT_INVALID;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -52,6 +53,7 @@ import java.util.List;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Ignore("without this ignore intellij tries to run the step files")
@@ -314,12 +316,31 @@ public class AisSteps extends SpringCucumberTestBase {
   }
 
   @When("PSU accesses the transaction list")
-  public void getAccountList() {
+  public void getTransactionList() {
     getTransactionList("true");
   }
 
   @When("PSU accesses the transaction list withBalances (.*)")
   public void getTransactionList(String withBalance) {
+    ResponseEntity<TransactionsResponse200Json> response = getTransactions(
+        TransactionsResponse200Json.class, withBalance
+    );
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    context.setActualResponse(response);
+  }
+
+  @When("PSU accesses the transaction list without a valid consent")
+  public void getTransactionListWithoutConsent() {
+    ResponseEntity<JsonNode> response = getTransactions(JsonNode.class, "false");
+
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+    context.setActualResponse(response);
+  }
+
+  private <T> ResponseEntity<T> getTransactions(Class<T> clazz, String withBalance) {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
@@ -329,37 +350,47 @@ public class AisSteps extends SpringCucumberTestBase {
         "?bookingStatus=both&dateFrom=%s&dateTo=%s&withBalance=%s",
         LocalDate.now().minusYears(1), LocalDate.now(), withBalance
     );
-
     context.setWithBalance(Boolean.parseBoolean(withBalance));
 
-    ResponseEntity<TransactionsResponse200Json> response = template.exchange(
+    return template.exchange(
         "accounts/" + context.getAccountId() + "/transactions" + queryParams,
         HttpMethod.GET,
         request.toHttpEntity(),
-        TransactionsResponse200Json.class);
+        clazz);
+  }
+
+  @When("PSU accesses the balance list")
+  public void getBalanceList() {
+    ResponseEntity<ReadAccountBalanceResponse200> response = getBalances(
+        ReadAccountBalanceResponse200.class
+    );
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
     context.setActualResponse(response);
   }
 
-  @When("PSU accesses the balance list")
-  public void getBalanceList() {
+  @When("PSU accesses the balance list without a valid consent")
+  public void psuAccessesTheBalanceListWithoutAValidConsent() {
+    ResponseEntity<JsonNode> response = getBalances(JsonNode.class);
+
+    assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+
+    context.setActualResponse(response);
+  }
+
+  private <T> ResponseEntity<T> getBalances(Class<T> clazz) {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
     Request<?> request = Request.emptyRequest(headers);
     context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
 
-    ResponseEntity<ReadAccountBalanceResponse200> response = template.exchange(
+    return template.exchange(
         "accounts/" + context.getAccountId() + "/balances",
         HttpMethod.GET,
         request.toHttpEntity(),
-        ReadAccountBalanceResponse200.class);
-
-    assertTrue(response.getStatusCode().is2xxSuccessful());
-
-    context.setActualResponse(response);
+        clazz);
   }
 
   @When("PSU accesses a single transaction")
@@ -465,6 +496,27 @@ public class AisSteps extends SpringCucumberTestBase {
     assertThat(err.get("category").asText(), equalTo(TppMessageCategory.ERROR.toString()));
     assertThat(err.get("code").asText(), equalTo(errorMessage));
     assertThat(err.get("text").asText(), containsString("channel independent blocking"));
+  }
+
+  @Then("the transactions are not accessible")
+  public void transactionsAreNotAccessible() {
+    assertUnauthorizedBecauseConsentMissingPermissions();
+  }
+
+  @Then("the balances are not accessible")
+  public void balancesAreNotAccessible() {
+    assertUnauthorizedBecauseConsentMissingPermissions();
+  }
+
+  private void assertUnauthorizedBecauseConsentMissingPermissions() {
+    ResponseEntity<JsonNode> actualResponse = context.getActualResponse();
+    JsonNode err = actualResponse.getBody().get("tppMessages").get(0);
+
+    assertEquals(HttpStatus.UNAUTHORIZED, context.getActualResponse().getStatusCode());
+    assertThat(err.get("category").asText(), equalTo(TppMessageCategory.ERROR.toString()));
+    assertThat(err.get("code").asText(), equalTo(CONSENT_INVALID.toString()));
+    assertThat(err.get("text").asText(), containsString(
+        "The consent was created by this TPP but is not valid for the addressed service/resource"));
   }
 
   private <T> ResponseEntity<T> handleCredentialRequest(Class<T> clazz, String url, String psuId,
