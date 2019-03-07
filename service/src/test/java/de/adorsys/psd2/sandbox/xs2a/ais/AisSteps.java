@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a.ais;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -293,7 +294,7 @@ public class AisSteps extends SpringCucumberTestBase {
   }
 
   @When("PSU accesses the account list withBalances (.*)")
-  public void getAccountList(String withBalance) {
+  public void getAccountListWithBalance(String withBalance) {
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
     Request<?> request = Request.emptyRequest(headers);
@@ -312,15 +313,23 @@ public class AisSteps extends SpringCucumberTestBase {
   }
 
   @When("PSU accesses the transaction list")
-  public void getTransactionList() {
+  public void getAccountList() {
+    getTransactionList("true");
+  }
+
+  @When("PSU accesses the transaction list withBalances (.*)")
+  public void getTransactionList(String withBalance) {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
     Request<?> request = Request.emptyRequest(headers);
     context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
-    String queryParams = "?bookingStatus=both&dateFrom="
-        + LocalDate.now().minusYears(1) + "&dateTo="
-        + LocalDate.now();
+    String queryParams = String.format(
+        "?bookingStatus=both&dateFrom=%s&dateTo=%s&withBalance=%s",
+        LocalDate.now().minusYears(1), LocalDate.now(), withBalance
+    );
+
+    context.setWithBalance(Boolean.parseBoolean(withBalance));
 
     ResponseEntity<TransactionsResponse200Json> response = template.exchange(
         "accounts/" + context.getAccountId() + "/transactions" + queryParams,
@@ -400,6 +409,12 @@ public class AisSteps extends SpringCucumberTestBase {
     ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getBody().getTransactions().getBooked().size(), equalTo(5));
+
+    if (context.isWithBalance()) {
+      assertThat(actualResponse.getBody().getBalances().size(), equalTo(2));
+    } else {
+      assertNull(actualResponse.getBody().getBalances());
+    }
   }
 
   @Then("the transaction data are received")
