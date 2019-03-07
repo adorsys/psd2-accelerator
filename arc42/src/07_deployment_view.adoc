@@ -244,7 +244,7 @@ There are health check endpoints for both deployments. They return `200 OK` when
 
 ===== Using the Actuator Features
 
-We use Spring Boot Actuator for metrics, health checks and information about the deployment. Per default there are three endpoints enabled (active on both ports).
+We use Spring Boot Actuator for metrics, health checks and information about the deployment. Per default there are four endpoints enabled (active on both ports).
 
 - `GET /management/health` returns `{status: "UP"}` if we're good
 - `GET /management/info` returns information about
@@ -252,6 +252,7 @@ We use Spring Boot Actuator for metrics, health checks and information about the
     ** git commit/tag from which it was build
     ** bundled XS2A impl and spec version
 - `GET /management/metrics` returns the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/production-ready-metrics.html[Spring Actuator Metrics]
+- `GET /management/prometheus` returns the application metrics in https://prometheus.io/[Prometheus] format
 
 NOTE: The actuator endpoints are all public. We do not expect any sensitive information there. Please verify this.
 
@@ -262,6 +263,7 @@ If you want to disable certain endpoints you can do so:
 endpoints.metrics.enabled=false
 endpoints.health.enabled=false
 endpoints.info.enabled=false
+endpoints.prometheus.enabled=false
 ----
 
 WARNING: (KNOWN BUG) You can't disable the endpoints with CLI arguments. System properties and environment variables work fine, though.
