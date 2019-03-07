@@ -2,9 +2,9 @@ package de.adorsys.psd2.sandbox.xs2a.ais;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +18,7 @@ import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.AccountAccess;
 import de.adorsys.psd2.model.AccountList;
 import de.adorsys.psd2.model.AccountReference;
+import de.adorsys.psd2.model.AccountReport;
 import de.adorsys.psd2.model.BalanceType;
 import de.adorsys.psd2.model.ConsentInformationResponse200Json;
 import de.adorsys.psd2.model.ConsentStatus;
@@ -407,14 +408,19 @@ public class AisSteps extends SpringCucumberTestBase {
   @Then("the transaction list data are received")
   public void receiveTransactionListData() {
     ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
+    AccountReport transactions = actualResponse.getBody().getTransactions();
 
-    assertThat(actualResponse.getBody().getTransactions().getBooked().size(), equalTo(5));
+    assertThat(actualResponse.getBody().getTransactions().getBooked().size(), equalTo(4));
 
     if (context.isWithBalance()) {
       assertThat(actualResponse.getBody().getBalances().size(), equalTo(2));
     } else {
       assertNull(actualResponse.getBody().getBalances());
     }
+    assertThat(transactions.getBooked().size(), equalTo(4));
+    boolean includesInvalidTransactions = transactions.getBooked().stream()
+        .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
+    assertFalse(includesInvalidTransactions);
   }
 
   @Then("the transaction data are received")
