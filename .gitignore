@@ -12,6 +12,7 @@ target/
 node_modules/
 npm-debug.log
 ui/coverage/
+service/logs
 
 ### STS ###
 .apt_generated

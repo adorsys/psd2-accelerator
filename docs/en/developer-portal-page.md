@@ -271,6 +271,35 @@ Payment Status Endpoint.
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSP          |
 
+### Confirmation of Funds
+
+Confirmation of funds checks if the requested amount is available on an account. If the amount is sufficient, it returns "true", otherwise it returns "false".
+
+The following code snippet is an example cURL command which performs confirmation of funds for PSU "PSU-Successful":
+
+`POST https://sandbox-api.dev.adorsys.de/v1/funds-confirmations`
+
+```sh
+curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{
+        "cardNumber": "CARD-NUMBER",
+        "payee": "Testuser",
+        "account": {
+          "currency": "EUR",
+          "iban": "DE11760365688833114935"
+        },
+        "instructedAmount": {
+          "currency": "EUR",
+          "amount": "15"
+        }
+      }'
+```
+
 ### Dedicated Consent Creation
 
 In order to create a dedicated consent, replace the Iban in your request with the

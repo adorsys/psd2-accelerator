@@ -225,6 +225,37 @@ Um den Transaction Status eines Payments abzufragen, fügen Sie Ihre Payment-Id 
 | :------------- | :--------------------- | :--------- | :----------------- |
 | PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSP          |
 
+
+### Confirmation of Funds
+
+Confirmation of Funds überprüft, ob der zu überweisende Betrag auf einem Konto vorhanden ist. Wenn der Kontostand ausreichend ist, wird "true" ausgegeben, anderenfalls wird "false" ausgegeben.
+
+Der nachfolgende Code beschreibt einen beispielhaften cURL Command, der Confirmation of Funds für PSU "PSU-Successful" durchführt:
+
+`POST https://sandbox-api.dev.adorsys.de/v1/funds-confirmations`
+
+```sh
+curl -v "https://sandbox-api.dev.adorsys.de/v1/payments/sepa-credit-transfers" \
+  -H "accept: application/json" \
+  -H "X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721" \
+  -H "Content-Type: application/json" \
+  --cert certificate.pem \
+  --key private.key \
+  -d '{
+        "cardNumber": "CARD-NUMBER",
+        "payee": "Testuser",
+        "account": {
+          "currency": "EUR",
+          "iban": "DE11760365688833114935"
+        },
+        "instructedAmount": {
+          "currency": "EUR",
+          "amount": "15"
+        }
+      }'
+```
+
+
 ### Erstellung eines Dedicated Consent
 
 Um Accounts abfragen zu können, ist es vorab notwendig einen sogenannten Dedicated Consent anzulegen. Dabei handelt es sich um eine Art Einverständniserklärung mit einer definierten Gültigkeit, die es erlaubt je nach Art des Consents Accounts für einen festgelegten Gültigkeitszeitraum abzufragen. Um einen Dedicated Consent anzulegen, ersetzen Sie die IBAN in Ihrem Request mit der IBAN.Ihres gewünschten PSU. Den Consent können Sie, wie im vorherigen Absatz beschrieben, mit dem SCA Redirect-Link authorisieren.
