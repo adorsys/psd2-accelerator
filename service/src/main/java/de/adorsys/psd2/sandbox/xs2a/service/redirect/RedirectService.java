@@ -158,7 +158,7 @@ public class RedirectService {
         TransactionStatus newTxStatus = TransactionStatus
             .getByValue(psu.get().getTransactionStatusAfterSca().xs2aValue());
 
-        if (newTxStatus.equals(TransactionStatus.ACSP)
+        if (newTxStatus.equals(TransactionStatus.ACSC)
             && isFutureOrPeriodicPayment(pisPaymentData)) {
           newTxStatus = TransactionStatus.ACTC;
         }
