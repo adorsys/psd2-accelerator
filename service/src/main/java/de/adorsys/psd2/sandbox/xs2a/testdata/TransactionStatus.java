@@ -3,7 +3,7 @@ package de.adorsys.psd2.sandbox.xs2a.testdata;
 public enum TransactionStatus {
   Received("Received"),
   Pending("Pending"),
-  AcceptedSettlementInProcess("AcceptedSettlementInProcess"),
+  AcceptedSettlementCompleted("AcceptedSettlementCompleted"),
   AcceptedTechnicalValidation("AcceptedTechnicalValidation"),
   Rejected("Rejected"),
   Canceled("Canceled");

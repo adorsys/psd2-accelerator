@@ -29,7 +29,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
       | future-dated | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACTC   |
       | periodic     | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACTC   |
 
@@ -75,7 +75,7 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | payment-type | iban                   | payment-product       | psu-id         | password | sca-method | tan   | status |
-      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSP   |
+      | single       | DE11760365688833114935 | sepa-credit-transfers | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
 
     ################################################################################################
     #                                                                                              #
@@ -126,5 +126,5 @@ Feature: PIS
     Then the transaction status <status> is received
     Examples:
       | iban                   | amount  | psu-id         | password | sca-method | tan   | status |
-      | DE11760365688833114935 | 1500.00 | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSP   |
+      | DE11760365688833114935 | 1500.00 | PSU-Successful | 12345    | SMS_OTP    | 54321 | ACSC   |
       | DE11760365688833114935 | 1500.01 | PSU-Successful | 12345    | SMS_OTP    | 54321 | RJCT   |

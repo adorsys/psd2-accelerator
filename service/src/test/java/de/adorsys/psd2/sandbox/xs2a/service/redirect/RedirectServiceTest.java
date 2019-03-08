@@ -146,14 +146,14 @@ public class RedirectServiceTest {
     @Test
     public void shouldReturnSuccessfulScaUri() {
       when(pisAuth.getScaStatus()).thenReturn(ScaStatus.FINALISED);
-      when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.ACSP);
+      when(pisAuth.getPaymentData().getTransactionStatus()).thenReturn(TransactionStatus.ACSC);
       when(tppInfo.getNokRedirectUri()).thenReturn(UNSUCCESSFUL_SCA_URI);
       when(tppInfo.getRedirectUri()).thenReturn(SUCCESSFUL_SCA_URI);
 
       OnlineBankingData data = redirectService.getOnlineBankingData(EXTERNAL_ID).get();
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
-      assertEquals("AcceptedSettlementInProcess", data.getResourceStatus());
+      assertEquals("AcceptedSettlementCompleted", data.getResourceStatus());
     }
 
     @Test

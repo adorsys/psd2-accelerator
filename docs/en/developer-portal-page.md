@@ -222,7 +222,7 @@ The following code snippet is an example response for a successful payment:
 
 | PSU-ID            | Iban                   | SCA Status                  | Transaction Status                  |
 | :---------------- | :--------------------- | :-------------------------- | :---------------------------------- |
-| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACSP\*                         |
+| PSU-Successful    | DE11760365688833114935 | finalised                   | ACTC/ACSC\*                         |
 | PSU-Rejected\*\*  | DE06760365689827461249 | failed                      | RJCT                                |
 | PSU-Blocked       | DE13760365681209386222 | _(no SCA Status available)_ | _(no Transaction Status available)_ |
 | PSU-InternalLimit | DE91760365683491763002 | finalised                   | RJCT                                |
@@ -269,7 +269,7 @@ Payment Status Endpoint.
 
 | PSU-ID         | Iban                   | SCA Status | Transaction Status |
 | :------------- | :--------------------- | :--------- | :----------------- |
-| PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSP          |
+| PSU-Successful | DE11760365688833114935 | finalised  | ACTC/ACSC          |
 
 ### Confirmation of Funds
 
