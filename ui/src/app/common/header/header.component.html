@@ -19,7 +19,7 @@
       <ul class="navbar-nav ml-auto">
         <li class="nav-item" routerLinkActive="active">
           <a class="nav-link" routerLink="/developer-portal"
-            >Developer Portal <span class="sr-only">(current)</span>
+            >{{ 'NAV.DEVPORTAL' | translate }}
           </a>
         </li>
         <li
@@ -28,11 +28,11 @@
           *ngIf="config.certPageEnabled"
         >
           <a class="nav-link" routerLink="/certificate-service"
-            >Certificate Service</a
-          >
+            >{{ 'NAV.CERTSERVICE' | translate }}
+          </a>
         </li>
         <li class="nav-item" routerLinkActive="active">
-          <a class="nav-link" routerLink="/faqs">FAQs</a>
+          <a class="nav-link" routerLink="/faqs">FAQs </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" [href]="config.contactMailto">Contact</a>

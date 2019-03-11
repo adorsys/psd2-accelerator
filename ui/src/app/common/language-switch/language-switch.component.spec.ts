@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Language } from '../../../models/language';
 import { By } from '@angular/platform-browser';
+import { MockModule } from '../mock/mock.module';
 
 describe('LanguageSwitchComponent', () => {
   let component: LanguageSwitchComponent;
@@ -16,7 +17,12 @@ describe('LanguageSwitchComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [LanguageSwitchComponent, HeaderComponent],
-      imports: [RouterTestingModule, FormsModule, HttpClientTestingModule],
+      imports: [
+        RouterTestingModule,
+        FormsModule,
+        HttpClientTestingModule,
+        MockModule,
+      ],
     }).compileComponents();
   }));
 

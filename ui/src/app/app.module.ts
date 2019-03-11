@@ -1,5 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { MarkdownModule, MarkedOptions, MarkedRenderer } from 'ngx-markdown';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -7,15 +9,23 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { RouterModule } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { MockMarkdownComponent } from './common/mock-markdown.component';
 import { ConfigService } from './common/services/config.service';
 import { initializer } from './app-init';
 import { FeatureEnabledGuard } from './common/FeatureEnabledGuard';
 
 @NgModule({
-  declarations: [AppComponent, MockMarkdownComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: function HttpLoaderFactory(http: HttpClient) {
+          return new TranslateHttpLoader(http, './assets/i18n/');
+        },
+        deps: [HttpClient],
+      },
+    }),
     AppRoutingModule,
     HttpClientModule,
     MarkdownModule.forRoot({

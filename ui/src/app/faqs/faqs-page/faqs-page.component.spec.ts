@@ -3,9 +3,9 @@ import { FaqsPageComponent } from './faqs-page.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HeaderComponent } from '../../common/header/header.component';
-import { MockMarkdownComponent } from '../../common/mock-markdown.component';
 import { FormsModule } from '@angular/forms';
 import { LanguageSwitchComponent } from '../../common/language-switch/language-switch.component';
+import { MockModule } from '../../common/mock/mock.module';
 
 describe('FaqsPageComponent', () => {
   let component: FaqsPageComponent;
@@ -16,10 +16,14 @@ describe('FaqsPageComponent', () => {
       declarations: [
         FaqsPageComponent,
         HeaderComponent,
-        MockMarkdownComponent,
         LanguageSwitchComponent,
       ],
-      imports: [HttpClientTestingModule, RouterTestingModule, FormsModule],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule,
+        FormsModule,
+        MockModule,
+      ],
     }).compileComponents();
   }));
 
