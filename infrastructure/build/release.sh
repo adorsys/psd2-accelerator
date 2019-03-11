@@ -74,7 +74,7 @@ if ! git diff-files --quiet --ignore-submodules --; then
   echo "DEBUG Create version bump commit ($RELEASE_VERSION)" 1>&2
   git commit -am "Bump version to $RELEASE_VERSION"
   echo "DEBUG Create release tag $(releaseTag $RELEASE_VERSION)" 1>&2
-  git tag -a -m "Release version $RELEASE_VERSION" $(releaseTag $RELEASE_VERSION)
+  git tag -a -m "Release version $RELEASE_VERSION 🚀" $(releaseTag $RELEASE_VERSION)
 else
   echo "ERROR Expected modified package.json/pom.xml but there are no local changes." 1>&2
   exit 1
