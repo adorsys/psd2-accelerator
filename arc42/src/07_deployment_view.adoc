@@ -105,7 +105,7 @@ Possible values are: _true_ or _false_            | _true_
 | SANDBOX_UI_CONTENT_URLS_EN_CERT                        | URL to customized english markdown file for certificate page | Points to the default english `create-cert-page.md` embedded in the application
 | SANDBOX_UI_CONTENT_URLS_EN_FAQ                        | URL to customized english markdown file for faq page | Points to the default english `faq-page.md` embedded in the application
 | SANDBOX_UI_CONTENT_URLS_EN_PORTAL                        | URL to customized english markdown file for portal page | Points to the default english `developer-portal-page.md` embedded in the application
-| LOGGING_CONFIG                                 | Location of the logback configuration  | _classpath:sandbox-logback.xml_
+| LOGGING_CONFIG                                 | Location of the logback configuration  | _classpath:logback.xml_
 | CONSOLE_LOG_PATTERN                            | Sandbox log pattern (note: `logging.pattern.console` if not as ENV) | _[%-5level][%d{HH:mm:ss.SSS}] - %logger: %message%n%xException_
 |=======
 
@@ -227,10 +227,10 @@ To use a custom log configuration start the PSD2 Accelerator with `-Dlogging.con
 .Default Logging Configuration
 [source,yaml]
 ----
-include::../../service/src/main/resources/sandbox-logback.xml[]
+include::../../service/src/main/resources/logback.xml[]
 ----
 
-WARNING: If you use your own `logback.xml` we can't guarantee that the default Spring Boot configuration properties still work. Please check the docs thoroughly. Have a look at the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration], the https://logback.qos.ch/manual/configuration.html[Logback Documentation] and our `sandbox-logback.xml` to see whats possible.
+WARNING: If you use your own `logback.xml` we can't guarantee that the default Spring Boot configuration properties still work. Please check the docs thoroughly. Have a look at the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration], the https://logback.qos.ch/manual/configuration.html[Logback Documentation] and our `logback.xml` to see whats possible.
 
 ==== Production Ready Features
 
