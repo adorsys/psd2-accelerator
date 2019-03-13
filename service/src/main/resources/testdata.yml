@@ -17,7 +17,7 @@ sandbox:
       "PSU-InternalLimit":
         - DE91760365683491763002
       "PSU-Pending":
-        - DE89760365681729983660
+        - DE06760365680304199226
       "PSU-ConsentExpired":
         - DE12760365687895439876
       "PSU-ConsentRevokedByPsu":
