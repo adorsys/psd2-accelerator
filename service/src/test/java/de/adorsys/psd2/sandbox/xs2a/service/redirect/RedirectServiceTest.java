@@ -1,6 +1,8 @@
 package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,6 +17,7 @@ import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
@@ -111,6 +114,7 @@ public class RedirectServiceTest {
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("rejected", data.getResourceStatus());
     }
+
   }
 
   public class PisRedirect {
@@ -166,6 +170,28 @@ public class RedirectServiceTest {
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("Rejected", data.getResourceStatus());
+    }
+  }
+
+  public class Common {
+
+    @Test
+    public void shouldAllowExecutionOfAuth() {
+      TestPsu scaPsu = mock(TestPsu.class);
+      List<String> authIban = Collections.singletonList("DE17012013");
+
+      when(testDataService.getPsuByIban(anyString())).thenReturn(Optional.of(scaPsu));
+      assertTrue(redirectService.isPsuAllowedToExecuteAuth(Optional.of(scaPsu), authIban));
+    }
+
+    @Test
+    public void shouldForbidExecutionOfAuthForNotPsusIban() {
+      TestPsu scaPsu = mock(TestPsu.class);
+      TestPsu otherPsu = mock(TestPsu.class);
+      List<String> authIban = Collections.singletonList("DE17012013");
+
+      when(testDataService.getPsuByIban(anyString())).thenReturn(Optional.of(otherPsu));
+      assertFalse(redirectService.isPsuAllowedToExecuteAuth(Optional.of(scaPsu), authIban));
     }
   }
 }

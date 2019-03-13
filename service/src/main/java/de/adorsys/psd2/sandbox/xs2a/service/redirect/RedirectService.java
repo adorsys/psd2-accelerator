@@ -25,8 +25,10 @@ import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -73,12 +75,15 @@ public class RedirectService {
     AisConsentAuthorization aisConsentAuth = aisConsentAuthorization.get();
 
     AisConsent consent = aisConsentAuth.getConsent();
+    List<String> authorizationIbans = consent.getAccesses().stream()
+        .map(TppAccountAccess::getAccountIdentifier)
+        .collect(Collectors.toList());
 
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
 
     Optional<ConsentStatus> consentStatus;
     ScaStatus newScaStatus;
-    if (psu.isPresent()) {
+    if (psu.isPresent() && isPsuAllowedToExecuteAuth(psu, authorizationIbans)) {
       if (consent.getAisConsentRequestType().equals(AisConsentRequestType.BANK_OFFERED)
           && testDataService.isSucccessfulPsu(psuId)) {
         consent.setAccesses(fillAccountAccesses());
@@ -144,7 +149,8 @@ public class RedirectService {
     Optional<TestPsu> psu = testDataService.getPsu(psuId);
 
     // TODO clean up optional handling (rat iio)
-    if (isPsuAllowedToAccessPayment(psu, pisPaymentData.getDebtorAccount().getIban())) {
+    if (isPsuAllowedToExecuteAuth(psu,
+        Collections.singletonList(pisPaymentData.getDebtorAccount().getIban()))) {
       if (scaOperation == ScaOperation.CANCEL) {
         TransactionStatus newTxStatus = TransactionStatus.getByValue(
             psu.get().getTransactionStatusAfterCancellation().xs2aValue()
@@ -202,12 +208,14 @@ public class RedirectService {
     return accountBalance.getBalanceAmount().getAmount().compareTo(amount) >= 0;
   }
 
-  private boolean isPsuAllowedToAccessPayment(Optional<TestPsu> scaPsu, String debtorIban) {
-    Optional<TestPsu> accPsu = testDataService.getPsuByIban(debtorIban);
-    if (!accPsu.isPresent() || !scaPsu.isPresent()) {
-      return false;
+  boolean isPsuAllowedToExecuteAuth(Optional<TestPsu> scaPsu, List<String> debtorIbans) {
+    for (String debtorIban : debtorIbans) {
+      Optional<TestPsu> accPsu = testDataService.getPsuByIban(debtorIban);
+      if (!accPsu.isPresent() || !scaPsu.isPresent() || !scaPsu.equals(accPsu)) {
+        return false;
+      }
     }
-    return scaPsu.equals(accPsu);
+    return true;
   }
 
   private boolean isFutureOrPeriodicPayment(PisPaymentData pisPaymentData) {
