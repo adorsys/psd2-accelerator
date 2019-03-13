@@ -61,6 +61,9 @@ script:
   - cp -r service/target/site/images pages/licenses || travis_terminate 1
   - cp service/target/site/dependencies.html pages/licenses/index.html || travis_terminate 1
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+
 deploy:
   # master
   - provider: script
