@@ -57,7 +57,6 @@ Feature: AIS
       | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful    | 12345    | SMS_OTP    | 54321 | valid  |
       | DE91760365683491763002 | DE91760365683491763002 | DE91760365683491763002 | PSU-InternalLimit | 12345    | SMS_OTP    | 54321 | valid  |
 
-
   Scenario Outline: Consent Status Rejected
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU deletes the consent
@@ -67,6 +66,7 @@ Feature: AIS
       | accounts               | balances               | transactions           | status   |
       | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | rejected |
       | DE68760365687914626923 | DE68760365687914626923 | DE68760365687914626923 | rejected |
+
 
   Scenario Outline: Consent Status TerminatedByTpp
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
@@ -183,9 +183,11 @@ Feature: AIS
     When PSU requests the consent status
     Then the status <status> is received
     Examples:
-      | accounts               | balances               | transactions | psu-id       | password | status   |
-      | DE11760365688833114935 | DE11760365688833114935 | null         | PSU-Unknown  | 12345    | rejected |
-      | DE06760365689827461249 | DE06760365689827461249 | null         | PSU-Rejected | 12345    | rejected |
+      | accounts               | balances               | transactions           | psu-id         | password | status   |
+      | DE11760365688833114935 | DE11760365688833114935 | null                   | PSU-Unknown    | 12345    | rejected |
+      | DE06760365689827461249 | DE06760365689827461249 | null                   | PSU-Rejected   | 12345    | rejected |
+      | DE06760365689827461249 | DE06760365689827461249 | DE06760365689827461249 | PSU-Successful | 12345    | rejected |
+
 
   Scenario Outline: Service blocked for Consent Creation
     Given PSU tries to create a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
