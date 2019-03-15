@@ -353,13 +353,13 @@ public class AisSteps extends SpringCucumberTestBase {
 
   @When("PSU accesses the transaction list")
   public void getTransactionList() {
-    getTransactionList("true");
+    getTransactionList("true", "both");
   }
 
-  @When("PSU accesses the transaction list withBalances (.*)")
-  public void getTransactionList(String withBalance) {
+  @When("PSU accesses the transaction list withBalances (.*) and bookingStatus (.*)")
+  public void getTransactionList(String withBalance, String bookingStatus) {
     ResponseEntity<TransactionsResponse200Json> response = getTransactions(
-        TransactionsResponse200Json.class, withBalance
+        TransactionsResponse200Json.class, withBalance, bookingStatus
     );
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
@@ -369,22 +369,23 @@ public class AisSteps extends SpringCucumberTestBase {
 
   @When("PSU accesses the transaction list without a valid consent")
   public void getTransactionListWithoutConsent() {
-    ResponseEntity<JsonNode> response = getTransactions(JsonNode.class, "false");
+    ResponseEntity<JsonNode> response = getTransactions(JsonNode.class, "false", "both");
 
     assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
 
     context.setActualResponse(response);
   }
 
-  private <T> ResponseEntity<T> getTransactions(Class<T> clazz, String withBalance) {
+  private <T> ResponseEntity<T> getTransactions(Class<T> clazz, String withBalance,
+      String bookingStatus) {
     ResponseEntity<AccountList> actualResponse = context.getActualResponse();
     HashMap<String, String> headers = TestUtils.createSession();
     headers.put("Consent-ID", context.getConsentId());
     Request<?> request = Request.emptyRequest(headers);
     context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
     String queryParams = String.format(
-        "?bookingStatus=both&dateFrom=%s&dateTo=%s&withBalance=%s",
-        LocalDate.now().minusYears(1), LocalDate.now(), withBalance
+        "?bookingStatus=%s&dateFrom=%s&dateTo=%s&withBalance=%s",
+        bookingStatus, LocalDate.now().minusYears(1), LocalDate.now(), withBalance
     );
     context.setWithBalance(Boolean.parseBoolean(withBalance));
 

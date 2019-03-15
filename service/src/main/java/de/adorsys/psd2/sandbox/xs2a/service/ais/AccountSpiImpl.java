@@ -106,6 +106,7 @@ public class AccountSpiImpl implements AccountSpi {
 
     List<SpiTransaction> spiTransactions = transactions.get().stream()
         .filter(t -> this.dateIsInDateRange(t.getBookingDate(), dateFrom, dateTo))
+        .filter(t -> this.isTransactionWithBookingStatus(t, bookingStatus))
         .map(testDataMapper::mapTransactionToSpiTransaction)
         .collect(Collectors.toList());
 
@@ -264,6 +265,16 @@ public class AccountSpiImpl implements AccountSpi {
   }
 
   boolean dateIsInDateRange(LocalDate date, LocalDate from, LocalDate to) {
-    return date.isAfter(from) && date.isBefore(to) || date.isEqual(from) || date.isEqual(to);
+    return date == null || date.isAfter(from) && date.isBefore(to)
+        || date.isEqual(from) || date.isEqual(to);
+  }
+
+  boolean isTransactionWithBookingStatus(Transaction transaction, BookingStatus bookingStatus) {
+    if (bookingStatus.equals(BookingStatus.BOOKED)) {
+      return transaction.getBookingDate() != null;
+    } else if (bookingStatus.equals(BookingStatus.PENDING)) {
+      return transaction.getBookingDate() == null;
+    }
+    return true;
   }
 }
