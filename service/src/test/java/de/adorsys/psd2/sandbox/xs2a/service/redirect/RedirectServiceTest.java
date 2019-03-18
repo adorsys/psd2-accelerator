@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,6 +21,7 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.ConsentStatus;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.core.psu.PsuIdData;
 import de.adorsys.psd2.xs2a.core.sca.ScaStatus;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +31,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.io.ClassPathResource;
 
 @RunWith(NestedRunner.class)
 public class RedirectServiceTest {
@@ -36,6 +39,7 @@ public class RedirectServiceTest {
   private static final String EXTERNAL_ID = "123";
   private static final String UNSUCCESSFUL_SCA_URI = "http://tpp.de/unsuccessfulsca";
   private static final String SUCCESSFUL_SCA_URI = "http://tpp.de/success";
+  private static final String PSU_ID = "PSU_Successful";
 
   private PisAuthorization pisAuth;
   private AisConsentAuthorization aisAuth;
@@ -115,6 +119,20 @@ public class RedirectServiceTest {
       assertEquals("rejected", data.getResourceStatus());
     }
 
+    @Test
+    public void shouldReturnScaHasFailedErrorPage() {
+      when(aisAuth.getScaStatus()).thenReturn(ScaStatus.FINALISED);
+      TestPsu psu = mock(TestPsu.class);
+      when(testDataService.getPsu(anyString())).thenReturn(Optional.of(psu));
+      try {
+        redirectService.handleConsentCreationRedirectRequest(EXTERNAL_ID, PSU_ID);
+        fail("Expected exception not thrown");
+      } catch (Exception e) {
+        assertEquals("redirect-uri already called",
+            e.getMessage());
+      }
+    }
+
   }
 
   public class PisRedirect {
@@ -170,6 +188,20 @@ public class RedirectServiceTest {
 
       assertEquals("http://tpp.de/success", data.getTppRedirectUri());
       assertEquals("Rejected", data.getResourceStatus());
+    }
+
+    @Test
+    public void shouldReturnScaHasFailedErrorPage() {
+      when(pisAuth.getScaStatus()).thenReturn(ScaStatus.FINALISED);
+      TestPsu psu = mock(TestPsu.class);
+      when(testDataService.getPsu(anyString())).thenReturn(Optional.of(psu));
+      try {
+        redirectService.handlePaymentRedirectRequest(EXTERNAL_ID, PSU_ID, ScaOperation.INIT);
+        fail("Expected exception not thrown");
+      } catch (Exception e) {
+        assertEquals("redirect-uri already called",
+            e.getMessage());
+      }
     }
   }
 

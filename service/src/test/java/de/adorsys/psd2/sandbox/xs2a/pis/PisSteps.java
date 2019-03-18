@@ -257,6 +257,21 @@ public class PisSteps extends SpringCucumberTestBase {
     //}
   }
 
+  @And("^PSU initiates the payment cancellation authorisation$")
+  public void psuInitiatesThePaymentCancellationAuthorisation() {
+    HashMap<String, String> headers = TestUtils.createSession();
+    Request<?> request = Request.emptyRequest(headers);
+    ResponseEntity<JsonNode> response = template.exchange(
+        context.getPaymentService() + "/" +
+            context.getPaymentProduct() + "/" +
+            context.getPaymentId() + "/cancellation-authorisations",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        JsonNode.class);
+    context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").asText());
+    context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").asText());
+  }
+
   @Then("^the transaction status (.*) is received$")
   public void checkTransactionResponse(String status) {
     ResponseEntity<TransactionStatusResponse> actualResponse = context.getActualResponse();

@@ -87,6 +87,7 @@ Feature: PIS
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     And PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU cancels the payment
+    And PSU initiates the payment cancellation authorisation
     And PSU authorised the cancellation with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     When PSU requests the payment status
     Then the transaction status <status> is received
@@ -98,6 +99,7 @@ Feature: PIS
     Given PSU initiated a <payment-type> payment with iban <iban> using the payment product <payment-product>
     And PSU authorised the payment with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU cancels the payment
+    And PSU initiates the payment cancellation authorisation
     And PSU tries to authorise the cancellation resource with his <psu-id> and <password>
     When PSU requests the payment status
     Then the transaction status <status> is received
@@ -115,9 +117,9 @@ Feature: PIS
     When PSU tries to initiate a payment <payment-service> with iban <iban> and currency <currency> using the payment product <payment-product>
     Then an error with code <code>, category <category> and a text containing <text> is received
     Examples:
-      | payment-service | iban                   | currency | payment-product       | code            | category | text                                                              |
-      | payments        | DE13760365681209386222 | EUR      | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
-      | payments        | DE89370400440532013000 | EUR      | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
+      | payment-service | iban                   | currency | payment-product       | code            | category | text                                                                    |
+      | payments        | DE13760365681209386222 | EUR      | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                            |
+      | payments        | DE89370400440532013000 | EUR      | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process       |
       | payments        | DE11760365688833114935 | USD      | sepa-credit-transfers | FORMAT_ERROR    | ERROR    | Format of certain request fields are not matching the XS2A requirements |
       | payments        | DE56760365681650680255 | EUR      | sepa-credit-transfers | FORMAT_ERROR    | ERROR    | Format of certain request fields are not matching the XS2A requirements |
 

@@ -26,9 +26,9 @@
 
   <div class="starter-template">
     <h2>
-      <span th:text="'ERROR: externalId not found!'"></span>
+      <span>SCA has failed</span>
     </h2>
-    <p th:text="'The externalId ' + ${externalId} + ' within your scaRedirectUrl can not be matched internally'"></p>
+    <p th:text="${errorMessage}"></p>
   </div>
 
 </div>

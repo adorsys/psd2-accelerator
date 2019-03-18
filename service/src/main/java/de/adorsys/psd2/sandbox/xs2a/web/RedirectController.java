@@ -1,11 +1,11 @@
 package de.adorsys.psd2.sandbox.xs2a.web;
 
+import de.adorsys.psd2.sandbox.xs2a.service.domain.ScaException;
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.OnlineBankingData;
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.RedirectService;
 import de.adorsys.psd2.sandbox.xs2a.service.redirect.ScaOperation;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +39,13 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.INIT);
+    try {
+      redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.INIT);
+    } catch (ScaException e) {
+      model.addAttribute("errorMessage",
+          "ScaRedirectUrl was already called.");
+      return new ModelAndView("error-page");
+    }
     Optional<OnlineBankingData> data = redirectService.getOnlineBankingData(externalId);
 
     if (!data.isPresent()) {
@@ -67,7 +73,12 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.CANCEL);
+    try {
+      redirectService.handlePaymentRedirectRequest(externalId, psuId, ScaOperation.CANCEL);
+    } catch (ScaException e) {
+      model.addAttribute("errorMessage", "ScaRedirectUrl was already called.");
+      return "error-page";
+    }
     Optional<OnlineBankingData> data = redirectService.getOnlineBankingData(externalId);
 
     if (!data.isPresent()) {
@@ -94,15 +105,23 @@ public class RedirectController {
       @RequestParam("psu-id") String psuId,
       Model model) {
 
-    redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
+    try {
+      redirectService.handleConsentCreationRedirectRequest(externalId, psuId);
+    } catch (ScaException e) {
+      model.addAttribute("errorMessage", "ScaRedirectUrl was already called.");
+      return "error-page";
+    }
     Optional<OnlineBankingData> data = redirectService.getOnlineBankingDataForConsent(externalId);
 
     if (!data.isPresent()) {
+      model.addAttribute("errorMessage",
+          "The externalId within your scaRedirectUrl can not be matched internally.");
       return "error-page";
     }
     model.addAttribute("resourceType", "consent");
     model.addAttribute("onlineBankingData", data.get());
 
     return targetHtmlFile;
+
   }
 }
