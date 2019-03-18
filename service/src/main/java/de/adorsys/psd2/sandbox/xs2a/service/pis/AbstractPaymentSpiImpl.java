@@ -3,8 +3,11 @@ package de.adorsys.psd2.sandbox.xs2a.service.pis;
 import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
+import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
@@ -13,6 +16,7 @@ import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.SpiPayment;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +87,17 @@ class AbstractPaymentSpiImpl {
         .aspspConsentData(aspspConsentData)
         .message(Collections.singletonList("Wrong PIN"))
         .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+  }
+
+  void isCorrectCurrency(Optional<Account> account, SpiSinglePayment payment) {
+    if (account.isPresent()) {
+      Currency expectedCurrency = account.get().getCurrency();
+      if (!(payment.getDebtorAccount().getCurrency().equals(expectedCurrency)
+          && payment.getInstructedAmount().getCurrency().equals(expectedCurrency)
+          && payment.getCreditorAccount().getCurrency().equals(expectedCurrency))) {
+        throw new RestException(MessageErrorCode.FORMAT_ERROR);
+      }
+    }
   }
 
   private Optional<TransactionStatus> getPaymentStatusFromRepo(String paymentId) {

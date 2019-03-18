@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
@@ -33,7 +34,8 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
       @NotNull SpiSinglePayment payment,
       @NotNull AspspConsentData initialAspspConsentData) {
 
-    Optional<TestPsu> psuId = testDataService.getPsuByIban(payment.getDebtorAccount().getIban());
+    String debtorIban = payment.getDebtorAccount().getIban();
+    Optional<TestPsu> psuId = testDataService.getPsuByIban(debtorIban);
     if (!psuId.isPresent()) {
       // TODO what should we do here? (e.g. no account with this IBAN exists)
       throw new RestException(MessageErrorCode.PAYMENT_FAILED);
@@ -42,6 +44,10 @@ public class SinglePaymentSpiImpl extends AbstractPaymentSpiImpl implements Sing
     if (testDataService.isBlockedPsu(psuId.get().getPsuId())) {
       throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
     }
+
+    Optional<Account> account = testDataService.getAccountByIban(psuId.get().getPsuId(),
+        payment.getDebtorAccount().getIban());
+    super.isCorrectCurrency(account, payment);
 
     SpiSinglePaymentInitiationResponse response = new SpiSinglePaymentInitiationResponse();
     String paymentId = UUID.randomUUID().toString();

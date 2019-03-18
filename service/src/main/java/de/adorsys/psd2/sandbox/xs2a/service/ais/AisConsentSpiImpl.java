@@ -2,6 +2,7 @@ package de.adorsys.psd2.sandbox.xs2a.service.ais;
 
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
@@ -17,6 +18,7 @@ import de.adorsys.psd2.xs2a.spi.domain.consent.SpiVerifyScaAuthorisationResponse
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.AisConsentSpi;
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -54,8 +56,24 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
         throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
       }
+
+      spiAccountConsent.getAccess().getAccounts().forEach(accountReference -> {
+        Optional<Account> account = testDataService
+            .getAccountByIban(knownPsuId.getPsuId(), accountReference.getIban());
+        if (account.isPresent()) {
+          checkCurrency(account.get().getCurrency(), accountReference.getCurrency());
+        } else {
+          throw new RestException(MessageErrorCode.FORMAT_ERROR);
+        }
+      });
     }
     return new SpiResponse<>(new SpiInitiateAisConsentResponse(), aspspConsentData);
+  }
+
+  private void checkCurrency(Currency expectedCurrency, Currency definedCurrency) {
+    if (!definedCurrency.equals(expectedCurrency)) {
+      throw new RestException(MessageErrorCode.FORMAT_ERROR);
+    }
   }
 
   @Override

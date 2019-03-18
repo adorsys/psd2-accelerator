@@ -252,6 +252,26 @@ public class TestDataServiceTest {
   }
 
   @Test
+  public void getAccountByIbanSuccessful() {
+    final String psuId = "PSU-Successful";
+    final String iban = "DE11760365688833114935";
+
+    Optional<Account> account = testDataService.getAccountByIban(psuId, iban);
+    assertNotNull(account);
+
+    assertThat(account.get().getIban(), equalTo(iban));
+  }
+
+  @Test
+  public void getAccountByIbanWithUnknownIban() {
+    final String psuId = "PSU-Successful";
+    final String iban = "DE11760365688833114111";
+
+    Optional<Account> account = testDataService.getAccountByIban(psuId, iban);
+    assertThat(account, equalTo(Optional.empty()));
+  }
+
+  @Test
   public void getTransactionsTestSuccessful() {
     final String psuId = "PSU-Successful";
     final String accountIdGiro = "9b86539d-589b-4082-90c2-d725c019777f";

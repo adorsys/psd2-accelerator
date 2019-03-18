@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
+import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
@@ -9,10 +10,12 @@ import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPeriodicPayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPeriodicPaymentInitiationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.PeriodicPaymentSpi;
+import java.util.Currency;
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +73,10 @@ public class PeriodicPaymentSpiImpl extends AbstractPaymentSpiImpl implements Pe
     if (testDataService.isBlockedPsu(knownPsu.getPsuId())) {
       throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
     }
+
+    Optional<Account> account = testDataService.getAccountByIban(psuId.get().getPsuId(),
+        payment.getDebtorAccount().getIban());
+    super.isCorrectCurrency(account, payment);
 
     SpiPeriodicPaymentInitiationResponse response = new SpiPeriodicPaymentInitiationResponse();
     response.setTransactionStatus(TransactionStatus.RCVD);
