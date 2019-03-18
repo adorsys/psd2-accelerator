@@ -116,12 +116,14 @@ Feature: AIS
     Given PSU created a consent on dedicated accounts for account information <accounts>, balances <balances> and transactions <transactions>
     And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
     And PSU accesses the account list withBalances <withBalance>
-    When PSU accesses the transaction list withBalances <withBalance>
+    When PSU accesses the transaction list withBalances <withBalance> and bookingStatus <bookingStatus>
     Then the transaction list data are received
     Examples:
-      | accounts               | balances               | transactions           | psu-id         | password | sca-method | tan   | withBalance |
-      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
-      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        |
+      | accounts               | balances               | transactions           | psu-id         | password | sca-method | tan   | withBalance | bookingStatus |
+      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       | BOTH          |
+      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        | BOTH          |
+      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       | BOOKED        |
+      | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       | PENDING       |
 
 
   Scenario Outline: Get Single Transaction
