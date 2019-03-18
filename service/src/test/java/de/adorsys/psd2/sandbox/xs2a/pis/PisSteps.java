@@ -126,18 +126,19 @@ public class PisSteps extends SpringCucumberTestBase {
   }
 
 
-  @When("PSU tries to initiate a payment (.*) with iban (.*) using the payment product (.*)")
-  public void tryToInitiatePayment(String paymentService, String iban, String paymentProduct) {
+  @When("PSU tries to initiate a payment (.*) with iban (.*) and currency (.*) using the payment product (.*)")
+  public void tryToInitiatePayment(String paymentService, String iban, String currency,
+      String paymentProduct) {
     PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
     payment.setEndToEndIdentification("WBG-123456789");
-    payment.setDebtorAccount(createAccount(iban, "EUR"));
+    payment.setDebtorAccount(createAccount(iban, currency));
 
     Amount instructedAmount = new Amount();
     instructedAmount.setAmount("520");
-    instructedAmount.setCurrency("EUR");
+    instructedAmount.setCurrency(currency);
     payment.setInstructedAmount(instructedAmount);
 
-    payment.setCreditorAccount(createAccount("DE15500105172295759744", "EUR"));
+    payment.setCreditorAccount(createAccount("DE15500105172295759744", currency));
     payment.setCreditorName("WBG");
     payment.setCreditorAddress(createCreditorAddress());
     payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");

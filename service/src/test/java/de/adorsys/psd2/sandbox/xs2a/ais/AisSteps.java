@@ -191,6 +191,42 @@ public class AisSteps extends SpringCucumberTestBase {
     context.setConsentId(response.getBody().getConsentId());
   }
 
+  @Given("PSU tries to create a consent for account information (.*), balances (.*) and transactions (.*) with wrong currency (.*)")
+  public void psuTriesToCreateConsentWithWrongCurrency(String accounts, String balances,
+      String transactions, String currency) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Consents consent = new Consents();
+
+    AccountAccess accountAccess = new AccountAccess();
+
+    List<AccountReference> accountList = fillAccountReferences(accounts, currency);
+    List<AccountReference> balanceList = fillAccountReferences(balances, currency);
+    List<AccountReference> transactionList = fillAccountReferences(transactions, currency);
+
+    accountAccess.setAccounts(accountList);
+    accountAccess.setBalances(balanceList);
+    accountAccess.setTransactions(transactionList);
+
+    context.setConsentAccountAccess(accountAccess);
+
+    consent.setAccess(accountAccess);
+    consent.setRecurringIndicator(true);
+    consent.setValidUntil(LocalDate.now().plusDays(30));
+    consent.setFrequencyPerDay(5);
+
+    Request<Consents> request = new Request<>(consent, headers);
+    ResponseEntity<JsonNode> response = template.exchange(
+        "consents",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        JsonNode.class);
+
+    assertTrue(response.getStatusCode().is4xxClientError());
+
+    context.setActualResponse(response);
+  }
+
   @When("PSU accesses the consent data")
   public void accessConsentData() {
     HashMap<String, String> headers = TestUtils.createSession();
@@ -495,8 +531,8 @@ public class AisSteps extends SpringCucumberTestBase {
 
     assertThat(err.get("category").asText(), equalTo(TppMessageCategory.ERROR.toString()));
     assertThat(err.get("code").asText(), equalTo(errorMessage));
-    assertThat(err.get("text").asText(), containsString("channel independent blocking"));
   }
+
 
   @Then("the transactions are not accessible")
   public void transactionsAreNotAccessible() {
@@ -554,6 +590,21 @@ public class AisSteps extends SpringCucumberTestBase {
 
       result.add(referenceIban);
     }
+    return result;
+  }
+
+  private List<AccountReference> fillAccountReferences(String iban, String currency) {
+    ArrayList<AccountReference> result = new ArrayList<>();
+
+    if (iban.equals("null")) {
+      return null;
+    }
+
+    AccountReference referenceIban = new AccountReference();
+    referenceIban.setCurrency(currency);
+    referenceIban.setIban(iban);
+    result.add(referenceIban);
+
     return result;
   }
 

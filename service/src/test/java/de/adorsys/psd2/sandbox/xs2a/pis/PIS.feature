@@ -112,12 +112,14 @@ Feature: PIS
     ################################################################################################
 
   Scenario Outline: Certain payment initiations are blocked
-    When PSU tries to initiate a payment <payment-service> with iban <iban> using the payment product <payment-product>
+    When PSU tries to initiate a payment <payment-service> with iban <iban> and currency <currency> using the payment product <payment-product>
     Then an error with code <code>, category <category> and a text containing <text> is received
     Examples:
-      | payment-service | iban                   | payment-product       | code            | category | text                                                              |
-      | payments        | DE13760365681209386222 | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
-      | payments        | DE89370400440532013000 | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
+      | payment-service | iban                   | currency | payment-product       | code            | category | text                                                              |
+      | payments        | DE13760365681209386222 | EUR      | sepa-credit-transfers | SERVICE_BLOCKED | ERROR    | channel independent blocking                                      |
+      | payments        | DE89370400440532013000 | EUR      | sepa-credit-transfers | PAYMENT_FAILED  | ERROR    | payment initiation POST request failed during the initial process |
+      | payments        | DE11760365688833114935 | USD      | sepa-credit-transfers | FORMAT_ERROR    | ERROR    | Format of certain request fields are not matching the XS2A requirements |
+      | payments        | DE56760365681650680255 | EUR      | sepa-credit-transfers | FORMAT_ERROR    | ERROR    | Format of certain request fields are not matching the XS2A requirements |
 
   Scenario Outline: Initiation of a Single Payment Exceeding the Available Balance
     Given PSU initiated a single payment with iban <iban> and the exceeding amount <amount>

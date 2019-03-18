@@ -108,23 +108,21 @@ public class TestDataService {
   }
 
   /**
-   * Returns Identification Number of an Account that matches the passed IBAN.
+   * Returns requested Account that matches the passed IBAN.
    *
    * @param psuId Identification of Psu
    * @param iban  Iban
-   * @return AccountId
+   * @return Account
    */
-  public Optional<String> getAccountIdByIban(String psuId, String iban) {
+  public Optional<Account> getAccountByIban(String psuId, String iban) {
     if (!psuMap.containsKey(psuId)) {
       return Optional.empty();
     }
     HashMap<String, Account> map = psuMap.get(psuId).getAccounts();
 
-    Account result = map.values().stream()
+    return map.values().stream()
         .filter(account -> account.getIban().equals(iban))
-        .collect(Collectors.toList()).get(0);
-
-    return Optional.ofNullable(result.getAccountId());
+        .findAny();
   }
 
   /**

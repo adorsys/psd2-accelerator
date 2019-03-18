@@ -26,6 +26,14 @@ Feature: AIS
       | psu-id         | password | sca-method | tan   |
       | PSU-Successful | 12345    | SMS_OTP    | 54321 |
 
+    Scenario Outline: Dedicated Consent Creation with wrong currency
+      Given PSU tries to create a consent for account information <accounts>, balances <balances> and transactions <transactions> with wrong currency <currency>
+      Then an error-message <error-message> is received
+      Examples:
+        | accounts               | balances               | transactions           | currency | error-message |
+        | DE11760365688833114935 | DE11760365688833114935 | DE11760365688833114935 | USD      | FORMAT_ERROR  |
+        | DE56760365681650680255 | DE56760365681650680255 | DE56760365681650680255 | EUR      | FORMAT_ERROR  |
+
     ################################################################################################
     #                                                                                              #
     # Consent Status                                                                               #

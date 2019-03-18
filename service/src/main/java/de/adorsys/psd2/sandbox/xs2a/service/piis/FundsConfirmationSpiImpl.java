@@ -7,6 +7,8 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
+import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
+import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationResponse;
@@ -45,22 +47,30 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       return new SpiResponse<>(response, aspspConsentData);
     }
 
-    Optional<String> accountId = testDataService.getAccountIdByIban(psuId.get().getPsuId(), iban);
+    Optional<Account> account = testDataService.getAccountByIban(psuId.get().getPsuId(), iban);
     BigDecimal requestedAmount = spiFundsConfirmationRequest.getInstructedAmount().getAmount();
 
-    if (accountId.isPresent()) {
-      Optional<Account> account = testDataService.getDistinctAccount(
-          psuId.get().getPsuId(), accountId.get());
-      if (account.isPresent()) {
-        Balance balance = account.get().getBalances().stream()
-            .filter(b -> b.getBalanceType().equals(BalanceType.INTERIM_AVAILABLE))
-            .findFirst().get();
-
-        response
-            .setFundsAvailable(
-                requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);
+    if (account.isPresent()) {
+      if (!isCorrectCurrency(account.get(), spiFundsConfirmationRequest)) {
+        throw new RestException(MessageErrorCode.FORMAT_ERROR);
       }
+
+      Balance balance = account.get().getBalances().stream()
+          .filter(b -> b.getBalanceType().equals(BalanceType.INTERIM_AVAILABLE))
+          .findFirst().get();
+
+      response
+          .setFundsAvailable(
+              requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);
     }
     return new SpiResponse<>(response, aspspConsentData);
+  }
+
+  private boolean isCorrectCurrency(Account account, SpiFundsConfirmationRequest request) {
+    if (request.getPsuAccount().getCurrency().equals(account.getCurrency())
+        && request.getInstructedAmount().getCurrency().equals(account.getCurrency())) {
+      return true;
+    }
+    return false;
   }
 }
