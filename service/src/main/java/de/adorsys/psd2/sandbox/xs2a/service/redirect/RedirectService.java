@@ -12,6 +12,7 @@ import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.AisConsentAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisAuthorisationRepository;
 import de.adorsys.psd2.consent.repository.PisCommonPaymentDataRepository;
+import de.adorsys.psd2.sandbox.xs2a.service.domain.ScaException;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
@@ -64,7 +65,8 @@ public class RedirectService {
    * @param externalId Consent Id
    * @param psuId      Psu Id
    */
-  public void handleConsentCreationRedirectRequest(String externalId, String psuId) {
+  public void handleConsentCreationRedirectRequest(String externalId, String psuId)
+      throws ScaException {
     Optional<AisConsentAuthorization> aisConsentAuthorization = aisConsentAuthorizationRepository
         .findByExternalId(externalId);
 
@@ -84,12 +86,16 @@ public class RedirectService {
     Optional<ConsentStatus> consentStatus;
     ScaStatus newScaStatus;
     if (psu.isPresent() && isPsuAllowedToExecuteAuth(psu, authorizationIbans)) {
-      if (consent.getAisConsentRequestType().equals(AisConsentRequestType.BANK_OFFERED)
-          && testDataService.isSucccessfulPsu(psuId)) {
-        consent.setAccesses(fillAccountAccesses());
+      if (aisConsentAuth.getScaStatus().isNotFinalisedStatus()) {
+        if (consent.getAisConsentRequestType().equals(AisConsentRequestType.BANK_OFFERED)
+            && testDataService.isSucccessfulPsu(psuId)) {
+          consent.setAccesses(fillAccountAccesses());
+        }
+        consentStatus = ConsentStatus.fromValue(psu.get().getConsentStatusAfterSca().xs2aValue());
+        newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
+      } else {
+        throw new ScaException("redirect-uri already called");
       }
-      consentStatus = ConsentStatus.fromValue(psu.get().getConsentStatusAfterSca().xs2aValue());
-      newScaStatus = ScaStatus.fromValue(psu.get().getInitiationScaStatus().xs2aValue());
     } else {
       consentStatus = ConsentStatus.fromValue("rejected");
       newScaStatus = ScaStatus.FAILED;
@@ -127,7 +133,7 @@ public class RedirectService {
    * @param scaOperation Executed for Initiation or Cancellation
    */
   public void handlePaymentRedirectRequest(String externalId, String psuId,
-      ScaOperation scaOperation) {
+      ScaOperation scaOperation) throws ScaException {
     Optional<PisAuthorization> pisAuthorization = pisAuthorizationRepository
         .findByExternalId(externalId);
 
@@ -139,6 +145,10 @@ public class RedirectService {
     PisAuthorization paymentAuth = pisAuthorization.get();
 
     List<PisPaymentData> pisPaymentDataList = paymentAuth.getPaymentData().getPayments();
+
+    if (pisAuthorization.get().getScaStatus().isFinalisedStatus()) {
+      throw new ScaException("redirect-uri already called");
+    }
 
     if (pisPaymentDataList.isEmpty()) {
       //TODO handle error case
