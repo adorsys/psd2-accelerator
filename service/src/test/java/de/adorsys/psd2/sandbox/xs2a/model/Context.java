@@ -1,6 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.model;
 
 import de.adorsys.psd2.model.AccountAccess;
+import de.adorsys.psd2.xs2a.core.ais.BookingStatus;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 
@@ -21,6 +22,7 @@ public class Context {
   private AccountAccess consentAccountAccess;
   private ResponseEntity actualResponse;
   private boolean withBalance;
+  private BookingStatus bookingStatus;
   private String scaStatusUrl;
 
   @SuppressWarnings("unchecked") // "just" test code

@@ -44,6 +44,7 @@ import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
 import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
+import de.adorsys.psd2.xs2a.core.ais.BookingStatus;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -388,6 +389,7 @@ public class AisSteps extends SpringCucumberTestBase {
         bookingStatus, LocalDate.now().minusYears(1), LocalDate.now(), withBalance
     );
     context.setWithBalance(Boolean.parseBoolean(withBalance));
+    context.setBookingStatus(BookingStatus.forValue(bookingStatus));
 
     return template.exchange(
         "accounts/" + context.getAccountId() + "/transactions" + queryParams,
@@ -478,17 +480,28 @@ public class AisSteps extends SpringCucumberTestBase {
     ResponseEntity<TransactionsResponse200Json> actualResponse = context.getActualResponse();
     AccountReport transactions = actualResponse.getBody().getTransactions();
 
-    assertThat(actualResponse.getBody().getTransactions().getBooked().size(), equalTo(4));
+    if (context.getBookingStatus().equals(BookingStatus.BOOKED)) {
+      assertThat(transactions.getBooked().size(), equalTo(3));
+      assertThat(transactions.getPending(), equalTo(null));
+      boolean includesInvalidTransactions = transactions.getBooked().stream()
+          .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
+      assertFalse(includesInvalidTransactions);
+    } else if (context.getBookingStatus().equals(BookingStatus.BOTH)) {
+      assertThat(transactions.getBooked().size(), equalTo(3));
+      assertThat(transactions.getPending().size(), equalTo(1));
+      boolean includesInvalidTransactions = transactions.getBooked().stream()
+          .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
+      assertFalse(includesInvalidTransactions);
+    } else {
+      assertThat(transactions.getBooked(), equalTo(null));
+      assertThat(transactions.getPending().size(), equalTo(1));
+    }
 
     if (context.isWithBalance()) {
       assertThat(actualResponse.getBody().getBalances().size(), equalTo(2));
     } else {
       assertNull(actualResponse.getBody().getBalances());
     }
-    assertThat(transactions.getBooked().size(), equalTo(4));
-    boolean includesInvalidTransactions = transactions.getBooked().stream()
-        .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
-    assertFalse(includesInvalidTransactions);
   }
 
   @Then("the transaction data are received")

@@ -123,7 +123,7 @@ class TestDataFileReader {
         UUID.randomUUID().toString(),
         null,
         transactionAmount,
-        LocalDate.parse(bookingDate),
+        bookingDate.isEmpty() ? null : LocalDate.parse(bookingDate),
         LocalDate.parse(valueDate),
         debtorIban,
         currencyDebtorAccount,
