@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,15 +46,19 @@ public class TestDataService {
 
   private TestDataFileReader testDataFileReader;
 
+  private boolean usdEnabled;
+
   /**
    * Creates a new TestDataService and inits its data depending on the given configuration.
    *
    * @param testDataConfiguration externalized testdata configuration, see testdata.yml
    */
   public TestDataService(TestDataConfiguration testDataConfiguration,
-      TestDataFileReader testDataFileReader) {
+      TestDataFileReader testDataFileReader,
+      @Value("${sandbox.testdata.usd.enabled:true}") boolean usdEnabled) {
     this.testDataConfiguration = testDataConfiguration;
     this.testDataFileReader = testDataFileReader;
+    this.usdEnabled = usdEnabled;
 
     HashMap<String, TestPsu> map = new HashMap<>();
 
@@ -384,48 +389,51 @@ public class TestDataService {
 
     accounts.put(lowerAvailableBalanceAccount.getAccountId(), lowerAvailableBalanceAccount);
 
-    String ibanGiroUsd = testDataConfiguration.getIbanForPsu(psuId, 5);
-    String accountIdGiroUsd = "cfefebae-a72a-4cac-9e6d-ee3f3bb186dc";
+    if (usdEnabled) {
+      String ibanGiroUsd = testDataConfiguration.getIbanForPsu(psuId, 5);
+      String accountIdGiroUsd = "cfefebae-a72a-4cac-9e6d-ee3f3bb186dc";
 
-    Transaction giroUsdTransaction = new Transaction(
-        "6058dcd0-6f2a-4f8c-b329-b1d99b5fdf6c",
-        "",
-        new Amount(USD, BigDecimal.valueOf(-50.00)),
-        LocalDate.parse("2018-12-01"),
-        LocalDate.parse("2018-12-01"),
-        debtorName,
-        ibanGiroUsd,
-        "BORIC SOMMER",
-        "DE44760365687977921213",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "Happy Birthday Boric DATUM 01.12.2018, 21.04 UHR1.TAN 633209",
-        "",
-        "",
-        ""
-    );
+      Transaction giroUsdTransaction = new Transaction(
+          "6058dcd0-6f2a-4f8c-b329-b1d99b5fdf6c",
+          "",
+          new Amount(USD, BigDecimal.valueOf(-50.00)),
+          LocalDate.parse("2018-12-01"),
+          LocalDate.parse("2018-12-01"),
+          debtorName,
+          ibanGiroUsd,
+          "BORIC SOMMER",
+          "DE44760365687977921213",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "Happy Birthday Boric DATUM 01.12.2018, 21.04 UHR1.TAN 633209",
+          "",
+          "",
+          ""
+      );
 
-    HashMap<String, Transaction> giroUsdMap = new HashMap<>();
-    giroUsdMap
-        .put(giroUsdTransaction.getTransactionId(), giroUsdTransaction);
+      HashMap<String, Transaction> giroUsdMap = new HashMap<>();
+      giroUsdMap
+          .put(giroUsdTransaction.getTransactionId(), giroUsdTransaction);
 
-    Account giroUsdAccount = new Account(
-        accountIdGiroUsd,
-        ibanGiroUsd,
-        USD,
-        "Current",
-        CashAccountType.CACC,
-        Arrays.asList(
-            new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)),
-                BalanceType.INTERIM_AVAILABLE),
-            new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)), BalanceType.CLOSING_BOOKED)),
-        giroUsdMap
-    );
+      Account giroUsdAccount = new Account(
+          accountIdGiroUsd,
+          ibanGiroUsd,
+          USD,
+          "Current",
+          CashAccountType.CACC,
+          Arrays.asList(
+              new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)),
+                  BalanceType.INTERIM_AVAILABLE),
+              new Balance(new Amount(USD, BigDecimal.valueOf(9281.45)),
+                  BalanceType.CLOSING_BOOKED)),
+          giroUsdMap
+      );
 
-    accounts.put(giroUsdAccount.getAccountId(), giroUsdAccount);
+      accounts.put(giroUsdAccount.getAccountId(), giroUsdAccount);
+    }
 
     return new TestPsu(
         psuId,
