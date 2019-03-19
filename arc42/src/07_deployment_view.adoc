@@ -76,6 +76,9 @@ For an example and the actual default values used in the sandbox see the <<sampl
 
 | Points to the default `bank_profile.yml` YML embedded in the application
 | SANDBOX_TESTDATA_TRANSACTIONS_PATH | Path and filename of the custom transaction data | Points to the default `transactions_dump.csv` CSV embedded in the application
+| SANDBOX_TESTDATA_USD_ENABLED | Enables/Disables the account with the currency US-Dollar of PSU-Successful.
+
+Possible values are: _true_ or _false_  | _true_
 | CERTIFICATE_FILTER
 a| Set to the format of the QWAC certificate in the `tpp-qwac-certificate` header. This value depends on your SSL-Proxy configuration. Possible values are:
 
