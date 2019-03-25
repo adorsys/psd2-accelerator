@@ -222,6 +222,7 @@ public class AccountSpiImpl implements AccountSpi {
     Optional<TestPsu> psu = testDataService.getPsuByIban(iban);
 
     if (!psu.isPresent()) {
+      System.out.println("test");
       return Optional.empty();
     }
 
