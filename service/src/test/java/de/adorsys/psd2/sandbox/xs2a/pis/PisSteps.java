@@ -82,21 +82,21 @@ public class PisSteps extends SpringCucumberTestBase {
         throw new IllegalStateException("Unknown payment product=" + paymentType);
     }
 
-    ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct(),
         HttpMethod.POST,
         request.toHttpEntity(),
-        PaymentInitationRequestResponse201.class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
-      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
-      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
     }
 
-    context.setPaymentId(response.getBody().getPaymentId());
+    context.setPaymentId(response.getBody().get("paymentId").asText());
   }
 
   @Given("^PSU initiated a single payment with iban (.*) and the exceeding amount (.*)$")
@@ -108,21 +108,21 @@ public class PisSteps extends SpringCucumberTestBase {
 
     request = getSinglePayment(headers, false, debtorIban, amount);
 
-    ResponseEntity<PaymentInitationRequestResponse201> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct(),
         HttpMethod.POST,
         request.toHttpEntity(),
-        PaymentInitationRequestResponse201.class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
-      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
-      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
     }
 
-    context.setPaymentId(response.getBody().getPaymentId());
+    context.setPaymentId(response.getBody().get("paymentId").asText());
   }
 
 
@@ -268,8 +268,8 @@ public class PisSteps extends SpringCucumberTestBase {
         HttpMethod.POST,
         request.toHttpEntity(),
         JsonNode.class);
-    context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").asText());
-    context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").asText());
+    context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+    context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
   }
 
   @Then("^the transaction status (.*) is received$")

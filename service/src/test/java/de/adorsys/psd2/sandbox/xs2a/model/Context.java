@@ -29,18 +29,4 @@ public class Context {
   public <T> ResponseEntity<T> getActualResponse() {
     return (ResponseEntity<T>) actualResponse;
   }
-
-  private String removeObsoleteHrefPrefix(String url){
-    return url.contains("href")
-        ? url.substring(url.indexOf("http:"))
-               : url;
-  }
-
-  public void setScaRedirect(String scaRedirect) {
-    this.scaRedirect = removeObsoleteHrefPrefix(scaRedirect);
-  }
-
-  public void setScaStatusUrl(String scaStatusUrl) {
-    this.scaStatusUrl = removeObsoleteHrefPrefix(scaStatusUrl);
-  }
 }

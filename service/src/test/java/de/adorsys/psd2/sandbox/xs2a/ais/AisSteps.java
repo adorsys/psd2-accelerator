@@ -40,6 +40,7 @@ import de.adorsys.psd2.model.TransactionDetails;
 import de.adorsys.psd2.model.TransactionsResponse200Json;
 import de.adorsys.psd2.model.UpdatePsuAuthentication;
 import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
+import de.adorsys.psd2.sandbox.migration.MigrationService;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
@@ -52,6 +53,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.Ignore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -62,6 +65,7 @@ public class AisSteps extends SpringCucumberTestBase {
 
   @Autowired
   AspspProfileService aspspProfileService;
+  private static final Logger logger = LoggerFactory.getLogger(AisSteps.class);
 
   private Context context = new Context();
   private String scaApproach;
@@ -100,20 +104,20 @@ public class AisSteps extends SpringCucumberTestBase {
 
     Request<Consents> request = new Request<>(consent, headers);
 
-    ResponseEntity<ConsentsResponse201> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         "consents",
         HttpMethod.POST,
         request.toHttpEntity(),
-        ConsentsResponse201.class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
-      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
-      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
     }
 
-    context.setConsentId(response.getBody().getConsentId());
+    context.setConsentId(response.getBody().get("consentId").asText());
   }
 
   @Given("PSU tries to create a consent on dedicated accounts for account information (.*), balances (.*) and transactions (.*)")
@@ -176,20 +180,20 @@ public class AisSteps extends SpringCucumberTestBase {
 
     Request<Consents> request = new Request<>(consent, headers);
 
-    ResponseEntity<ConsentsResponse201> response = template.exchange(
+    ResponseEntity<JsonNode> response = template.exchange(
         "consents",
         HttpMethod.POST,
         request.toHttpEntity(),
-        ConsentsResponse201.class);
+        JsonNode.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
     if (scaApproach.equalsIgnoreCase("redirect")) {
-      context.setScaRedirect(response.getBody().getLinks().get("scaRedirect").toString());
-      context.setScaStatusUrl(response.getBody().getLinks().get("scaStatus").toString());
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
     }
 
-    context.setConsentId(response.getBody().getConsentId());
+    context.setConsentId(response.getBody().get("consentId").asText());
   }
 
   @Given("PSU tries to create a consent for account information (.*), balances (.*) and transactions (.*) with wrong currency (.*)")
