@@ -12,8 +12,10 @@ import de.adorsys.psd2.xs2a.config.ObjectMapperConfig;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
+import de.adorsys.psd2.xs2a.web.validator.methods.factory.HeadersValidationServiceFactory;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -24,7 +26,9 @@ import org.hibernate.internal.SessionFactoryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -61,6 +65,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 )
 @Import(ContextHolder.class)
 public class Xs2aConfig {
+
+  /**
+   * Initiates a ServiceLocatorFactoryBean if HeadersValidationServiceFactory is not present in
+   * ApplicationContext inherited from xs2a.
+   * @return ServiceLocatorFactoryBean
+   */
+  @ConditionalOnMissingBean(HeadersValidationServiceFactory.class)
+  @Bean
+  public ServiceLocatorFactoryBean headersValidationServiceFactory() {
+    ServiceLocatorFactoryBean serviceLocatorFactoryBean = new ServiceLocatorFactoryBean();
+    serviceLocatorFactoryBean.setServiceLocatorInterface(HeadersValidationServiceFactory.class);
+    return serviceLocatorFactoryBean;
+  }
 
   @Bean
   QwacCertificateFilter sandboxCertificateFilter(

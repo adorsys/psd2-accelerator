@@ -16,30 +16,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
-import de.adorsys.psd2.model.AccountAccess;
-import de.adorsys.psd2.model.AccountList;
-import de.adorsys.psd2.model.AccountReference;
-import de.adorsys.psd2.model.AccountReport;
-import de.adorsys.psd2.model.BalanceType;
-import de.adorsys.psd2.model.ConsentInformationResponse200Json;
-import de.adorsys.psd2.model.ConsentStatus;
-import de.adorsys.psd2.model.ConsentStatusResponse200;
-import de.adorsys.psd2.model.Consents;
-import de.adorsys.psd2.model.ConsentsResponse201;
-import de.adorsys.psd2.model.PsuData;
-import de.adorsys.psd2.model.ReadAccountBalanceResponse200;
-import de.adorsys.psd2.model.ScaStatus;
-import de.adorsys.psd2.model.ScaStatusResponse;
-import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
-import de.adorsys.psd2.model.SelectPsuAuthenticationMethodResponse;
-import de.adorsys.psd2.model.StartScaprocessResponse;
-import de.adorsys.psd2.model.TppMessage401AIS;
-import de.adorsys.psd2.model.TppMessageCategory;
-import de.adorsys.psd2.model.TransactionAuthorisation;
-import de.adorsys.psd2.model.TransactionDetails;
-import de.adorsys.psd2.model.TransactionsResponse200Json;
-import de.adorsys.psd2.model.UpdatePsuAuthentication;
-import de.adorsys.psd2.model.UpdatePsuAuthenticationResponse;
+import de.adorsys.psd2.model.*;
 import de.adorsys.psd2.sandbox.migration.MigrationService;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
@@ -48,10 +25,8 @@ import de.adorsys.psd2.sandbox.xs2a.util.TestUtils;
 import de.adorsys.psd2.xs2a.core.ais.BookingStatus;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+
 import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -486,7 +461,7 @@ public class AisSteps extends SpringCucumberTestBase {
 
     if (context.getBookingStatus().equals(BookingStatus.BOOKED)) {
       assertThat(transactions.getBooked().size(), equalTo(3));
-      assertThat(transactions.getPending(), equalTo(null));
+      assertThat(transactions.getPending(), equalTo(new TransactionList()));
       boolean includesInvalidTransactions = transactions.getBooked().stream()
           .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
       assertFalse(includesInvalidTransactions);
@@ -497,7 +472,7 @@ public class AisSteps extends SpringCucumberTestBase {
           .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
       assertFalse(includesInvalidTransactions);
     } else {
-      assertThat(transactions.getBooked(), equalTo(null));
+      assertThat(transactions.getBooked(), equalTo(new TransactionList()));
       assertThat(transactions.getPending().size(), equalTo(1));
     }
 
