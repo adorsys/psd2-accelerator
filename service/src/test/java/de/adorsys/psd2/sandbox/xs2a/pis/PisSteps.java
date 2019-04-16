@@ -18,10 +18,9 @@ import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.DayOfExecution;
 import de.adorsys.psd2.model.ExecutionRule;
 import de.adorsys.psd2.model.FrequencyCode;
-import de.adorsys.psd2.model.PaymentInitationRequestResponse201;
-import de.adorsys.psd2.model.PaymentInitiationSctJson;
-import de.adorsys.psd2.model.PaymentInitiationSctWithStatusResponse;
-import de.adorsys.psd2.model.PeriodicPaymentInitiationSctJson;
+import de.adorsys.psd2.model.PaymentInitiationJson;
+import de.adorsys.psd2.model.PaymentInitiationWithStatusResponse;
+import de.adorsys.psd2.model.PeriodicPaymentInitiationJson;
 import de.adorsys.psd2.model.PsuData;
 import de.adorsys.psd2.model.ScaStatus;
 import de.adorsys.psd2.model.ScaStatusResponse;
@@ -129,7 +128,7 @@ public class PisSteps extends SpringCucumberTestBase {
   @When("PSU tries to initiate a payment (.*) with iban (.*) and currency (.*) using the payment product (.*)")
   public void tryToInitiatePayment(String paymentService, String iban, String currency,
       String paymentProduct) {
-    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
+    PaymentInitiationJson payment = new PaymentInitiationJson();
     payment.setEndToEndIdentification("WBG-123456789");
     payment.setDebtorAccount(createAccount(iban, currency));
 
@@ -145,7 +144,7 @@ public class PisSteps extends SpringCucumberTestBase {
 
     HashMap<String, String> headers = TestUtils.createSession();
 
-    Request<PaymentInitiationSctJson> request = new Request<>(payment, headers);
+    Request<PaymentInitiationJson> request = new Request<>(payment, headers);
 
     ResponseEntity<JsonNode> response = template.exchange(
         paymentService + "/" + paymentProduct,
@@ -203,13 +202,13 @@ public class PisSteps extends SpringCucumberTestBase {
 
     Request<?> request = Request.emptyRequest(headers);
 
-    ResponseEntity<PaymentInitiationSctWithStatusResponse> response = template.exchange(
+    ResponseEntity<PaymentInitiationWithStatusResponse> response = template.exchange(
         context.getPaymentService() + "/" +
             context.getPaymentProduct() + "/" +
             context.getPaymentId(),
         HttpMethod.GET,
         request.toHttpEntity(),
-        PaymentInitiationSctWithStatusResponse.class);
+        PaymentInitiationWithStatusResponse.class);
 
     assertTrue(response.getStatusCode().is2xxSuccessful());
 
@@ -281,7 +280,7 @@ public class PisSteps extends SpringCucumberTestBase {
 
   @Then("^the payment data and its transaction-status is (.*) are received$")
   public void receivePaymentDataAndResponseCode(String transactionStatus) {
-    ResponseEntity<PaymentInitiationSctWithStatusResponse> actualResponse = context
+    ResponseEntity<PaymentInitiationWithStatusResponse> actualResponse = context
         .getActualResponse();
 
     assertThat(actualResponse.getBody().getTransactionStatus().toString(),
@@ -300,16 +299,16 @@ public class PisSteps extends SpringCucumberTestBase {
     assertThat(err.get("text").asText(), containsString(text));
   }
 
-  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
+  private Request<PaymentInitiationJson> getSinglePayment(HashMap<String, String> headers,
       boolean isFutureDated, String debtorIban) {
     return getSinglePayment(headers, isFutureDated, debtorIban, "520");
   }
 
-  private Request<PaymentInitiationSctJson> getSinglePayment(HashMap<String, String> headers,
+  private Request<PaymentInitiationJson> getSinglePayment(HashMap<String, String> headers,
       boolean isFutureDated, String debtorIban, String amount) {
     context.setPaymentService("payments");
 
-    PaymentInitiationSctJson payment = new PaymentInitiationSctJson();
+    PaymentInitiationJson payment = new PaymentInitiationJson();
     payment.setEndToEndIdentification("WBG-123456789");
     payment.setDebtorAccount(createAccount(debtorIban, "EUR"));
 
@@ -332,7 +331,7 @@ public class PisSteps extends SpringCucumberTestBase {
   private Request getPeriodicPayment(HashMap<String, String> headers, String debtorIban) {
     context.setPaymentService("periodic-payments");
 
-    PeriodicPaymentInitiationSctJson periodicPayment = new PeriodicPaymentInitiationSctJson();
+    PeriodicPaymentInitiationJson periodicPayment = new PeriodicPaymentInitiationJson();
     periodicPayment.setEndToEndIdentification("WBG-123456789");
 
     periodicPayment.setDebtorAccount(createAccount(debtorIban, "EUR"));
@@ -346,7 +345,7 @@ public class PisSteps extends SpringCucumberTestBase {
     periodicPayment.setCreditorName("WBG");
     periodicPayment.setFrequency(FrequencyCode.MONTHLY);
     periodicPayment.setDayOfExecution(DayOfExecution._1);
-    periodicPayment.setExecutionRule(ExecutionRule.PRECEEDING);
+    periodicPayment.setExecutionRule(ExecutionRule.PRECEDING);
     periodicPayment.setStartDate(LocalDate.now().plusDays(7));
     periodicPayment.setEndDate(LocalDate.now().plusMonths(1));
 
