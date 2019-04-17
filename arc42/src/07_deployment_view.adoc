@@ -118,7 +118,7 @@ WARNING: It is required to enable CORS in the service which serves the customize
 .Sample bank_profile.yml
 [source,yaml]
 ----
-include::../../service/src/main/resources/bank_profile.yml[]
+include::../../service/sandbox-core/src/main/resources/bank_profile.yml[]
 ----
 
 ===== Customizing the Test Data
@@ -128,7 +128,7 @@ The IBANs of the different PSUs we provide are configurable. There is a default 
 .Default Test Data Configuration
 [source,yaml]
 ----
-include::../../service/src/main/resources/testdata.yml[]
+include::../../service/sandbox-core/src/main/resources/testdata.yml[]
 ----
 
 Every PSU has one or more accounts. The account order _does_ matter (e.g. the first IBAN of _PSU-Successful_ is always picked for the giro account). You can override the configuration by placing an edited copy in `$CWD/config/testdata.yml` next to the JAR.
@@ -142,7 +142,7 @@ The format of the CSV file must match the following example:
 .Default Transaction Data
 [source,csv]
 ----
-include::../../service/src/main/resources/transactions_dump.csv[]
+include::../../service/sandbox-core/src/main/resources/transactions_dump.csv[]
 ----
 
 The CSV must comply with the following restrictions:
@@ -230,7 +230,7 @@ To use a custom log configuration start the PSD2 Accelerator with `-Dlogging.con
 .Default Logging Configuration
 [source,yaml]
 ----
-include::../../service/src/main/resources/logback.xml[]
+include::../../service/sandbox-core/src/main/resources/logback.xml[]
 ----
 
 WARNING: If you use your own `logback.xml` we can't guarantee that the default Spring Boot configuration properties still work. Please check the docs thoroughly. Have a look at the https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/howto-logging.html[Spring Boot logging configuration], the https://logback.qos.ch/manual/configuration.html[Logback Documentation] and our `logback.xml` to see whats possible.

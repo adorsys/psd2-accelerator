@@ -94,4 +94,5 @@ a|
 | Nadja Krendel     | Agile Coach             | nkr@adorsys.de
 | Roman Ataman      | Developer               | rat@adorsys.de https://github.com/atamanroman
 | Sebastian Wild    | Developer               | swi@adorsys.de
+| Petro Rudenko     | Developer               | pru@adorsys.com.ua
 |===

@@ -51,7 +51,7 @@ public class SwaggerConfig {
         .groupName("Certificate Generator API")
         .select()
         .apis(RequestHandlerSelectors
-            .basePackage("de.adorsys.psd2.sandbox.portal.certificateserver"))
+            .basePackage("de.adorsys.psd2.sandbox.certificate"))
         .paths(PathSelectors.any())
         .build();
   }

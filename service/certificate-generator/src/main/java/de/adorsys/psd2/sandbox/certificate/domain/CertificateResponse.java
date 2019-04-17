@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.portal.certificateserver.domain;
+package de.adorsys.psd2.sandbox.certificate.domain;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Builder;

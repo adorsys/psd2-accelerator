@@ -1,4 +1,4 @@
-package de.adorsys.psd2.sandbox.portal.certificateserver;
+package de.adorsys.psd2.sandbox.certificate.exception;
 
 public class CertificateException extends RuntimeException {
 
@@ -18,7 +18,7 @@ public class CertificateException extends RuntimeException {
   }
 
   public CertificateException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+                              boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 

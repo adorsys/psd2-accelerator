@@ -1,14 +1,14 @@
-package de.adorsys.psd2.sandbox.portal.certificateserver.service;
+package de.adorsys.psd2.sandbox.certificate.service;
 
 import com.nimbusds.jose.util.X509CertUtils;
-import de.adorsys.psd2.sandbox.portal.certificateserver.CertificateException;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.CertificateRequest;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.CertificateResponse;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.IssuerData;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.NcaId;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.NcaName;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.PspRole;
-import de.adorsys.psd2.sandbox.portal.certificateserver.domain.SubjectData;
+import de.adorsys.psd2.sandbox.certificate.domain.CertificateRequest;
+import de.adorsys.psd2.sandbox.certificate.domain.CertificateResponse;
+import de.adorsys.psd2.sandbox.certificate.domain.IssuerData;
+import de.adorsys.psd2.sandbox.certificate.domain.NcaId;
+import de.adorsys.psd2.sandbox.certificate.domain.NcaName;
+import de.adorsys.psd2.sandbox.certificate.domain.PspRole;
+import de.adorsys.psd2.sandbox.certificate.domain.SubjectData;
+import de.adorsys.psd2.sandbox.certificate.exception.CertificateException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -409,11 +409,11 @@ public class CertificateService {
   private static class RoleOfPsp extends DERSequence {
 
     static final RoleOfPsp PSP_PI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_PI,
-        RoleOfPspName.PSP_PI);
+                                                  RoleOfPspName.PSP_PI);
     static final RoleOfPsp PSP_AI = new RoleOfPsp(RoleOfPspOid.ID_PSD_2_ROLE_PSP_AI,
-        RoleOfPspName.PSP_AI);
+                                                  RoleOfPspName.PSP_AI);
     static final RoleOfPsp PSP_IC = new RoleOfPsp(RoleOfPspOid.ROLE_OF_PSP_OID,
-        RoleOfPspName.PSP_IC);
+                                                  RoleOfPspName.PSP_IC);
 
     private RoleOfPsp(RoleOfPspOid roleOfPspOid, RoleOfPspName roleOfPspName) {
       super(new ASN1Encodable[]{roleOfPspOid, roleOfPspName});

@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   service:
-    build: service
+    build: service/sandbox-core
     image: adorsys/psd2-sandbox
     ports:
       - "8080:8080"
