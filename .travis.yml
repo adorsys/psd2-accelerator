@@ -47,7 +47,7 @@ script:
   - sha1sum *.jar | tee $(ls *.jar).sha1 || travis_terminate 1
   - cd -
   # build docker
-  - docker build --pull -t "adorsys/$PSD2_SANDBOX_IMAGE:latest" service || travis_terminate 1
+  - docker build --pull -t "adorsys/$PSD2_SANDBOX_IMAGE:latest" service/sandbox-core || travis_terminate 1
   - docker build --pull -t "adorsys/$SSL_PROXY_IMAGE:latest" ssl-proxy || travis_terminate 1
   - docker run -it --rm -v $PWD:/src -w /src -u $(id -u ${USER}):$(id -g ${USER})
     adorsys/arc42-tools sh -c "make arc42/psd2-accelerator-arc42.html" || travis_terminate 1
