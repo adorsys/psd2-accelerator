@@ -7,13 +7,18 @@
   <groupId>de.adorsys.psd2</groupId>
   <artifactId>sandbox</artifactId>
   <version>1.5.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>Sandbox</name>
   <description>
     The PSD2 Sandbox shall offer functional usage of XS2A based on test data and comply
     with mandatory regulations of PSD2. Furthermore, it should be easy to deploy.
   </description>
+
+  <modules>
+    <module>sandbox-core</module>
+    <module>certificate-generator</module>
+  </modules>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -27,158 +32,209 @@
     <xs2a.version>2.3</xs2a.version>
     <cucumber.version>4.2.0</cucumber.version>
     <testcontainers.version>1.10.1</testcontainers.version>
+    <liquibase.version>3.5.5</liquibase.version>
+    <swagger.annotations.version>1.5.20</swagger.annotations.version>
+    <springfox.version>2.9.2</springfox.version>
+    <bcpkix.jdk15on.version>1.60</bcpkix.jdk15on.version>
+    <nimbus.jose.jwt.version>6.1.1</nimbus.jose.jwt.version>
+    <commons.io.version>2.6</commons.io.version>
+    <commons.csv.version>1.6</commons.csv.version>
+    <micrometer.version>1.1.3</micrometer.version>
+    <mockito.core.version>2.24.0</mockito.core.version>
+    <junit.runners.version>1.3</junit.runners.version>
+    <spring-boot.version>1.5.18.RELEASE</spring-boot.version>
   </properties>
 
-  <dependencies>
-    <!-- Spring Boot -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+  <dependencyManagement>
+    <dependencies>
+      <!-- Spring Boot -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
 
-    <!-- XS2A -->
-    <dependency>
-      <groupId>de.adorsys.psd2</groupId>
-      <artifactId>xs2a-impl</artifactId>
-      <version>${xs2a.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.adorsys.psd2</groupId>
-      <artifactId>aspsp-profile-lib</artifactId>
-      <version>${xs2a.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.adorsys.psd2</groupId>
-      <artifactId>consent-management-lib</artifactId>
-      <version>${xs2a.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>de.adorsys.psd2</groupId>
-          <artifactId>aspsp-profile-remote</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
 
-    <dependency>
-      <groupId>de.adorsys.psd2</groupId>
-      <artifactId>cms-db-schema</artifactId>
-      <version>${xs2a.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.liquibase</groupId>
-      <artifactId>liquibase-core</artifactId>
-    </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
 
-    <!-- Lombok -->
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
-    </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>${spring-boot.version}</version>
+        <scope>test</scope>
+      </dependency>
 
-    <!-- Certificate -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-      <version>1.60</version>
-    </dependency>
-    <dependency>
-      <groupId>com.nimbusds</groupId>
-      <artifactId>nimbus-jose-jwt</artifactId>
-      <version>6.1.1</version>
-    </dependency>
+      <!-- XS2A -->
+      <dependency>
+        <groupId>de.adorsys.psd2</groupId>
+        <artifactId>xs2a-impl</artifactId>
+        <version>${xs2a.version}</version>
+      </dependency>
 
-    <!-- Commons -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-csv</artifactId>
-      <version>1.6</version>
-    </dependency>
+      <dependency>
+        <groupId>de.adorsys.psd2</groupId>
+        <artifactId>aspsp-profile-lib</artifactId>
+        <version>${xs2a.version}</version>
+      </dependency>
 
-    <!--Prometheus-->
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-spring-legacy</artifactId>
-      <version>1.1.3</version>
-    </dependency>
+      <dependency>
+        <groupId>de.adorsys.psd2</groupId>
+        <artifactId>consent-management-lib</artifactId>
+        <version>${xs2a.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>de.adorsys.psd2</groupId>
+            <artifactId>aspsp-profile-remote</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
-    <dependency>
-      <groupId>io.micrometer</groupId>
-      <artifactId>micrometer-registry-prometheus</artifactId>
-      <version>1.1.3</version>
-    </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
 
-    <!-- Cucumber -->
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-java</artifactId>
-      <version>${cucumber.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-junit</artifactId>
-      <version>${cucumber.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-spring</artifactId>
-      <version>${cucumber.version}</version>
-      <scope>test</scope>
-    </dependency>
+      <dependency>
+        <groupId>de.adorsys.psd2</groupId>
+        <artifactId>cms-db-schema</artifactId>
+        <version>${xs2a.version}</version>
+      </dependency>
 
-    <!--Mockito-->
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>2.24.0</version>
-      <scope>test</scope>
-    </dependency>
-    <!--Needed for nested junit tests-->
-    <dependency>
-      <groupId>com.nitorcreations</groupId>
-      <artifactId>junit-runners</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>${liquibase.version}</version>
+      </dependency>
 
-    <!-- Testcontainers -->
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+      <!-- Lombok -->
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+      </dependency>
+
+      <!-- Certificate -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpkix-jdk15on</artifactId>
+        <version>${bcpkix.jdk15on.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.nimbusds</groupId>
+        <artifactId>nimbus-jose-jwt</artifactId>
+        <version>${nimbus.jose.jwt.version}</version>
+      </dependency>
+
+      <!-- Commons -->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons.io.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-csv</artifactId>
+        <version>${commons.csv.version}</version>
+      </dependency>
+
+      <!--Prometheus-->
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-spring-legacy</artifactId>
+        <version>${micrometer.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.micrometer</groupId>
+        <artifactId>micrometer-registry-prometheus</artifactId>
+        <version>${micrometer.version}</version>
+      </dependency>
+
+      <!-- Swagger -->
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-annotations</artifactId>
+        <version>${swagger.annotations.version}</version>
+      </dependency>
+
+      <!-- Cucumber -->
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-java</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-junit</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.cucumber</groupId>
+        <artifactId>cucumber-spring</artifactId>
+        <version>${cucumber.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!--Mockito-->
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.core.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!--Needed for nested junit tests-->
+      <dependency>
+        <groupId>com.nitorcreations</groupId>
+        <artifactId>junit-runners</artifactId>
+        <version>${junit.runners.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <!-- Test containers -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${testcontainers.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <!-- enable filtering for sandbox-application.properties (replace @variable@) -->
@@ -198,153 +254,157 @@
         <filtering>false</filtering>
       </resource>
     </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>repackage</goal>
-              <goal>build-info</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!--
-          Allows us to load JDBC driver from FS. See
-          https://docs.spring.io/spring-boot/docs/1.5.17.RELEASE/reference/html/build-tool-plugins-gradle-plugin.html#build-tool-plugins-gradle-configuration-layouts
-          -->
-          <layout>ZIP</layout>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <delimiters>
-                <delimiter>@</delimiter>
-              </delimiters>
-              <useDefaultDelimiters>false</useDefaultDelimiters>
-              <outputDirectory>${basedir}/target/classes/app</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../ui/dist/psd2-accelerator</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <id>prepare-package</id>
-            <phase>prepare-package</phase>
-            <configuration>
-              <configLocation>${project.basedir}/google-checkstyle.xml</configLocation>
-              <encoding>UTF-8</encoding>
-              <consoleOutput>true</consoleOutput>
-              <failsOnError>true</failsOnError>
-              <failOnViolation>true</failOnViolation>
-              <includeTestResources>true</includeTestResources>
-            </configuration>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>com.puppycrawl.tools</groupId>
-            <artifactId>checkstyle</artifactId>
-            <version>8.18</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
-        <executions>
-          <execution>
-            <id>default-prepare-agent</id>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>default-report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Make licenses blacklistable -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>1.16</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>add-third-party</goal>
-            </goals>
-            <configuration>
-              <!-- License blacklist -->
-              <excludedLicenses>
-                <excludedLicense>GNU General Public License, v2.0</excludedLicense>
-              </excludedLicenses>
-              <!-- Fail mvn build if there are some dependencies with no license -->
-              <failOnMissing>false</failOnMissing>
-              <!-- Fail mvn build if there are some dependencies with blacklisted license -->
-              <failOnBlacklist>true</failOnBlacklist>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- Create license report -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <id>license-report</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>dependencies</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
-        <configuration>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
-        </configuration>
-      </plugin>
-      <!-- collect build and git information for actuator -->
-      <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-      </plugin>
-    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring-boot.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>repackage</goal>
+                <goal>build-info</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!--
+            Allows us to load JDBC driver from FS. See
+            https://docs.spring.io/spring-boot/docs/1.5.17.RELEASE/reference/html/build-tool-plugins-gradle-plugin.html#build-tool-plugins-gradle-configuration-layouts
+            -->
+            <layout>ZIP</layout>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+            <execution>
+              <id>copy-resources</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <delimiters>
+                  <delimiter>@</delimiter>
+                </delimiters>
+                <useDefaultDelimiters>false</useDefaultDelimiters>
+                <outputDirectory>${basedir}/target/classes/app</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>../ui/dist/psd2-accelerator</directory>
+                    <filtering>false</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <id>prepare-package</id>
+              <phase>prepare-package</phase>
+              <configuration>
+                <configLocation>${project.basedir}/google-checkstyle.xml</configLocation>
+                <encoding>UTF-8</encoding>
+                <consoleOutput>true</consoleOutput>
+                <failsOnError>true</failsOnError>
+                <failOnViolation>true</failOnViolation>
+                <includeTestResources>true</includeTestResources>
+              </configuration>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>8.18</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.2</version>
+          <executions>
+            <execution>
+              <id>default-prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>default-report</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Make licenses blacklistable -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>1.16</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>add-third-party</goal>
+              </goals>
+              <configuration>
+                <!-- License blacklist -->
+                <excludedLicenses>
+                  <excludedLicense>GNU General Public License, v2.0</excludedLicense>
+                </excludedLicenses>
+                <!-- Fail mvn build if there are some dependencies with no license -->
+                <failOnMissing>false</failOnMissing>
+                <!-- Fail mvn build if there are some dependencies with blacklisted license -->
+                <failOnBlacklist>true</failOnBlacklist>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- Create license report -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+          <executions>
+            <execution>
+              <id>license-report</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>dependencies</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.0</version>
+          <configuration>
+            <compilerArgument>-Xlint:unchecked</compilerArgument>
+          </configuration>
+        </plugin>
+        <!-- collect build and git information for actuator -->
+        <plugin>
+          <groupId>pl.project13.maven</groupId>
+          <artifactId>git-commit-id-plugin</artifactId>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>

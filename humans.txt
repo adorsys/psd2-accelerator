@@ -27,6 +27,9 @@
   Tarkan Nein, Developer
   Contact: tne [at] adorsys.de
 
+  Petro Rudenko, Developer
+  Contact: pru [at] adorsys.com.ua
+
 /* THANKS */
 
   Thanks to everybody at adorsys.de and adorsys.com.ua for all the kind help.
