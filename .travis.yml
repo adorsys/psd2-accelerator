@@ -43,7 +43,7 @@ script:
   - cd -
   # build service
   - mvn -f service/pom.xml -B clean package || travis_terminate 1
-  - cd service/target || travis_terminate 1
+  - cd service/sandbox-core/target || travis_terminate 1
   - sha1sum *.jar | tee $(ls *.jar).sha1 || travis_terminate 1
   - cd -
   # build docker
@@ -57,9 +57,9 @@ script:
   - cp arc42/psd2-accelerator-arc42.html pages/index.html || travis_terminate 1
   - cp arc42/psd2-accelerator-deployment.html pages/deployment.html || travis_terminate 1
   - mkdir pages/licenses || travis_terminate 1
-  - cp -r service/target/site/css pages/licenses || travis_terminate 1
-  - cp -r service/target/site/images pages/licenses || travis_terminate 1
-  - cp service/target/site/dependencies.html pages/licenses/index.html || travis_terminate 1
+  - cp -r service/sandbox-core/target/site/css pages/licenses || travis_terminate 1
+  - cp -r service/sandbox-core/target/site/images pages/licenses || travis_terminate 1
+  - cp service/sandbox-core/target/site/dependencies.html pages/licenses/index.html || travis_terminate 1
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
@@ -84,8 +84,8 @@ deploy:
     skip_cleanup: true
     file_glob: true
     file:
-      - service/target/*.jar
-      - service/target/*.jar.sha1
+      - service/sandbox-core/target/*.jar
+      - service/sandbox-core/target/*.jar.sha1
     draft: true
     on:
       tags: true
