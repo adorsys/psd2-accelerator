@@ -9,18 +9,18 @@
 
 # use jq or node to get the version
 ACCELERATOR_VERSION=$(shell jq -r .version ui/package.json)
-JAVA_SRC = $(shell find service/src)
+JAVA_SRC = $(shell find service/sandbox-core/src)
 TS_SRC = $(shell find ui/src -type f)
 ARC42_SRC = $(shell find arc42/src)
 PLANTUML_SRC = $(shell find arc42/diagrams -type f -name '*.puml')
 DEPENDENCIES = jq npm plantuml asciidoctor docker-compose mvn
 
-all: service/target arc42/psd2-accelerator-arc42.html ## Build all components
+all: service/sandbox-core/target arc42/psd2-accelerator-arc42.html ## Build all components
 
 run: all ## Run everything with docker-compose after building
 	docker-compose up --build
 
-service/target: service/pom.xml $(JAVA_SRC) ui/dist ## Build the jar
+service/sandbox-core/target: service/pom.xml $(JAVA_SRC) ui/dist ## Build the jar
 	cd service && mvn -DskipTests clean package
 
 ui/dist: ui/node_modules $(TS_SRC) ## Build the UI package (HTML/JS)
