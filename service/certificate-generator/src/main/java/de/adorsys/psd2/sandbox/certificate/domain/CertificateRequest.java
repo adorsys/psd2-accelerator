@@ -64,4 +64,8 @@ public class CertificateRequest {
   @Builder.Default
   private int validity = 365;
 
+  @NotNull
+  @ApiModelProperty(example = "XS2A Sandbox")
+  private String commonName;
+
 }
