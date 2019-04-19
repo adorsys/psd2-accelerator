@@ -54,6 +54,7 @@ public class CertificateControllerTest {
 
     CertificateRequest certificateRequest = CertificateRequest.builder()
         .authorizationNumber("87B2AC")
+        .commonName("XS2A Sandbox")
         .organizationName("Fictional Corporation AG")
         .roles(Collections.singletonList(PspRole.AISP))
         .build();
@@ -70,6 +71,7 @@ public class CertificateControllerTest {
   public void createCertWithoutRoles() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
         .authorizationNumber("87B2AC")
+        .commonName("XS2A Sandbox")
         .organizationName("Fictional Corporation AG")
         .build();
 
@@ -86,6 +88,7 @@ public class CertificateControllerTest {
   public void createCertWithoutAuthrizationNumber() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
         .organizationName("Fictional Corporation AG")
+        .commonName("XS2A Sandbox")
         .roles(Collections.singletonList(PspRole.AISP))
         .build();
 
@@ -102,6 +105,7 @@ public class CertificateControllerTest {
   public void createCertWithoutOrganizationName() throws Exception {
     CertificateRequest certificateRequest = CertificateRequest.builder()
         .authorizationNumber("87B2AC")
+        .commonName("XS2A Sandbox")
         .roles(Collections.singletonList(PspRole.AISP))
         .build();
 

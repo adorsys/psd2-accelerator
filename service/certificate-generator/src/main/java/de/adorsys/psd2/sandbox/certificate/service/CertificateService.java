@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -170,7 +171,7 @@ public class CertificateService {
         writer)) {
       pemWriter.writeObject(obj);
       pemWriter.flush();
-      return writer.toString(); //.replaceAll("\n", ""); // comment for testing purposes
+      return writer.toString().replaceAll("\n", "");
     } catch (IOException ex) {
       throw new CertificateException("Could not export certificate", ex);
     }
@@ -317,9 +318,9 @@ public class CertificateService {
 
     X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
     builder.addRDN(BCStyle.O, cerData.getOrganizationName());
-
-    builder.addRDN(BCStyle.CN, "");
-
+    if(StringUtils.isNotBlank(cerData.getCommonName())) {
+      builder.addRDN(BCStyle.CN, cerData.getCommonName());
+    }
     if (cerData.getDomainComponent() != null) {
       builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
     }

@@ -1,6 +1,5 @@
 package de.adorsys.psd2.sandbox.certificate.service;
 
-import de.adorsys.psd2.sandbox.certificate.domain.*;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.junit.Test;
 
@@ -28,7 +27,9 @@ public class CertificateServiceTest {
     CertificateRequest certificateRequest = CertificateRequest.builder()
         .authorizationNumber("12345")
         .countryName("Germany")
-        .organizationName("adorsys").build();
+        .organizationName("adorsys")
+        .commonName("XS2A Sandbox")
+        .build();
     CertificateResponse certificateResponse = certificateService.newCertificate(certificateRequest);
     assertNotNull(certificateResponse.getPrivateKey());
     assertNotNull(certificateResponse.getEncodedCert());
@@ -58,7 +59,9 @@ public class CertificateServiceTest {
         .authorizationNumber("12345")
         .countryName("Germany")
         .roles(Collections.singletonList(PspRole.AISP))
-        .organizationName("adorsys").build();
+        .organizationName("adorsys")
+        .commonName("XS2A Sandbox")
+        .build();
 
     SubjectData subjectData = certificateService.generateSubjectData(certificateRequest);
     IssuerData issuerData = certificateService.generateIssuerData();
