@@ -69,6 +69,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 
 @Service
@@ -170,7 +171,7 @@ public class CertificateService {
         writer)) {
       pemWriter.writeObject(obj);
       pemWriter.flush();
-      return writer.toString(); //.replaceAll("\n", ""); // comment for testing purposes
+      return writer.toString().replaceAll("\n", "");
     } catch (IOException ex) {
       throw new CertificateException("Could not export certificate", ex);
     }
@@ -317,9 +318,9 @@ public class CertificateService {
 
     X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
     builder.addRDN(BCStyle.O, cerData.getOrganizationName());
-
-    builder.addRDN(BCStyle.CN, "");
-
+    if(!StringUtils.isEmpty(cerData.getCommonName())) {
+      builder.addRDN(BCStyle.CN, cerData.getCommonName());
+    }
     if (cerData.getDomainComponent() != null) {
       builder.addRDN(BCStyle.DC, cerData.getDomainComponent());
     }

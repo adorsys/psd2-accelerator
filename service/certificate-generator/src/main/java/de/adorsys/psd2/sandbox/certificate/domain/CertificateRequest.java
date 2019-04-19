@@ -64,4 +64,8 @@ public class CertificateRequest {
   @Builder.Default
   private int validity = 365;
 
+  @NotNull
+  @ApiModelProperty(example = "Rozetka")
+  private String commonName;
+
 }
