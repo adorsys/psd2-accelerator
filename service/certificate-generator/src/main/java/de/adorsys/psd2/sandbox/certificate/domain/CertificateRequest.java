@@ -65,7 +65,7 @@ public class CertificateRequest {
   private int validity = 365;
 
   @NotNull
-  @ApiModelProperty(example = "Rozetka")
+  @ApiModelProperty(example = "XS2A Sandbox")
   private String commonName;
 
 }

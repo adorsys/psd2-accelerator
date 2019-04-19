@@ -28,7 +28,7 @@ public class CertificateServiceTest {
         .authorizationNumber("12345")
         .countryName("Germany")
         .organizationName("adorsys")
-        .commonName("Rozetka")
+        .commonName("XS2A Sandbox")
         .build();
     CertificateResponse certificateResponse = certificateService.newCertificate(certificateRequest);
     assertNotNull(certificateResponse.getPrivateKey());
@@ -60,7 +60,7 @@ public class CertificateServiceTest {
         .countryName("Germany")
         .roles(Collections.singletonList(PspRole.AISP))
         .organizationName("adorsys")
-        .commonName("Rozetka")
+        .commonName("XS2A Sandbox")
         .build();
 
     SubjectData subjectData = certificateService.generateSubjectData(certificateRequest);

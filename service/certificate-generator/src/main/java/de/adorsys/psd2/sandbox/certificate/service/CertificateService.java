@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Random;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -69,7 +70,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 
 @Service
@@ -318,7 +318,7 @@ public class CertificateService {
 
     X500NameBuilder builder = new X500NameBuilder(BCStyle.INSTANCE);
     builder.addRDN(BCStyle.O, cerData.getOrganizationName());
-    if(!StringUtils.isEmpty(cerData.getCommonName())) {
+    if(StringUtils.isNotBlank(cerData.getCommonName())) {
       builder.addRDN(BCStyle.CN, cerData.getCommonName());
     }
     if (cerData.getDomainComponent() != null) {

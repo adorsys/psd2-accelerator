@@ -59,7 +59,7 @@ describe('CertificateService', () => {
       organizationName: 'Fictional Corporation AG',
       organizationUnit: 'Information Technology',
       stateOrProvinceName: 'Bayern',
-      commonName: 'Rozetka',
+      commonName: 'XS2A Sandbox',
       validity: 365,
     };
 
