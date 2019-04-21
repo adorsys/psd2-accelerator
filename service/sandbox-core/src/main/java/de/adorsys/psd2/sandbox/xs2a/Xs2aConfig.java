@@ -14,6 +14,7 @@ import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -175,6 +176,4 @@ public class Xs2aConfig {
       return false;
     }
   }
-
-
 }

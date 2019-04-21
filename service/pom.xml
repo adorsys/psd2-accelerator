@@ -29,7 +29,7 @@
   <properties>
     <java.version>1.8</java.version>
     <lombok.version>1.16.22</lombok.version>
-    <xs2a.version>2.1.1</xs2a.version>
+    <xs2a.version>2.3</xs2a.version>
     <cucumber.version>4.2.0</cucumber.version>
     <testcontainers.version>1.10.1</testcontainers.version>
     <liquibase.version>3.5.5</liquibase.version>
@@ -40,9 +40,9 @@
     <commons.io.version>2.6</commons.io.version>
     <commons.csv.version>1.6</commons.csv.version>
     <apache.commons-lang3.version>3.7</apache.commons-lang3.version>
-    <micrometer.version>1.1.3</micrometer.version>
     <mockito.core.version>2.24.0</mockito.core.version>
     <junit.runners.version>1.3</junit.runners.version>
+    <prometheus.version>0.1.0</prometheus.version>
     <spring-boot.version>1.5.18.RELEASE</spring-boot.version>
   </properties>
 
@@ -158,15 +158,21 @@
 
       <!--Prometheus-->
       <dependency>
-        <groupId>io.micrometer</groupId>
-        <artifactId>micrometer-spring-legacy</artifactId>
-        <version>${micrometer.version}</version>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_spring_boot</artifactId>
+        <version>${prometheus.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>io.micrometer</groupId>
-        <artifactId>micrometer-registry-prometheus</artifactId>
-        <version>${micrometer.version}</version>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_hotspot</artifactId>
+        <version>${prometheus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_servlet</artifactId>
+        <version>${prometheus.version}</version>
       </dependency>
 
       <!-- Swagger -->

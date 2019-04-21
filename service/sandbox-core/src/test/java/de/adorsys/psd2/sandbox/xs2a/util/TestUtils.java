@@ -1,11 +1,12 @@
 package de.adorsys.psd2.sandbox.xs2a.util;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class TestUtils {
@@ -16,14 +17,8 @@ public class TestUtils {
    * @return QwacCertificate as String
    */
   public static String getTppQwacCertificate() {
-    StringBuilder sb = new StringBuilder();
-    try {
-      Files.lines(Paths.get("src/test/resources/testData/testCertificate.pem"))
-          .forEach(sb::append);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    return sb.toString();
+    return new BufferedReader(new InputStreamReader(ClassLoader.getSystemResourceAsStream("testData/testCertificate.pem")))
+               .lines().collect(Collectors.joining());
   }
 
   /**

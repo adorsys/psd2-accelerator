@@ -3,6 +3,8 @@ package de.adorsys.psd2.sandbox;
 import de.adorsys.psd2.sandbox.migration.MigrationRunner;
 import de.adorsys.psd2.sandbox.portal.PortalConfig;
 import de.adorsys.psd2.sandbox.xs2a.Xs2aConfig;
+import io.prometheus.client.spring.boot.EnablePrometheusEndpoint;
+import io.prometheus.client.spring.boot.EnableSpringBootMetricsCollector;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
@@ -20,6 +22,8 @@ import org.springframework.context.annotation.Import;
 /**
  * Parent Spring Context which only does feature configuration.
  */
+@EnablePrometheusEndpoint
+@EnableSpringBootMetricsCollector
 @Configuration
 @EnableAutoConfiguration(exclude = {
     // TODO no persistence for now
