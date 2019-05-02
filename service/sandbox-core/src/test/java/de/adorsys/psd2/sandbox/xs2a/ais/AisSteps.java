@@ -95,6 +95,43 @@ public class AisSteps extends SpringCucumberTestBase {
     context.setConsentId(response.getBody().get("consentId").asText());
   }
 
+  @Given("PSU created a consent on dedicated accounts for account information (.*) without currency")
+  public void createDedicatedAccountConsentNoCurrency(String iban) {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Consents consent = new Consents();
+
+    AccountAccess accountAccess = new AccountAccess();
+
+    List<AccountReference> accountList = fillAccountReferences(iban,null);
+
+    accountAccess.setAccounts(accountList);
+
+    context.setConsentAccountAccess(accountAccess);
+
+    consent.setAccess(accountAccess);
+    consent.setRecurringIndicator(true);
+    consent.setValidUntil(LocalDate.now().plusDays(30));
+    consent.setFrequencyPerDay(5);
+
+    Request<Consents> request = new Request<>(consent, headers);
+
+    ResponseEntity<JsonNode> response = template.exchange(
+        "consents",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        JsonNode.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    if (scaApproach.equalsIgnoreCase("redirect")) {
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
+    }
+
+    context.setConsentId(response.getBody().get("consentId").asText());
+  }
+
   @Given("PSU tries to create a consent on dedicated accounts for account information (.*), balances (.*) and transactions (.*)")
   public void psuTriesToCreateConsent(String accounts, String balances, String transactions) {
     String[] ibansForAccountAccess = accounts.split(";");

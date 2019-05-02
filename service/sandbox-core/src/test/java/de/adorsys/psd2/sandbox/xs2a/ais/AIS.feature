@@ -17,6 +17,14 @@ Feature: AIS
       | null                                          | DE11760365688833114935 | null                   |
       | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | null                   |
 
+  Scenario Outline: Dedicated Consent Creation no Currency set
+    Given PSU created a consent on dedicated accounts for account information <accounts> without currency
+    When PSU accesses the consent data
+    Then the consent data are received
+    Examples:
+      | accounts                                   |
+      | DE11760365688833114935                     |
+
   Scenario Outline: Bank Offered Consent Creation
     Given PSU created a bank offered consent
     And PSU authorised the consent with psu-id <psu-id>, password <password>, sca-method <sca-method> and tan <tan>
