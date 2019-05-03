@@ -9,6 +9,7 @@ import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
+import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
@@ -18,9 +19,11 @@ import de.adorsys.psd2.xs2a.spi.domain.consent.SpiVerifyScaAuthorisationResponse
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
 import de.adorsys.psd2.xs2a.spi.service.AisConsentSpi;
+
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +36,7 @@ public class AisConsentSpiImpl implements AisConsentSpi {
 
   @Autowired
   public AisConsentSpiImpl(AuthorisationService authorisationService,
-      TestDataService testDataService) {
+                           TestDataService testDataService) {
     this.authorisationService = authorisationService;
     this.testDataService = testDataService;
   }
@@ -51,27 +54,26 @@ public class AisConsentSpiImpl implements AisConsentSpi {
 
       // TODO what's the right error here? (rat)
       TestPsu knownPsuId = psuId
-          .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+                               .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
 
       if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
         throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
       }
 
-      spiAccountConsent.getAccess().getAccounts().forEach(accountReference -> {
-        Optional<Account> account = testDataService
-            .getAccountByIban(knownPsuId.getPsuId(), accountReference.getIban());
-        if (account.isPresent()) {
-          checkCurrency(account.get().getCurrency(), accountReference.getCurrency());
-        } else {
-          throw new RestException(MessageErrorCode.FORMAT_ERROR);
-        }
-      });
+      spiAccountConsent.getAccess().getAccounts()
+          .forEach(ar -> checkAccountIsPresentAndCurrencyCorrect(knownPsuId, ar));
     }
     return new SpiResponse<>(new SpiInitiateAisConsentResponse(), aspspConsentData);
   }
 
+  private void checkAccountIsPresentAndCurrencyCorrect(TestPsu knownPsuId, SpiAccountReference ar) {
+    Account account = testDataService.getAccountByIban(knownPsuId.getPsuId(), ar.getIban())
+                          .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+    checkCurrency(ar.getCurrency(), account.getCurrency());
+  }
+
   private void checkCurrency(Currency expectedCurrency, Currency definedCurrency) {
-    if (!definedCurrency.equals(expectedCurrency)) {
+    if (expectedCurrency != null && !definedCurrency.equals(expectedCurrency)) {
       throw new RestException(MessageErrorCode.FORMAT_ERROR);
     }
   }
