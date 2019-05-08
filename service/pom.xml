@@ -291,32 +291,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-            <execution>
-              <id>copy-resources</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>copy-resources</goal>
-              </goals>
-              <configuration>
-                <delimiters>
-                  <delimiter>@</delimiter>
-                </delimiters>
-                <useDefaultDelimiters>false</useDefaultDelimiters>
-                <outputDirectory>${project.basedir}/sandbox-core/target/classes/app</outputDirectory>
-                <resources>
-                  <resource>
-                    <directory>../ui/dist/psd2-accelerator</directory>
-                    <filtering>false</filtering>
-                  </resource>
-                </resources>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.0.0</version>

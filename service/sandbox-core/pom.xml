@@ -217,7 +217,7 @@
               <outputDirectory>${project.basedir}/target/classes/app</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../ui/dist/psd2-accelerator</directory>
+                  <directory>../../ui/dist/psd2-accelerator</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>
