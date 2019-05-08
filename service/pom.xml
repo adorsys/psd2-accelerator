@@ -305,7 +305,7 @@
                   <delimiter>@</delimiter>
                 </delimiters>
                 <useDefaultDelimiters>false</useDefaultDelimiters>
-                <outputDirectory>${basedir}/sandbox-core/target/classes/app</outputDirectory>
+                <outputDirectory>${project.basedir}/sandbox-core/target/classes/app</outputDirectory>
                 <resources>
                   <resource>
                     <directory>../ui/dist/psd2-accelerator</directory>
