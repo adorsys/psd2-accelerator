@@ -214,7 +214,7 @@
                 <delimiter>@</delimiter>
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
-              <outputDirectory>${basedir}/target/classes/app</outputDirectory>
+              <outputDirectory>${project.basedir}/target/classes/app</outputDirectory>
               <resources>
                 <resource>
                   <directory>../ui/dist/psd2-accelerator</directory>

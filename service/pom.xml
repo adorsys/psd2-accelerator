@@ -305,7 +305,7 @@
                   <delimiter>@</delimiter>
                 </delimiters>
                 <useDefaultDelimiters>false</useDefaultDelimiters>
-                <outputDirectory>${basedir}/target/classes/app</outputDirectory>
+                <outputDirectory>${project.basedir}/sandbox-core/target/classes/app</outputDirectory>
                 <resources>
                   <resource>
                     <directory>../ui/dist/psd2-accelerator</directory>
@@ -325,7 +325,7 @@
               <id>prepare-package</id>
               <phase>prepare-package</phase>
               <configuration>
-                <configLocation>${project.basedir}/google-checkstyle.xml</configLocation>
+                <configLocation>${project.basedir}/sandbox-core/google-checkstyle.xml</configLocation>
                 <encoding>UTF-8</encoding>
                 <consoleOutput>true</consoleOutput>
                 <failsOnError>true</failsOnError>
