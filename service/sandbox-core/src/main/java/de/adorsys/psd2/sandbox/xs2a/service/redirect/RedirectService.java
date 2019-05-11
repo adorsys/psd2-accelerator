@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -87,7 +88,8 @@ public class RedirectService {
     ScaStatus newScaStatus;
     if (psu.isPresent() && isPsuAllowedToExecuteAuth(psu, authorizationIbans)) {
       if (aisConsentAuth.getScaStatus().isNotFinalisedStatus()) {
-        if (consent.getAisConsentRequestType().equals(AisConsentRequestType.BANK_OFFERED)
+        if (EnumSet.of(AisConsentRequestType.BANK_OFFERED, AisConsentRequestType.GLOBAL)
+                .contains(consent.getAisConsentRequestType())
             && testDataService.isSucccessfulPsu(psuId)) {
           consent.setAccesses(fillAccountAccesses());
         }

@@ -17,7 +17,7 @@ setting:
     - IBAN
   consentLifetime: 0
   transactionLifetime: 0
-  allPsd2Support: false
+  allPsd2Support: true
   transactionsWithoutBalancesSupported: true
   signingBasketSupported: false
   paymentCancellationAuthorizationMandated: true

@@ -208,6 +208,44 @@ public class AisSteps extends SpringCucumberTestBase {
     context.setConsentId(response.getBody().get("consentId").asText());
   }
 
+  @Given("PSU created a global consent")
+  public void createGlobalConsent() {
+    HashMap<String, String> headers = TestUtils.createSession();
+
+    Consents consent = new Consents();
+
+    AccountAccess accountAccess = new AccountAccess();
+
+    accountAccess.setAccounts(new ArrayList<>());
+    accountAccess.setBalances(new ArrayList<>());
+    accountAccess.setTransactions(new ArrayList<>());
+    accountAccess.setAllPsd2(AccountAccess.AllPsd2Enum.ALLACCOUNTS);
+
+    context.setConsentAccountAccess(accountAccess);
+
+    consent.setAccess(accountAccess);
+    consent.setRecurringIndicator(true);
+    consent.setValidUntil(LocalDate.now().plusDays(30));
+    consent.setFrequencyPerDay(5);
+
+    Request<Consents> request = new Request<>(consent, headers);
+
+    ResponseEntity<JsonNode> response = template.exchange(
+        "consents",
+        HttpMethod.POST,
+        request.toHttpEntity(),
+        JsonNode.class);
+
+    assertTrue(response.getStatusCode().is2xxSuccessful());
+
+    if (scaApproach.equalsIgnoreCase("redirect")) {
+      context.setScaRedirect(response.getBody().get("_links").get("scaRedirect").get("href").asText());
+      context.setScaStatusUrl(response.getBody().get("_links").get("scaStatus").get("href").asText());
+    }
+
+    context.setConsentId(response.getBody().get("consentId").asText());
+  }
+
   @Given("PSU tries to create a consent for account information (.*), balances (.*) and transactions (.*) with wrong currency (.*)")
   public void psuTriesToCreateConsentWithWrongCurrency(String accounts, String balances,
       String transactions, String currency) {
@@ -305,6 +343,19 @@ public class AisSteps extends SpringCucumberTestBase {
 
   @Then("the bank offered consent data are received")
   public void receiveBankOfferedConsentData() {
+    ResponseEntity<ConsentInformationResponse200Json> actualResponse = context.getActualResponse();
+    AccountAccess actualAccess = actualResponse.getBody().getAccess();
+
+    assertThat(actualAccess.getAccounts().size(), equalTo(2));
+    assertThat(actualAccess.getBalances().size(), equalTo(2));
+    assertThat(actualAccess.getTransactions().size(), equalTo(2));
+    assertThat(actualResponse.getBody().getConsentStatus(), equalTo(ConsentStatus.VALID));
+    assertThat(actualResponse.getBody().getFrequencyPerDay(), equalTo(5));
+    assertThat(actualResponse.getBody().getRecurringIndicator(), equalTo(true));
+  }
+
+  @Then("the global consent data are received")
+  public void receiveGlobalConsentData() {
     ResponseEntity<ConsentInformationResponse200Json> actualResponse = context.getActualResponse();
     AccountAccess actualAccess = actualResponse.getBody().getAccess();
 
