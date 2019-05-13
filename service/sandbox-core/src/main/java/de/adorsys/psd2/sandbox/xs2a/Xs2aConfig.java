@@ -79,23 +79,6 @@ public class Xs2aConfig {
     }
   }
 
-  // Looks like swagger-ui can't be disabled via config
-  @Controller
-  public static class SwaggerUiDisabler {
-
-    @RequestMapping("swagger-ui.html")
-    public void nope() {
-      // for proper default 404 error page instead of blank 404
-      throw new ForcedNotFoundException();
-    }
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private static class ForcedNotFoundException extends RuntimeException {
-
-    }
-
-  }
-
   public static class Xs2aComponentFilter implements TypeFilter {
 
     private static Logger log = LoggerFactory.getLogger(Xs2aComponentFilter.class);
