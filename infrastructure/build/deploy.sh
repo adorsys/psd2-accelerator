@@ -35,7 +35,7 @@ if [ "$1" == "latest" ]; then
   docker tag adorsys/$SSL_PROXY_IMAGE:latest $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEMO/$SSL_PROXY_IMAGE:latest
   docker push $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEMO/$SSL_PROXY_IMAGE:latest
 
-  docker logout
+  docker logout $OPENSHIFT_REGISTRY
 
 # push tags to dockerhub
 elif checkSemver $(git2dockerTag $1); then
