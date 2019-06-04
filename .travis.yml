@@ -21,7 +21,9 @@ env:
     - SSL_PROXY_IMAGE="psd2-sandbox-ssl-proxy"
     - NPM_CONFIG_CACHE="$HOME/.npm"
     - OPENSHIFT_REGISTRY="openshift-registry.adorsys.de"
-    - OPENSHIFT_NAMESPACE="psd2-sandbox-dev"
+    - OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV="psd2-sandbox-dev"
+    - OPENSHIFT_NAMESPACE_DYNAMIC_SANDBOX_DEV="adorsys-dynamic-sandbox-dev"
+    - OPENSHIFT_NAMESPACE_DYNAMIC_SANDBOX_DEMO="adorsys-dynamic-sandbox-demo"
 
 cache:
   directories:

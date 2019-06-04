@@ -20,17 +20,33 @@ fi
 # push latest to openshift
 if [ "$1" == "latest" ]; then
   echo $OPENSHIFT_DEPLOY_PASSWORD | docker login --password-stdin -u openshift $OPENSHIFT_REGISTRY
-  docker tag adorsys/$PSD2_SANDBOX_IMAGE:latest openshift-registry.adorsys.de/$OPENSHIFT_NAMESPACE/$PSD2_SANDBOX_IMAGE:latest
-  docker push openshift-registry.adorsys.de/$OPENSHIFT_NAMESPACE/$PSD2_SANDBOX_IMAGE:latest
-  docker tag adorsys/$SSL_PROXY_IMAGE:latest openshift-registry.adorsys.de/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:latest
-  docker push openshift-registry.adorsys.de/$OPENSHIFT_NAMESPACE/$SSL_PROXY_IMAGE:latest
+
+  # $OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV
+  docker tag adorsys/$PSD2_SANDBOX_IMAGE:latest $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV/$PSD2_SANDBOX_IMAGE:latest
+  docker push $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV/$PSD2_SANDBOX_IMAGE:latest
+  docker tag adorsys/$SSL_PROXY_IMAGE:latest $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV/$SSL_PROXY_IMAGE:latest
+  docker push $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_STATIC_SANDBOX_DEV/$SSL_PROXY_IMAGE:latest
+
+  # $OPENSHIFT_NAMESPACE_DYNAMIC_SANDBOX_DEV
+  docker tag adorsys/$SSL_PROXY_IMAGE:latest $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEV/$SSL_PROXY_IMAGE:latest
+  docker push $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEV/$SSL_PROXY_IMAGE:latest
+
+  #$OPENSHIFT_NAMESPACE_DYNAMIC_SANDBOX_DEMO
+  docker tag adorsys/$SSL_PROXY_IMAGE:latest $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEMO/$SSL_PROXY_IMAGE:latest
+  docker push $OPENSHIFT_REGISTRY/$OPENSHIFT_NAMESPACE_SANDBOX_DEMO/$SSL_PROXY_IMAGE:latest
+
+  docker logout $OPENSHIFT_REGISTRY
+
 # push tags to dockerhub
 elif checkSemver $(git2dockerTag $1); then
   echo $DOCKERHUB_DEPLOY_PASSWORD | docker login --password-stdin -u $DOCKERHUB_DEPLOY_USER
+
   docker tag adorsys/$PSD2_SANDBOX_IMAGE:latest adorsys/$PSD2_SANDBOX_IMAGE:$(git2dockerTag $1)
   docker push adorsys/$PSD2_SANDBOX_IMAGE:$(git2dockerTag $1)
   docker tag adorsys/$SSL_PROXY_IMAGE:latest adorsys/$SSL_PROXY_IMAGE:$(git2dockerTag $1)
   docker push adorsys/$SSL_PROXY_IMAGE:$(git2dockerTag $1)
+
+  docker logout
 # but nothing else
 else
   echo "ERROR We only deploy 'latest' or release tags ('v1.2.3') but got '$1'" 1>&2
