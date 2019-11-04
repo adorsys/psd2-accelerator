@@ -22,6 +22,7 @@ import de.adorsys.psd2.model.PaymentInitiationJson;
 import de.adorsys.psd2.model.PaymentInitiationWithStatusResponse;
 import de.adorsys.psd2.model.PeriodicPaymentInitiationJson;
 import de.adorsys.psd2.model.PsuData;
+import de.adorsys.psd2.model.PurposeCode;
 import de.adorsys.psd2.model.ScaStatus;
 import de.adorsys.psd2.model.ScaStatusResponse;
 import de.adorsys.psd2.model.SelectPsuAuthenticationMethod;
@@ -141,6 +142,8 @@ public class PisSteps extends SpringCucumberTestBase {
     payment.setCreditorName("WBG");
     payment.setCreditorAddress(createCreditorAddress());
     payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+
+    payment.setPurposeCode(PurposeCode.ACCT);
 
     HashMap<String, String> headers = TestUtils.createSession();
 
@@ -321,6 +324,9 @@ public class PisSteps extends SpringCucumberTestBase {
     payment.setCreditorName("WBG");
     payment.setCreditorAddress(createCreditorAddress());
     payment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
+
+    payment.setPurposeCode(PurposeCode.ACCT);
+
     if (isFutureDated) {
       payment.setRequestedExecutionDate(LocalDate.now().plusDays(7));
     }
@@ -352,6 +358,8 @@ public class PisSteps extends SpringCucumberTestBase {
     periodicPayment.setCreditorAddress(createCreditorAddress());
     periodicPayment.setRemittanceInformationUnstructured("Ref. Number WBG-1222");
 
+    periodicPayment.setPurposeCode(PurposeCode.ACCT);
+
     return new Request<>(periodicPayment, headers);
   }
 
@@ -365,10 +373,10 @@ public class PisSteps extends SpringCucumberTestBase {
   private Address createCreditorAddress() {
     Address creditorAddress = new Address();
     creditorAddress.setBuildingNumber("56");
-    creditorAddress.setCity("Nürnberg");
+    creditorAddress.setTownName("Nürnberg");
     creditorAddress.setCountry("DE");
-    creditorAddress.setPostalCode("90543");
-    creditorAddress.setStreet("WBG Straße");
+    creditorAddress.setPostCode("90543");
+    creditorAddress.setStreetName("WBG Straße");
     return creditorAddress;
   }
 

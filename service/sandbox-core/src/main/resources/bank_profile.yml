@@ -13,6 +13,7 @@ setting:
   availableBookingStatuses:
     - BOOKED
     - PENDING
+    - BOTH
   supportedAccountReferenceFields:
     - IBAN
   consentLifetime: 0
@@ -22,8 +23,8 @@ setting:
   signingBasketSupported: false
   paymentCancellationAuthorizationMandated: true
   piisConsentSupported: false
-  deltaReportSupported: false
   redirectUrlExpirationTimeMs: 600000
+  authorisationExpirationTimeMs: 86400000
   notConfirmedConsentExpirationPeriodMs: 86400000
   notConfirmedPaymentExpirationPeriodMs: 86400000
   supportedPaymentTypeAndProductMatrix:
@@ -35,3 +36,11 @@ setting:
   availableAccountsConsentSupported: false
   scaByOneTimeAvailableAccountsConsentRequired: true
   psuInInitialRequestMandated: false
+  forceXs2aBaseUrl: false
+  xs2aBaseUrl: http://myhost.com/
+  scaRedirectFlow: REDIRECT
+  deltaListSupported: false
+  entryReferenceFromSupported: false
+  supportedTransactionApplicationTypes:
+    - application/json
+  startAuthorisationMode: auto

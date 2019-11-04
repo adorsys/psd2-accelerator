@@ -1,6 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiPaymentInfo;
@@ -17,7 +17,7 @@ public class CommonPaymentSpiImpl implements CommonPaymentSpi {
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
       @NotNull SpiContextData spiContextData,
       @NotNull SpiPaymentInfo spiPaymentInfo,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     return null;
   }
 
@@ -26,7 +26,7 @@ public class CommonPaymentSpiImpl implements CommonPaymentSpi {
       @NotNull SpiContextData spiContextData,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiPaymentInfo spiPaymentInfo,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     return null;
   }
 }

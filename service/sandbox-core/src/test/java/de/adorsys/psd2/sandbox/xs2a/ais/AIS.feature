@@ -117,12 +117,12 @@ Feature: AIS
     When PSU accesses the account list withBalances <withBalance>
     Then the account data are received
     Examples:
-      | accounts                                      | balances               | transactions           | psu-id         | password | sca-method | tan   | withBalance |
-      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
-      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        |
-      | DE11760365688833114935                        | DE11760365688833114935 | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
-      | DE11760365688833114935                        | DE11760365688833114935 | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        |
-      | DE11760365688833114935                        | null                   | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
+      | accounts                                      | balances                                      | transactions           | psu-id         | password | sca-method | tan   | withBalance |
+      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935                        | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
+      | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935;DE13760365689669622432 | DE11760365688833114935 | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        |
+      | DE11760365688833114935                        | DE11760365688833114935                        | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
+      | DE11760365688833114935                        | DE11760365688833114935                        | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | true        |
+      | DE11760365688833114935                        | null                                          | null                   | PSU-Successful | 12345    | SMS_OTP    | 54321 | false       |
 
     ################################################################################################
     #                                                                                              #

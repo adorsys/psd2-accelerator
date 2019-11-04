@@ -4,8 +4,10 @@ import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
+import de.adorsys.psd2.xs2a.core.error.TppMessage;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
@@ -16,10 +18,8 @@ import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentCancellationResponse;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
-import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.PaymentCancellationSpi;
 import de.adorsys.psd2.xs2a.spi.service.SpiPayment;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -41,21 +41,25 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
   public @NotNull SpiResponse<SpiPaymentCancellationResponse> initiatePaymentCancellation(
       @NotNull SpiContextData ctx,
       @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     SpiPaymentCancellationResponse cancellationResponse = new SpiPaymentCancellationResponse();
     cancellationResponse.setCancellationAuthorisationMandated(true);
     cancellationResponse.setTransactionStatus(TransactionStatus.valueOf(
         paymentDataRepository.findByPaymentId(spiPayment.getPaymentId()).get().get(0)
             .getPaymentData().getTransactionStatus().name()));
-    return new SpiResponse<>(cancellationResponse, aspspConsentData);
+    return SpiResponse.<SpiPaymentCancellationResponse>builder()
+        .payload(cancellationResponse)
+        .build();
   }
 
   @Override
   public @NotNull SpiResponse<SpiResponse.VoidResponse> cancelPaymentWithoutSca(
       @NotNull SpiContextData ctx,
       @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
+    return SpiResponse.<SpiResponse.VoidResponse>builder()
+               .payload(SpiResponse.voidResponse())
+               .build();
   }
 
   @Override
@@ -63,7 +67,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       @NotNull SpiContextData ctx,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     if (spiScaConfirmation.getTanNumber().equals(TestDataService.GLOBAL_TAN)) {
       Optional<List<PisPaymentData>> paymentDataList = paymentDataRepository
@@ -73,19 +77,20 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
         PisPaymentData payment = paymentDataList.get().get(0);
         payment.getPaymentData().setTransactionStatus(TransactionStatus.CANC);
         paymentDataRepository.save(payment);
-        return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+        return SpiResponse.<SpiResponse.VoidResponse>builder()
+                   .payload(SpiResponse.voidResponse())
+                   .build();
       }
 
       return SpiResponse.<SpiResponse.VoidResponse>builder()
-          .aspspConsentData(aspspConsentData)
-          .message(Collections.singletonList("Payment not found"))
-          .fail(SpiResponseStatus.LOGICAL_FAILURE);
+          .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_PAYMENT_NOT_FOUND,
+              "Payment not found"))
+          .build();
     }
 
     return SpiResponse.<SpiResponse.VoidResponse>builder()
-        .aspspConsentData(aspspConsentData)
-        .message(Collections.singletonList("Wrong PIN"))
-        .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+        .error(new TppMessage(MessageErrorCode.UNAUTHORIZED,"Wrong PIN"))
+        .build();
   }
 
   @Override
@@ -93,7 +98,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       @NotNull SpiPsuData psuData,
       String password,
       SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     String iban = null;
 
     if (spiPayment instanceof SpiSinglePayment) {
@@ -103,15 +108,15 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       iban = ((SpiPeriodicPayment) spiPayment).getDebtorAccount().getIban();
     }
 
-    return authorisationService.authorisePsu(psuData, password, iban, aspspConsentData, true);
+    return authorisationService.authorisePsu(psuData, password, iban, true);
   }
 
   @Override
   public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
       @NotNull SpiContextData ctx,
       SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return authorisationService.requestAvailableScaMethods(aspspConsentData);
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
+    return authorisationService.requestAvailableScaMethods();
   }
 
   @Override
@@ -119,7 +124,7 @@ public class PaymentCancellationSpiImpl implements PaymentCancellationSpi {
       @NotNull SpiContextData ctx,
       @NotNull String s,
       @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
-    return authorisationService.requestAuthorisationCode(s, aspspConsentData);
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
+    return authorisationService.requestAuthorisationCode(s);
   }
 }

@@ -54,6 +54,16 @@
 
     <dependency>
       <groupId>de.adorsys.psd2</groupId>
+      <artifactId>event-service-xs2a-impl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>de.adorsys.psd2</groupId>
+      <artifactId>event-service-persist-log-impl</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>de.adorsys.psd2</groupId>
       <artifactId>consent-management-lib</artifactId>
       <exclusions>
         <exclusion>
@@ -98,7 +108,7 @@
     </dependency>
 
     <!--Prometheus-->
-    <dependency>
+    <!--dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_spring_boot</artifactId>
     </dependency>
@@ -111,7 +121,7 @@
     <dependency>
       <groupId>io.prometheus</groupId>
       <artifactId>simpleclient_servlet</artifactId>
-    </dependency>
+    </dependency-->
 
     <!-- Cucumber -->
     <dependency>

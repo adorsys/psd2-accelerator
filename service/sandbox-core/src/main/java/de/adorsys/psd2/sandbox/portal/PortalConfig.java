@@ -1,11 +1,11 @@
 package de.adorsys.psd2.sandbox.portal;
 
 import de.adorsys.psd2.sandbox.ContextHolder;
-import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 

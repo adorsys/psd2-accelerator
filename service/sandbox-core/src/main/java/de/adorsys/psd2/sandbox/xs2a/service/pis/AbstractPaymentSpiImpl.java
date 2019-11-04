@@ -4,18 +4,16 @@ import de.adorsys.psd2.consent.domain.payment.PisPaymentData;
 import de.adorsys.psd2.consent.repository.PisPaymentDataRepository;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
+import de.adorsys.psd2.xs2a.core.error.TppMessage;
 import de.adorsys.psd2.xs2a.core.pis.TransactionStatus;
-import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiSinglePayment;
+import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiGetPaymentStatusResponse;
 import de.adorsys.psd2.xs2a.spi.domain.payment.response.SpiPaymentExecutionResponse;
-import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
-import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.SpiPayment;
-import java.util.Collections;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -27,42 +25,37 @@ class AbstractPaymentSpiImpl {
   @Autowired
   PisPaymentDataRepository paymentDataRepository;
 
-  SpiResponse<TransactionStatus> getPaymentStatusById(
-      SpiSinglePayment payment,
-      AspspConsentData aspspConsentData) {
+  SpiResponse<SpiGetPaymentStatusResponse> getPaymentStatusById(
+      SpiSinglePayment payment) {
 
     Optional<TransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
     if (paymentStatus.isPresent()) {
       payment.setPaymentStatus(paymentStatus.get());
-      return SpiResponse.<TransactionStatus>builder()
-          .aspspConsentData(aspspConsentData)
-          .payload(payment.getPaymentStatus())
-          .success();
+      return SpiResponse.<SpiGetPaymentStatusResponse>builder()
+                 .payload(new SpiGetPaymentStatusResponse(payment.getPaymentStatus(),true))
+                 .build();
     }
-    return SpiResponse.<TransactionStatus>builder()
-        .fail(SpiResponseStatus.LOGICAL_FAILURE);
+    return SpiResponse.<SpiGetPaymentStatusResponse>builder()
+               .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_PAYMENT_NOT_FOUND))
+               .build();
   }
 
-  <T extends SpiSinglePayment> SpiResponse<T> getPaymentById(
-      SpiPsuData psuData,
-      T payment,
-      AspspConsentData aspspConsentData) {
+  <T extends SpiSinglePayment> SpiResponse<T> getPaymentById(T payment) {
     Optional<TransactionStatus> paymentStatus = getPaymentStatusFromRepo(payment.getPaymentId());
     if (paymentStatus.isPresent()) {
       payment.setPaymentStatus(paymentStatus.get());
       return SpiResponse.<T>builder()
-          .aspspConsentData(aspspConsentData)
-          .payload(payment)
-          .success();
+                 .payload(payment)
+                 .build();
     }
     return SpiResponse.<T>builder()
-        .fail(SpiResponseStatus.LOGICAL_FAILURE);
+               .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_PAYMENT_NOT_FOUND))
+               .build();
   }
 
   SpiResponse<SpiPaymentExecutionResponse> checkTanAndSetStatusOfPayment(
       SpiPayment spiPayment,
-      SpiScaConfirmation spiScaConfirmation,
-      AspspConsentData aspspConsentData) {
+      SpiScaConfirmation spiScaConfirmation) {
     if (spiScaConfirmation.getTanNumber().equals(TestDataService.GLOBAL_TAN)) {
       Optional<List<PisPaymentData>> paymentDataList = paymentDataRepository
           .findByPaymentId(spiPayment.getPaymentId());
@@ -72,21 +65,19 @@ class AbstractPaymentSpiImpl {
         payment.getPaymentData().setTransactionStatus(TransactionStatus.ACCP);
         paymentDataRepository.save(payment);
         return SpiResponse.<SpiPaymentExecutionResponse>builder()
-            .aspspConsentData(aspspConsentData)
-            .payload(new SpiPaymentExecutionResponse(TransactionStatus.ACCP))
-            .success();
+                   .payload(new SpiPaymentExecutionResponse(TransactionStatus.ACCP))
+                   .build();
       }
 
       return SpiResponse.<SpiPaymentExecutionResponse>builder()
-          .aspspConsentData(aspspConsentData)
-          .message(Collections.singletonList("Payment not found"))
-          .fail(SpiResponseStatus.LOGICAL_FAILURE);
+             .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_PAYMENT_NOT_FOUND,
+                 "Payment not found"))
+             .build();
     }
 
     return SpiResponse.<SpiPaymentExecutionResponse>builder()
-        .aspspConsentData(aspspConsentData)
-        .message(Collections.singletonList("Wrong PIN"))
-        .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+               .error(new TppMessage(MessageErrorCode.PSU_CREDENTIALS_INVALID,"Wrong PIN"))
+               .build();
   }
 
   void isCorrectCurrency(Optional<Account> account, SpiSinglePayment payment) {
@@ -95,14 +86,14 @@ class AbstractPaymentSpiImpl {
       if (!(payment.getDebtorAccount().getCurrency().equals(expectedCurrency)
           && payment.getInstructedAmount().getCurrency().equals(expectedCurrency)
           && payment.getCreditorAccount().getCurrency().equals(expectedCurrency))) {
-        throw new RestException(MessageErrorCode.FORMAT_ERROR);
+        throw new RestException(MessageErrorCode.FORMAT_ERROR, "Account mismatch");
       }
     }
   }
 
   private Optional<TransactionStatus> getPaymentStatusFromRepo(String paymentId) {
     Optional<List<PisPaymentData>> paymentData = paymentDataRepository
-        .findByPaymentId(paymentId);
+                                                     .findByPaymentId(paymentId);
 
     return paymentData.map(pisPaymentData -> TransactionStatus
         .valueOf(pisPaymentData.get(0).getPaymentData().getTransactionStatus().name()));

@@ -1,6 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiScaConfirmation;
 import de.adorsys.psd2.xs2a.spi.domain.payment.SpiBulkPayment;
@@ -16,14 +16,15 @@ public class BulkPaymentSpiImpl implements BulkPaymentSpi {
   @Override
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> executePaymentWithoutSca(
       @NotNull SpiContextData contextData, @NotNull SpiBulkPayment payment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     return null;
   }
 
   @Override
   public @NotNull SpiResponse<SpiPaymentExecutionResponse> verifyScaAuthorisationAndExecutePayment(
       @NotNull SpiContextData contextData, @NotNull SpiScaConfirmation spiScaConfirmation,
-      @NotNull SpiBulkPayment payment, @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiBulkPayment payment, @NotNull SpiAspspConsentDataProvider
+                                           spiAspspConsentDataProvider) {
     return null;
   }
 }

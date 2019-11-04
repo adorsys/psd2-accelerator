@@ -3,9 +3,9 @@ package de.adorsys.psd2.sandbox.migration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.actuate.autoconfigure.ManagementWebSecurityAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication(exclude = {

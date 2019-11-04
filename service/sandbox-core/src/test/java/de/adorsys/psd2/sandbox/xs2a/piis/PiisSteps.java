@@ -11,7 +11,7 @@ import cucumber.api.java.en.When;
 import de.adorsys.psd2.model.AccountReference;
 import de.adorsys.psd2.model.Amount;
 import de.adorsys.psd2.model.ConfirmationOfFunds;
-import de.adorsys.psd2.model.InlineResponse200;
+import de.adorsys.psd2.model.InlineResponse2003;
 import de.adorsys.psd2.model.TppMessageCategory;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
@@ -57,7 +57,7 @@ public class PiisSteps extends SpringCucumberTestBase {
         "funds-confirmations",
         HttpMethod.POST,
         request.toHttpEntity(),
-        InlineResponse200.class);
+        InlineResponse2003.class);
 
     context.setActualResponse(response);
   }
@@ -96,10 +96,10 @@ public class PiisSteps extends SpringCucumberTestBase {
 
   @Then("^the status (.*) and response code (.*) are received$")
   public void checkResponse(String availabilityStatus, String code) {
-    ResponseEntity<InlineResponse200> actualResponse = context.getActualResponse();
+    ResponseEntity<InlineResponse2003> actualResponse = context.getActualResponse();
 
     assertThat(actualResponse.getStatusCodeValue(), equalTo(Integer.parseInt(code)));
-    assertThat(actualResponse.getBody().isFundsAvailable(),
+    assertThat(actualResponse.getBody().getFundsAvailable(),
         equalTo(Boolean.valueOf(availabilityStatus)));
   }
 
