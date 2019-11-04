@@ -20,7 +20,7 @@ The *PSD2 Accelerator* project bundles the described PSD2 components created at 
 For more details about the PSD2 Accelerator and PSD2 see:
 
 - [our architecture documentation](https://adorsys.github.io/psd2-accelerator)
-- [our PSD2 landing page](https://adorsys.de/psd2.html)
+- [our PSD2 landing page](https://adorsys-platform.de/solutions/psd2-accelerator/)
 - [the PSD2 directive](https://ec.europa.eu/info/law/payment-services-psd-2-directive-eu-2015-2366_en)
 - [the XS2A spec](https://www.berlin-group.org/psd2-access-to-bank-accounts)
 - [the NextGenPSD2 Implementation Support Programme](https://nisp.online)

@@ -113,7 +113,7 @@ Possible values are: _true_ or _false_            | _true_
 |=======
 
 WARNING: It is required to enable CORS in the service which serves the customized markdown files for the UI. Otherwise the content can't be loaded and stays empty.
-  
+
 [[sample-bank-profile]]
 .Sample bank_profile.yml
 [source,yaml]
@@ -255,7 +255,6 @@ We use Spring Boot Actuator for metrics, health checks and information about the
     ** git commit/tag from which it was build
     ** bundled XS2A impl and spec version
 - `GET /management/metrics` returns the default https://docs.spring.io/spring-boot/docs/1.5.18.RELEASE/reference/html/production-ready-metrics.html[Spring Actuator Metrics]
-- `GET /management/prometheus` returns the application metrics in https://prometheus.io/[Prometheus] format
 
 NOTE: The actuator endpoints are all public. We do not expect any sensitive information there. Please verify this.
 
@@ -266,7 +265,6 @@ If you want to disable certain endpoints you can do so:
 endpoints.metrics.enabled=false
 endpoints.health.enabled=false
 endpoints.info.enabled=false
-endpoints.prometheus.enabled=false
 ----
 
 WARNING: (KNOWN BUG) You can't disable the endpoints with CLI arguments. System properties and environment variables work fine, though.

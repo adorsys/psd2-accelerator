@@ -107,22 +107,6 @@
       <artifactId>commons-csv</artifactId>
     </dependency>
 
-    <!--Prometheus-->
-    <!--dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_spring_boot</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_hotspot</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.prometheus</groupId>
-      <artifactId>simpleclient_servlet</artifactId>
-    </dependency-->
-
     <!-- Cucumber -->
     <dependency>
       <groupId>io.cucumber</groupId>

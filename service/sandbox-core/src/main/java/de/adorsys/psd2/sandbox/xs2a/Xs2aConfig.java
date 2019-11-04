@@ -110,23 +110,6 @@ public class Xs2aConfig {
     }
   }
 
-  /*
-   * TODO we have to override de.adorsys.psd2.xs2a.config.ObjectMapperConfig because
-   *  a) we can't exclude it (see Xs2aComponentFilter) and
-   *  b) the XS2A ObjectMapperConfig does not mark the OM as @Primary which clashes with
-   *    org.springframework.hateoas.config.HypermediaSupportBeanDefinitionRegistrar
-   *    but somehow only in tests
-   */
-  /*@Configuration
-  static class SandboxObjectMapperConfig extends ObjectMapperConfig { //TODO Consider removing @pruex
-
-    @Bean
-    @Primary
-    ObjectMapper sandboxObjectMapper() {
-      return super.xs2aObjectMapper();
-    }
-  }*/
-
   @Slf4j
   @Component
   public static class HardcodedInstanceIdSetter implements PreInsertEventListener {

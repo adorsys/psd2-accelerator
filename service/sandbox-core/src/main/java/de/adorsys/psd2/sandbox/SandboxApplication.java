@@ -17,14 +17,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-//import io.prometheus.client.spring.boot.EnablePrometheusEndpoint;
-//import io.prometheus.client.spring.boot.EnableSpringBootMetricsCollector;
-
 /**
  * Parent Spring Context which only does feature configuration.
  */
-//@EnablePrometheusEndpoint //TODO @pruex Either make it work or exclude
-//@EnableSpringBootMetricsCollector
 @Configuration
 @EnableAutoConfiguration(exclude = {
     // TODO no persistence for now
