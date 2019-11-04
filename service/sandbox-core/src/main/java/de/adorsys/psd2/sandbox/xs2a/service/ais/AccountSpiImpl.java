@@ -6,7 +6,9 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Transaction;
 import de.adorsys.psd2.xs2a.core.ais.BookingStatus;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
+import de.adorsys.psd2.xs2a.core.error.TppMessage;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountBalance;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
@@ -15,7 +17,6 @@ import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransaction;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiTransactionReport;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
-import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import de.adorsys.psd2.xs2a.spi.service.AccountSpi;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,21 +43,20 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiContextData ctx,
       boolean withBalance,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent,
         withBalance);
 
     if (!spiAccountDetails.isPresent()) {
       return SpiResponse.<List<SpiAccountDetails>>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+          .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_UNKNOWN_ACCOUNT,"Account not found"))
+          .build();
     }
 
     return SpiResponse.<List<SpiAccountDetails>>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(spiAccountDetails.get())
-        .success();
+        .build();
   }
 
   @Override
@@ -65,21 +65,21 @@ public class AccountSpiImpl implements AccountSpi {
       boolean withBalance,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     Optional<List<SpiAccountDetails>> spiAccountDetails = getAccountDetails(spiAccountConsent,
         withBalance);
 
     if (!spiAccountDetails.isPresent()) {
       return SpiResponse.<SpiAccountDetails>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+                 .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_UNKNOWN_ACCOUNT,
+                     "Account not found"))
+                 .build();
     }
 
     return SpiResponse.<SpiAccountDetails>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(spiAccountDetails.get().get(0))
-        .success();
+        .build();
   }
 
   @Override
@@ -92,7 +92,7 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull BookingStatus bookingStatus,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     Optional<List<Transaction>> transactions = this.getTransactionsByIbanAndAccountId(
         spiAccountReference.getIban(),
@@ -100,8 +100,9 @@ public class AccountSpiImpl implements AccountSpi {
 
     if (!transactions.isPresent()) {
       return SpiResponse.<SpiTransactionReport>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+                 .error(new TppMessage(MessageErrorCode.FORMAT_ERROR,
+                     "No transactions found for current account"))
+                 .build();
     }
 
     List<SpiTransaction> spiTransactions = transactions.get().stream()
@@ -114,8 +115,7 @@ public class AccountSpiImpl implements AccountSpi {
     if (withBalance) {
       Pair<List<SpiAccountBalance>, SpiResponse<SpiTransactionReport>> rslt = getBalancesForAccount(
           spiAccountReference,
-          spiAccountConsent,
-          aspspConsentData
+          spiAccountConsent
       );
       if (rslt.getRight() != null) {
         return rslt.getRight();
@@ -124,15 +124,15 @@ public class AccountSpiImpl implements AccountSpi {
     }
 
     SpiTransactionReport spiTransactionReport = new SpiTransactionReport(
+        null,
         spiTransactions,
         balances,
         SpiTransactionReport.RESPONSE_TYPE_JSON,
         null);
 
     return SpiResponse.<SpiTransactionReport>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(spiTransactionReport)
-        .success();
+        .build();
   }
 
   @Override
@@ -141,7 +141,7 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull String transactionId,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     Optional<List<Transaction>> transactions = this.getTransactionsByIbanAndAccountId(
         spiAccountReference.getIban(),
@@ -149,8 +149,9 @@ public class AccountSpiImpl implements AccountSpi {
 
     if (!transactions.isPresent()) {
       return SpiResponse.<SpiTransaction>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE);
+                 .error(new TppMessage(MessageErrorCode.FORMAT_ERROR,
+                     "No transactions found for current account"))
+                 .build();
     }
 
     SpiTransaction spiTransaction = transactions.get().stream()
@@ -160,9 +161,8 @@ public class AccountSpiImpl implements AccountSpi {
         .get();
 
     return SpiResponse.<SpiTransaction>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(spiTransaction)
-        .success();
+        .build();
   }
 
   @Override
@@ -170,21 +170,19 @@ public class AccountSpiImpl implements AccountSpi {
       @NotNull SpiContextData ctx,
       @NotNull SpiAccountReference spiAccountReference,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     Pair<List<SpiAccountBalance>, SpiResponse<List<SpiAccountBalance>>> res = getBalancesForAccount(
         spiAccountReference,
-        spiAccountConsent,
-        aspspConsentData
+        spiAccountConsent
     );
     if (res.getRight() != null) {
       return res.getRight();
     }
 
     return SpiResponse.<List<SpiAccountBalance>>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(res.getLeft())
-        .success();
+        .build();
   }
 
   private Optional<List<SpiAccountDetails>> getAccountDetails(SpiAccountConsent spiAccountConsent,
@@ -233,15 +231,14 @@ public class AccountSpiImpl implements AccountSpi {
    * @return Pair<Result, Error> with either Result or Error set
    */
   private <T> Pair<List<SpiAccountBalance>, SpiResponse<T>> getBalancesForAccount(
-      SpiAccountReference accountReference, SpiAccountConsent spiAccountConsent,
-      AspspConsentData aspspConsentData
+      SpiAccountReference accountReference, SpiAccountConsent spiAccountConsent
   ) {
     Optional<TestPsu> psu = testDataService.getPsuByIban(accountReference.getIban());
 
     if (!psu.isPresent()) {
       return Pair.of(null, SpiResponse.<T>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE)
+          .error(new TppMessage(MessageErrorCode.PSU_CREDENTIALS_INVALID,"User not found"))
+          .build()
       );
     }
 
@@ -252,8 +249,9 @@ public class AccountSpiImpl implements AccountSpi {
 
     if (!account.isPresent()) {
       return Pair.of(null, SpiResponse.<T>builder()
-          .aspspConsentData(aspspConsentData)
-          .fail(SpiResponseStatus.TECHNICAL_FAILURE));
+                               .error(new TppMessage(MessageErrorCode.FORMAT_ERROR_UNKNOWN_ACCOUNT,
+                                   "Account not found"))
+                               .build());
     }
 
     return Pair.of(

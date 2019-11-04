@@ -2,7 +2,6 @@ package de.adorsys.psd2.sandbox.xs2a.service.redirect;
 
 import de.adorsys.psd2.consent.api.TypeAccess;
 import de.adorsys.psd2.consent.domain.PsuData;
-import de.adorsys.psd2.consent.domain.TppInfoEntity;
 import de.adorsys.psd2.consent.domain.account.AisConsent;
 import de.adorsys.psd2.consent.domain.account.AisConsentAuthorization;
 import de.adorsys.psd2.consent.domain.account.TppAccountAccess;
@@ -250,8 +249,9 @@ public class RedirectService {
 
     ConsentStatus consentStatus = aisAuthorisation.get().getConsent().getConsentStatus();
 
-    TppInfoEntity tppInfo = aisAuthorisation.get().getConsent().getTppInfo();
-    String tppRedirectUri = getRedirectUri(tppInfo, aisAuthorisation.get().getScaStatus());
+    AisConsentAuthorization authorization = aisAuthorisation.get();
+    String tppRedirectUri = getRedirectUri(aisAuthorisation.get().getScaStatus(),
+        authorization.getTppOkRedirectUri(), authorization.getTppNokRedirectUri());
 
     return Optional.of(new OnlineBankingData(tppRedirectUri, consentStatus.getValue()));
   }
@@ -279,19 +279,19 @@ public class RedirectService {
       return null;
     }
 
-    TppInfoEntity tppInfo = commonPaymentData.get().getAuthorizations().get(0).getPaymentData()
-        .getTppInfo();
+    PisAuthorization authorization = commonPaymentData.get().getAuthorizations().get(0);
     ScaStatus scaStatus = commonPaymentData.get().getAuthorizations().get(0).getScaStatus();
-    String tppRedirectUri = getRedirectUri(tppInfo, scaStatus);
+    String tppRedirectUri = getRedirectUri(scaStatus, authorization.getTppOkRedirectUri(),
+        authorization.getTppNokRedirectUri());
 
     return Optional
         .of(new OnlineBankingData(tppRedirectUri, transactionStatus.getTransactionStatus()));
   }
 
-  private String getRedirectUri(TppInfoEntity tppInfo, ScaStatus scaStatus) {
-    String tppRedirectUri = tppInfo.getRedirectUri();
-    if (scaStatus.equals(ScaStatus.FAILED) && tppInfo.getNokRedirectUri() != null) {
-      tppRedirectUri = tppInfo.getNokRedirectUri();
+  private String getRedirectUri(ScaStatus scaStatus, String okUri, String nokUri) {
+    String tppRedirectUri = okUri;
+    if (scaStatus.equals(ScaStatus.FAILED) && nokUri != null) {
+      tppRedirectUri = nokUri;
     }
     return tppRedirectUri;
   }

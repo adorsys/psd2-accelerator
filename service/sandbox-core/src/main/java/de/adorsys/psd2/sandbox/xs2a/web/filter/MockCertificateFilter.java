@@ -1,7 +1,8 @@
 package de.adorsys.psd2.sandbox.xs2a.web.filter;
 
+import de.adorsys.psd2.xs2a.service.RequestProviderService;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
-import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
+import de.adorsys.psd2.xs2a.web.error.TppErrorMessageBuilder;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,10 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 public class MockCertificateFilter extends QwacCertificateFilter {
 
   public MockCertificateFilter(
-      TppRoleValidationService tppRoleValidationService,
-      TppInfoHolder tppInfoHolder
+      TppInfoHolder tppInfoHolder,
+      RequestProviderService requestProviderService,
+      TppErrorMessageBuilder tppErrorMessageBuilder
   ) {
-    super(tppRoleValidationService, tppInfoHolder);
+    super(tppInfoHolder,requestProviderService,tppErrorMessageBuilder);
   }
 
   @Override

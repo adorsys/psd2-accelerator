@@ -1,6 +1,6 @@
 package de.adorsys.psd2.sandbox.xs2a.ais;
 
-import static de.adorsys.psd2.xs2a.domain.MessageErrorCode.CONSENT_INVALID;
+import static de.adorsys.psd2.xs2a.core.error.MessageErrorCode.CONSENT_INVALID;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,7 +17,6 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import de.adorsys.psd2.aspsp.profile.service.AspspProfileService;
 import de.adorsys.psd2.model.*;
-import de.adorsys.psd2.sandbox.migration.MigrationService;
 import de.adorsys.psd2.sandbox.xs2a.SpringCucumberTestBase;
 import de.adorsys.psd2.sandbox.xs2a.model.Context;
 import de.adorsys.psd2.sandbox.xs2a.model.Request;
@@ -41,6 +40,7 @@ public class AisSteps extends SpringCucumberTestBase {
   @Autowired
   AspspProfileService aspspProfileService;
   private static final Logger logger = LoggerFactory.getLogger(AisSteps.class);
+  private static final LocalDate transactionRequestFromDate = LocalDate.of(2018,2,2);
 
   private Context context = new Context();
   private String scaApproach;
@@ -453,7 +453,7 @@ public class AisSteps extends SpringCucumberTestBase {
     context.setAccountId(actualResponse.getBody().getAccounts().get(0).getResourceId());
     String queryParams = String.format(
         "?bookingStatus=%s&dateFrom=%s&dateTo=%s&withBalance=%s",
-        bookingStatus, LocalDate.now().minusYears(1), LocalDate.now(), withBalance
+        bookingStatus,transactionRequestFromDate, LocalDate.now(), withBalance
     );
     context.setWithBalance(Boolean.parseBoolean(withBalance));
     context.setBookingStatus(BookingStatus.forValue(bookingStatus));
@@ -549,18 +549,18 @@ public class AisSteps extends SpringCucumberTestBase {
 
     if (context.getBookingStatus().equals(BookingStatus.BOOKED)) {
       assertThat(transactions.getBooked().size(), equalTo(3));
-      assertThat(transactions.getPending(), equalTo(new TransactionList()));
+      assertThat(transactions.getPending(), equalTo(null));
       boolean includesInvalidTransactions = transactions.getBooked().stream()
-          .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
+          .anyMatch(x -> x.getBookingDate().compareTo(transactionRequestFromDate) < 0);
       assertFalse(includesInvalidTransactions);
     } else if (context.getBookingStatus().equals(BookingStatus.BOTH)) {
       assertThat(transactions.getBooked().size(), equalTo(3));
       assertThat(transactions.getPending().size(), equalTo(1));
       boolean includesInvalidTransactions = transactions.getBooked().stream()
-          .anyMatch(x -> x.getBookingDate().compareTo(LocalDate.now().minusYears(1)) < 0);
+          .anyMatch(x -> x.getBookingDate().compareTo(transactionRequestFromDate) < 0);
       assertFalse(includesInvalidTransactions);
     } else {
-      assertThat(transactions.getBooked(), equalTo(new TransactionList()));
+      assertThat(transactions.getBooked(), equalTo(null));
       assertThat(transactions.getPending().size(), equalTo(1));
     }
 

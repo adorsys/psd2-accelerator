@@ -4,17 +4,16 @@ import static de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStat
 
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
+import de.adorsys.psd2.xs2a.core.error.TppMessage;
 import de.adorsys.psd2.xs2a.core.sca.ChallengeData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorizationCodeResult;
 import de.adorsys.psd2.xs2a.spi.domain.psu.SpiPsuData;
 import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponse;
-import de.adorsys.psd2.xs2a.spi.domain.response.SpiResponseStatus;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -33,11 +32,9 @@ public class AuthorisationService {
    *
    * @param spiPsuData       spiPsuData
    * @param password         password
-   * @param aspspConsentData aspspConsentData
    */
   public SpiResponse<SpiAuthorisationStatus> authorisePsu(
-      SpiPsuData spiPsuData, String password, String iban, AspspConsentData aspspConsentData,
-      boolean forceFailure) {
+      SpiPsuData spiPsuData, String password, String iban, boolean forceFailure) {
 
     Optional<TestPsu> inquiringPsu = testDataService.getPsu(spiPsuData.getPsuId());
     Optional<TestPsu> accOwner = testDataService.getPsuByIban(iban);
@@ -46,32 +43,27 @@ public class AuthorisationService {
         || !accOwner.isPresent() || !inquiringPsu.get().getPsuId().equals(accOwner.get().getPsuId())
         || inquiringPsu.get().getPsuId().equals("PSU-Rejected")) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
-          .aspspConsentData(aspspConsentData)
-          .message(Collections.singletonList("Authorization failed"))
-          .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+          .error(new TppMessage(MessageErrorCode.UNAUTHORIZED,"Authorization failed"))
+          .build();
     }
 
     if (inquiringPsu.get().getPsuId().equals("PSU-Cancellation-Rejected")
         && forceFailure) {
       return SpiResponse.<SpiAuthorisationStatus>builder()
-          .aspspConsentData(aspspConsentData)
-          .message(Collections.singletonList("Authorization failed"))
-          .fail(SpiResponseStatus.UNAUTHORIZED_FAILURE);
+          .error(new TppMessage(MessageErrorCode.UNAUTHORIZED,"Authorization failed"))
+          .build();
     }
 
     return SpiResponse.<SpiAuthorisationStatus>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(SUCCESS)
-        .success();
+        .build();
   }
 
   /**
    * Abstract Implementation of requestAvailableScaMethods.
    *
-   * @param aspspConsentData aspspConsentData
    */
-  public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
-      AspspConsentData aspspConsentData) {
+  public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods() {
     SpiAuthenticationObject smsTan = new SpiAuthenticationObject();
     smsTan.setName("SMS_OTP");
     smsTan.setAuthenticationMethodId("SMS_OTP");
@@ -81,24 +73,24 @@ public class AuthorisationService {
     List<SpiAuthenticationObject> spiMethods = new ArrayList<>(Arrays.asList(pushTan, smsTan));
 
     return SpiResponse.<List<SpiAuthenticationObject>>builder()
-        .aspspConsentData(aspspConsentData)
         .payload(spiMethods)
-        .success();
+        .build();
   }
 
   /**
    * Abstract Implementation of requestAuthorisationCode.
    *
    * @param selectedScaMethod selectedScaMethod
-   * @param aspspConsentData  aspspConsentData
    */
   public SpiResponse<SpiAuthorizationCodeResult> requestAuthorisationCode(
-      String selectedScaMethod, AspspConsentData aspspConsentData) {
+      String selectedScaMethod) {
     SpiAuthorizationCodeResult result = new SpiAuthorizationCodeResult();
     SpiAuthenticationObject selected = new SpiAuthenticationObject();
     selected.setAuthenticationMethodId(selectedScaMethod);
     result.setSelectedScaMethod(selected);
     result.setChallengeData(new ChallengeData()); // NPE otherwise
-    return new SpiResponse<>(result, aspspConsentData);
+    return SpiResponse.<SpiAuthorizationCodeResult>builder()
+        .payload(result)
+        .build();
   }
 }

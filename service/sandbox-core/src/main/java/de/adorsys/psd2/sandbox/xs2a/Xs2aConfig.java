@@ -1,17 +1,18 @@
 package de.adorsys.psd2.sandbox.xs2a;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import de.adorsys.psd2.consent.domain.InstanceDependableEntity;
 import de.adorsys.psd2.consent.domain.PsuData;
 import de.adorsys.psd2.consent.repository.PsuDataRepository;
+import de.adorsys.psd2.mapper.config.ObjectMapperConfig;
 import de.adorsys.psd2.sandbox.ContextHolder;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.MockCertificateFilter;
 import de.adorsys.psd2.sandbox.xs2a.web.filter.TabDelimitedCertificateFilter;
-import de.adorsys.psd2.xs2a.config.ObjectMapperConfig;
+import de.adorsys.psd2.xs2a.service.RequestProviderService;
 import de.adorsys.psd2.xs2a.service.validator.tpp.TppInfoHolder;
-import de.adorsys.psd2.xs2a.service.validator.tpp.TppRoleValidationService;
+import de.adorsys.psd2.xs2a.web.error.TppErrorMessageBuilder;
 import de.adorsys.psd2.xs2a.web.filter.QwacCertificateFilter;
+import de.adorsys.psd2.xs2a.web.validator.body.payment.config.DefaultPaymentValidationConfigImpl;
 import java.util.Set;
 import javax.persistence.EntityManagerFactory;
 
@@ -27,22 +28,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Configuration
 @EnableTransactionManagement
@@ -53,8 +50,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
     basePackages = {
         "de.adorsys.psd2.xs2a",
         "de.adorsys.psd2.aspsp",
+        "de.adorsys.psd2.event",
         "de.adorsys.psd2.consent",
         "de.adorsys.psd2.sandbox.xs2a",
+        "de.adorsys.psd2.aspsp.profile",
+        "de.adorsys.psd2.mapper"
     },
     excludeFilters = @ComponentScan.Filter(
         type = FilterType.CUSTOM, classes = Xs2aConfig.Xs2aComponentFilter.class
@@ -65,22 +65,30 @@ public class Xs2aConfig {
 
   @Bean
   QwacCertificateFilter sandboxCertificateFilter(
-      TppRoleValidationService roleValidationService,
       TppInfoHolder tppInfoHolder,
+      RequestProviderService requestProviderService,
+      TppErrorMessageBuilder tppErrorMessageBuilder,
       @Value("${certificate.filter}") String certificateFilterType
   ) {
     switch (certificateFilterType) {
       case "tab":
-        return new TabDelimitedCertificateFilter(roleValidationService, tppInfoHolder);
+        return new TabDelimitedCertificateFilter(tppInfoHolder, requestProviderService,
+            tppErrorMessageBuilder);
       case "mock":
-        return new MockCertificateFilter(roleValidationService, tppInfoHolder);
+        return new MockCertificateFilter(tppInfoHolder, requestProviderService,
+            tppErrorMessageBuilder);
       default:
-        return new QwacCertificateFilter(roleValidationService, tppInfoHolder);
+        return new QwacCertificateFilter(tppInfoHolder, requestProviderService,
+            tppErrorMessageBuilder);
     }
   }
 
-  public static class Xs2aComponentFilter implements TypeFilter {
+  @Configuration
+  @ConfigurationProperties(prefix = "validation.payment")
+  public static class PaymentValidationConfigImpl extends DefaultPaymentValidationConfigImpl {
+  }
 
+  public static class Xs2aComponentFilter implements TypeFilter {
     private static Logger log = LoggerFactory.getLogger(Xs2aComponentFilter.class);
 
     static Set<String> blacklist = Sets.newHashSet(
@@ -102,23 +110,6 @@ public class Xs2aConfig {
     }
   }
 
-  /*
-   * TODO we have to override de.adorsys.psd2.xs2a.config.ObjectMapperConfig because
-   *  a) we can't exclude it (see Xs2aComponentFilter) and
-   *  b) the XS2A ObjectMapperConfig does not mark the OM as @Primary which clashes with
-   *    org.springframework.hateoas.config.HypermediaSupportBeanDefinitionRegistrar
-   *    but somehow only in tests
-   */
-  @Configuration
-  static class SandboxObjectMapperConfig extends ObjectMapperConfig {
-
-    @Bean
-    @Primary
-    ObjectMapper sandboxObjectMapper() {
-      return super.objectMapper();
-    }
-  }
-
   @Slf4j
   @Component
   public static class HardcodedInstanceIdSetter implements PreInsertEventListener {
@@ -129,7 +120,7 @@ public class Xs2aConfig {
     HardcodedInstanceIdSetter(EntityManagerFactory emf) {
       SessionFactoryImpl sessionFactory = emf.unwrap(SessionFactoryImpl.class);
       EventListenerRegistry registry = sessionFactory.getServiceRegistry()
-          .getService(EventListenerRegistry.class);
+                                           .getService(EventListenerRegistry.class);
       registry.getEventListenerGroup(EventType.PRE_INSERT).appendListener(this);
     }
 

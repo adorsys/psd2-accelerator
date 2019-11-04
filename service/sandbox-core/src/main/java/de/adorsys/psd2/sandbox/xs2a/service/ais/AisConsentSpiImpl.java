@@ -4,9 +4,9 @@ import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.TestDataService;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
-import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountConsent;
 import de.adorsys.psd2.xs2a.spi.domain.account.SpiAccountReference;
@@ -45,7 +45,7 @@ public class AisConsentSpiImpl implements AisConsentSpi {
   public SpiResponse<SpiInitiateAisConsentResponse> initiateAisConsent(
       @NotNull SpiContextData spiContextData,
       SpiAccountConsent spiAccountConsent,
-      AspspConsentData aspspConsentData) {
+      SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     if (!spiAccountConsent.getAccess().getAccounts().isEmpty()) {
       // TODO potential bug - we need to check ALL IBANs here? (rat)
@@ -54,27 +54,31 @@ public class AisConsentSpiImpl implements AisConsentSpi {
 
       // TODO what's the right error here? (rat)
       TestPsu knownPsuId = psuId
-                               .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+                               .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR,
+                                   "User not found"));
 
       if (testDataService.isBlockedPsu(knownPsuId.getPsuId())) {
-        throw new RestException(MessageErrorCode.SERVICE_BLOCKED);
+        throw new RestException(MessageErrorCode.SERVICE_BLOCKED,"Account is BLOCKED by ASPSP");
       }
 
       spiAccountConsent.getAccess().getAccounts()
           .forEach(ar -> checkAccountIsPresentAndCurrencyCorrect(knownPsuId, ar));
     }
-    return new SpiResponse<>(new SpiInitiateAisConsentResponse(), aspspConsentData);
+    return SpiResponse.<SpiInitiateAisConsentResponse>builder()
+        .payload(new SpiInitiateAisConsentResponse())
+        .build();
   }
 
   private void checkAccountIsPresentAndCurrencyCorrect(TestPsu knownPsuId, SpiAccountReference ar) {
     Account account = testDataService.getAccountByIban(knownPsuId.getPsuId(), ar.getIban())
-                          .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR));
+                          .orElseThrow(() -> new RestException(MessageErrorCode.FORMAT_ERROR,
+                              "Account not found"));
     checkCurrency(ar.getCurrency(), account.getCurrency());
   }
 
   private void checkCurrency(Currency expectedCurrency, Currency definedCurrency) {
     if (expectedCurrency != null && !definedCurrency.equals(expectedCurrency)) {
-      throw new RestException(MessageErrorCode.FORMAT_ERROR);
+      throw new RestException(MessageErrorCode.FORMAT_ERROR,"Account not found");
     }
   }
 
@@ -82,8 +86,10 @@ public class AisConsentSpiImpl implements AisConsentSpi {
   public SpiResponse<SpiResponse.VoidResponse> revokeAisConsent(
       @NotNull SpiContextData spiContextData,
       SpiAccountConsent spiAccountConsent,
-      AspspConsentData aspspConsentData) {
-    return new SpiResponse<>(SpiResponse.voidResponse(), aspspConsentData);
+      SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
+    return SpiResponse.<SpiResponse.VoidResponse>builder()
+               .payload(SpiResponse.voidResponse())
+               .build();
   }
 
   @Override
@@ -91,10 +97,10 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       @NotNull SpiContextData spiContextData,
       @NotNull SpiScaConfirmation spiScaConfirmation,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
-    return new SpiResponse<>(
-        new SpiVerifyScaAuthorisationResponse(spiAccountConsent.getConsentStatus()),
-        aspspConsentData);
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
+    return SpiResponse.<SpiVerifyScaAuthorisationResponse>builder()
+        .payload(new SpiVerifyScaAuthorisationResponse(spiAccountConsent.getConsentStatus()))
+        .build();
   }
 
   @Override
@@ -103,19 +109,19 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       @NotNull SpiPsuData spiPsuData,
       String password,
       SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     String iban = spiAccountConsent.getAccess().getAccounts().get(0).getIban();
 
-    return authorisationService.authorisePsu(spiPsuData, password, iban, aspspConsentData, false);
+    return authorisationService.authorisePsu(spiPsuData, password, iban, false);
   }
 
   @Override
   public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
       @NotNull SpiContextData spiContextData,
       SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
-    return authorisationService.requestAvailableScaMethods(aspspConsentData);
+    return authorisationService.requestAvailableScaMethods();
   }
 
   @Override
@@ -123,8 +129,8 @@ public class AisConsentSpiImpl implements AisConsentSpi {
       @NotNull SpiContextData spiContextData,
       @NotNull String selectedScaMethod,
       @NotNull SpiAccountConsent spiAccountConsent,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
-    return authorisationService.requestAuthorisationCode(selectedScaMethod, aspspConsentData);
+    return authorisationService.requestAuthorisationCode(selectedScaMethod);
   }
 }

@@ -1,7 +1,7 @@
 package de.adorsys.psd2.sandbox.xs2a.service.pis;
 
 import de.adorsys.psd2.sandbox.xs2a.service.AuthorisationService;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthenticationObject;
 import de.adorsys.psd2.xs2a.spi.domain.authorisation.SpiAuthorisationStatus;
@@ -33,7 +33,7 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
       @NotNull SpiPsuData psuData,
       String password,
       SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
     String iban = null;
 
@@ -45,7 +45,7 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
     }
 
     return authorisationService.authorisePsu(
-        ctx.getPsuData(), password, iban, aspspConsentData, false
+        ctx.getPsuData(), password, iban, false
     );
   }
 
@@ -53,9 +53,9 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
   public SpiResponse<List<SpiAuthenticationObject>> requestAvailableScaMethods(
       @NotNull SpiContextData ctx,
       SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
-    return authorisationService.requestAvailableScaMethods(aspspConsentData);
+    return authorisationService.requestAvailableScaMethods();
   }
 
   @Override
@@ -63,8 +63,8 @@ public class PaymentAuthorisationSpiImpl implements PaymentAuthorisationSpi {
       @NotNull SpiContextData ctx,
       @NotNull String selectedScaMethod,
       @NotNull SpiPayment spiPayment,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
 
-    return authorisationService.requestAuthorisationCode(selectedScaMethod, aspspConsentData);
+    return authorisationService.requestAuthorisationCode(selectedScaMethod);
   }
 }

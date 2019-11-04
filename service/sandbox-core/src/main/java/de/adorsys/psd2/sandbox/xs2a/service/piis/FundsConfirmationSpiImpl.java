@@ -5,10 +5,10 @@ import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Account;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.Balance;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.BalanceType;
 import de.adorsys.psd2.sandbox.xs2a.testdata.domain.TestPsu;
-import de.adorsys.psd2.xs2a.core.consent.AspspConsentData;
+import de.adorsys.psd2.xs2a.core.error.MessageErrorCode;
 import de.adorsys.psd2.xs2a.core.piis.PiisConsent;
-import de.adorsys.psd2.xs2a.domain.MessageErrorCode;
 import de.adorsys.psd2.xs2a.exception.RestException;
+import de.adorsys.psd2.xs2a.spi.domain.SpiAspspConsentDataProvider;
 import de.adorsys.psd2.xs2a.spi.domain.SpiContextData;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationRequest;
 import de.adorsys.psd2.xs2a.spi.domain.fund.SpiFundsConfirmationResponse;
@@ -34,7 +34,7 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
       @NotNull SpiContextData ctx,
       @Nullable PiisConsent piisConsent,
       @NotNull SpiFundsConfirmationRequest spiFundsConfirmationRequest,
-      @NotNull AspspConsentData aspspConsentData) {
+      @NotNull SpiAspspConsentDataProvider spiAspspConsentDataProvider) {
     SpiFundsConfirmationResponse response = new SpiFundsConfirmationResponse();
 
     String iban = spiFundsConfirmationRequest.getPsuAccount().getIban();
@@ -44,7 +44,9 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
     // Passed iban could not be matched to an existing PSU
     if (!psuId.isPresent()) {
       response.setFundsAvailable(false);
-      return new SpiResponse<>(response, aspspConsentData);
+      return SpiResponse.<SpiFundsConfirmationResponse>builder()
+          .payload(response)
+          .build();
     }
 
     Optional<Account> account = testDataService.getAccountByIban(psuId.get().getPsuId(), iban);
@@ -52,7 +54,7 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
 
     if (account.isPresent()) {
       if (!isCorrectCurrency(account.get(), spiFundsConfirmationRequest)) {
-        throw new RestException(MessageErrorCode.FORMAT_ERROR);
+        throw new RestException(MessageErrorCode.FORMAT_ERROR, "Account not found");
       }
 
       Balance balance = account.get().getBalances().stream()
@@ -63,14 +65,13 @@ public class FundsConfirmationSpiImpl implements FundsConfirmationSpi {
           .setFundsAvailable(
               requestedAmount.compareTo(balance.getBalanceAmount().getAmount()) <= 0);
     }
-    return new SpiResponse<>(response, aspspConsentData);
+    return SpiResponse.<SpiFundsConfirmationResponse>builder()
+               .payload(response)
+               .build();
   }
 
   private boolean isCorrectCurrency(Account account, SpiFundsConfirmationRequest request) {
-    if (request.getPsuAccount().getCurrency().equals(account.getCurrency())
-        && request.getInstructedAmount().getCurrency().equals(account.getCurrency())) {
-      return true;
-    }
-    return false;
+    return request.getPsuAccount().getCurrency().equals(account.getCurrency())
+               && request.getInstructedAmount().getCurrency().equals(account.getCurrency());
   }
 }
