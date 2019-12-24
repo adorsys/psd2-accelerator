@@ -83,12 +83,16 @@ class AbstractPaymentSpiImpl {
   void isCorrectCurrency(Optional<Account> account, SpiSinglePayment payment) {
     if (account.isPresent()) {
       Currency expectedCurrency = account.get().getCurrency();
-      if (!(payment.getDebtorAccount().getCurrency().equals(expectedCurrency)
-          && payment.getInstructedAmount().getCurrency().equals(expectedCurrency)
-          && payment.getCreditorAccount().getCurrency().equals(expectedCurrency))) {
+      if (isIncorrectCurrency(payment, expectedCurrency)) {
         throw new RestException(MessageErrorCode.FORMAT_ERROR, "Account mismatch");
       }
     }
+  }
+
+  private boolean isIncorrectCurrency(SpiSinglePayment payment, Currency expectedCurrency) {
+    return !(expectedCurrency.equals(payment.getDebtorAccount().getCurrency())
+        && expectedCurrency.equals(payment.getInstructedAmount().getCurrency())
+        && expectedCurrency.equals(payment.getCreditorAccount().getCurrency()));
   }
 
   private Optional<TransactionStatus> getPaymentStatusFromRepo(String paymentId) {
