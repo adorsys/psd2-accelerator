@@ -1,6 +1,6 @@
 {
   "name": "psd2-accelerator",
-  "version": "1.9.0",
+  "version": "2.0.0-SNAPSHOT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
