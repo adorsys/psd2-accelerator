@@ -63,9 +63,14 @@ script:
   - cp -r service/sandbox-core/target/site/css pages/licenses || travis_terminate 1
   - cp -r service/sandbox-core/target/site/images pages/licenses || travis_terminate 1
   - cp service/sandbox-core/target/site/dependencies.html pages/licenses/index.html || travis_terminate 1
+  # sonar cloud
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=adorsys_psd2-accelerator
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+addons:
+  sonarcloud:
+    organization: "adorsys"
+    token:
+      secure: $SONARCLOUD_TOKEN
 
 deploy:
   # master
