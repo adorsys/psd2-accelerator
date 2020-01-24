@@ -1,7 +1,7 @@
 # <img src="arc42/images/logo/psd2-accelerator.svg" height="24px"> PSD2 Accelerator
 
 [![Build Status](https://travis-ci.com/adorsys/psd2-accelerator.svg?branch=master)](https://travis-ci.com/adorsys/psd2-accelerator)
-[![codecov](https://codecov.io/gh/adorsys/psd2-accelerator/branch/master/graph/badge.svg)](https://codecov.io/gh/adorsys/psd2-accelerator)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=adorsys_psd2-accelerator&metric=coverage)](https://sonarcloud.io/dashboard?id=adorsys_psd2-accelerator)
 
 <img src="arc42/images/accelerator.png" width="50%" align="center">
 

@@ -9,7 +9,7 @@
   <version>2.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Sandbox</name>
+  <name>PSD2 accelerator</name>
   <description>
     The PSD2 Sandbox shall offer functional usage of XS2A based on test data and comply
     with mandatory regulations of PSD2. Furthermore, it should be easy to deploy.
