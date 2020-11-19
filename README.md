@@ -3,6 +3,9 @@
 [![Build Status](https://travis-ci.com/adorsys/psd2-accelerator.svg?branch=master)](https://travis-ci.com/adorsys/psd2-accelerator)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=adorsys_psd2-accelerator&metric=coverage)](https://sonarcloud.io/dashboard?id=adorsys_psd2-accelerator)
 
+**This project is obsolete and not supported any longer.<br>
+For the actual and modern version of Sandbox please refer to our [XS2A-Sandbox](https://github.com/adorsys/XS2A-Sandbox).**
+
 <img src="arc42/images/accelerator.png" width="50%" align="center">
 
 _Figure 1.1:_ Components of the PSD2 Accelerator
@@ -101,7 +104,7 @@ See the [service README.md](./service/README.md) for mor details.
 
 After starting the Spring Boot application you can run the Angular dev server against the _service_:
 
-```sh 
+```sh
 $ cd ui
 $ npm install
 $ npm start
